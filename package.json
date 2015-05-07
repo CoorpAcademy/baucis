@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Set links and Link header for baucis JSON responses.'",
   "main": "index.js",
+  "publishConfig": {
+    "registry": "http://registry.npmjs.org/"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
