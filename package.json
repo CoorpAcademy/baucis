@@ -1,6 +1,6 @@
 {
   "name": "baucis-links",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Set links and Link header for baucis JSON responses.'",
   "main": "index.js",
   "publishConfig": {
@@ -16,9 +16,6 @@
   ],
   "author": "William Riley-Land",
   "license": "MIT",
-  "peerDependencies": {
-    "baucis": "^1.0.0"
-  },
   "dependencies": {
     "deco": "^0.12.3"
   }

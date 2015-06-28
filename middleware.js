@@ -3,7 +3,6 @@
 // __Dependencies__
 var url = require('url');
 var deco = require('deco');
-var baucis = require('baucis');
 var qs = require('querystring');
 
 // __Module Definition__
