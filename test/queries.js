@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const mongoose = require('mongoose');
 const express = require('express');
 const passport = require('passport');
@@ -21,7 +21,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', vegetables.length - 1);
       done();
     });
@@ -34,7 +34,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', vegetables.length - 2);
       done();
     });
@@ -47,7 +47,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 1);
       done();
     });
@@ -60,7 +60,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 2);
       done();
     });
@@ -73,7 +73,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property('message', 'Including excluded fields is not permitted (403).');
       done();
     });
@@ -86,7 +86,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property('message', 'Including excluded fields is not permitted (403).');
       done();
     });
@@ -99,7 +99,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property('message', 'Including excluded fields is not permitted (403).');
       done();
     });
@@ -112,7 +112,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property('message', 'Including excluded fields is not permitted (403).');
       done();
     });
@@ -125,7 +125,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property(
         'message',
         'Selecting fields of populated documents is not permitted (403).'
@@ -141,7 +141,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property('message', 'Including excluded fields is not permitted (403).');
       done();
     });
@@ -154,7 +154,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property(
         'message',
         'Selecting fields of populated documents is not permitted (403).'
@@ -171,7 +171,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property(
         'message',
         'Selecting fields of populated documents is not permitted (403).'
@@ -187,7 +187,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property(
         'message',
         'Selecting fields of populated documents is not permitted (403).'
@@ -204,7 +204,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('nutrients');
       expect(body.nutrients).to.have.property('length', 1);
       expect(body.nutrients[0]).to.have.property('color', 'Blue');
@@ -220,7 +220,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('name', 'Turnip');
       done();
     });
@@ -233,7 +233,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 1);
       expect(body[0]).to.have.property('name', 'Radicchio');
       done();
@@ -247,7 +247,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body[0]).not.to.have.property('_id');
       expect(body[0]).not.to.have.property('name');
       expect(body[0]).to.have.property('lastModified');
@@ -262,10 +262,10 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       let lastMineral = '';
       body.forEach(function(mineral) {
-        expect(mineral.color).to.be.above(lastMineral);
+        expect(mineral.color > lastMineral).to.be.true;
         lastMineral = mineral.color;
       });
       done();
@@ -279,10 +279,10 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       let lastMineral = '';
       body.forEach(function(mineral) {
-        if (lastMineral) expect(mineral.color).to.be.below(lastMineral);
+        if (lastMineral) expect(mineral.color < lastMineral).to.be.true;
         lastMineral = mineral.color;
       });
       done();
@@ -296,7 +296,7 @@ describe('Queries', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body[0]).to.have.property('_id');
       expect(body[0]).to.have.property('__v');
       expect(body[0]).not.to.have.property('hpyhenated-field-name');
@@ -312,8 +312,8 @@ describe('Queries', function() {
     request.get(options, function(error, response, body) {
       if (error) return done(error);
       const expected = '</api/minerals>; rel="search", ' + '</api/minerals?sort=color>; rel="self"';
-      expect(response.statusCode).to.be(200);
-      expect(response.headers.link).to.be(expected);
+      expect(response.statusCode).to.equal(200);
+      expect(response.headers.link).to.equal(expected);
       done();
     });
   });
@@ -340,8 +340,8 @@ describe('Queries', function() {
           `${'</api/minerals>; rel="collection", ' +
             '</api/minerals>; rel="search", ' +
             '</api/minerals/'}${id}>; rel="edit", ` + `</api/minerals/${id}>; rel="self"`;
-        expect(response.statusCode).to.be(200);
-        expect(response.headers.link).to.be(expected);
+        expect(response.statusCode).to.equal(200);
+        expect(response.headers.link).to.equal(expected);
         done();
       });
     });
@@ -354,7 +354,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(response.headers).not.to.have.property('link');
       expect(body).to.have.property('message', 'Limit must be a positive integer if set (400).');
       done();
@@ -368,7 +368,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(response.headers).not.to.have.property('link');
       expect(body).to.have.property('message', 'Limit must be a positive integer if set (400).');
       done();
@@ -382,7 +382,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(response.headers).not.to.have.property('link');
       expect(body).to.have.property('message', 'Limit must be a positive integer if set (400).');
       done();
@@ -396,7 +396,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(response.headers).not.to.have.property('link');
       expect(body).to.have.property('message', 'Limit must be a positive integer if set (400).');
       done();
@@ -410,7 +410,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(response.headers).not.to.have.property('link');
       expect(body).to.have.property('message', 'Skip must be a non-negative integer if set (400).');
       done();
@@ -424,7 +424,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(response.headers).not.to.have.property('link');
       expect(body).to.have.property('message', 'Count must be "true" or "false" if set (400).');
       done();
@@ -438,7 +438,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('link');
       done();
     });
@@ -451,7 +451,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers.link).to.contain('rel="self"');
       expect(response.headers.link).to.contain('rel="search"');
       expect(response.headers.link).to.not.contain('rel="first"');
@@ -469,8 +469,8 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
-      expect(response.headers.link).to.be(undefined);
+      expect(response.statusCode).to.equal(200);
+      expect(response.headers.link).to.equal(undefined);
       done();
     });
   });
@@ -482,7 +482,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers.link).to.contain('rel="first"');
       expect(response.headers.link).to.contain('rel="last"');
       expect(response.headers.link).to.contain('rel="next"');
@@ -499,7 +499,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('link');
       expect(response.headers.link).to.contain('rel="next"');
       done();
@@ -513,7 +513,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('link');
       expect(response.headers.link).to.contain('rel="previous"');
       done();
@@ -527,7 +527,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('link');
       expect(response.headers.link).not.to.contain('rel="previous"');
       done();
@@ -541,7 +541,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('link');
       expect(response.headers.link).not.to.contain('rel="next"');
       done();
@@ -556,7 +556,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('link');
       expect(response.headers.link).to.contain('rel="next"');
       const links = parselinks(response.headers.link);
@@ -573,7 +573,7 @@ describe('Queries', function() {
     request.get(options, function(error, response, body) {
       if (error) return done(error);
 
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('link');
 
       const links = parselinks(response.headers.link);
@@ -584,7 +584,7 @@ describe('Queries', function() {
         json: true
       };
       request.get(options, function(error, response, body) {
-        expect(response.statusCode).to.be(200);
+        expect(response.statusCode).to.equal(200);
         done();
       });
     });
@@ -597,7 +597,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('link');
       const links = parselinks(response.headers.link);
       expect(links).to.have.property('previous');
@@ -606,7 +606,7 @@ describe('Queries', function() {
         json: true
       };
       request.get(options, function(error, response, body) {
-        expect(response.statusCode).to.be(200);
+        expect(response.statusCode).to.equal(200);
         done();
       });
     });
@@ -619,7 +619,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('link');
       const links = parselinks(response.headers.link);
       expect(links).to.have.property('first');
@@ -628,7 +628,7 @@ describe('Queries', function() {
         json: true
       };
       request.get(options, function(error, response, body) {
-        expect(response.statusCode).to.be(200);
+        expect(response.statusCode).to.equal(200);
         done();
       });
     });
@@ -641,7 +641,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('link');
       const links = parselinks(response.headers.link);
       expect(links).to.have.property('last');
@@ -650,7 +650,7 @@ describe('Queries', function() {
         json: true
       };
       request.get(options, function(error, response, body) {
-        expect(response.statusCode).to.be(200);
+        expect(response.statusCode).to.equal(200);
         done();
       });
     });
@@ -663,8 +663,8 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
-      expect(body).to.be(8);
+      expect(response.statusCode).to.equal(200);
+      expect(body).to.equal(8);
       done();
     });
   });
@@ -676,8 +676,8 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
-      expect(body).not.to.be.a(Number);
+      expect(response.statusCode).to.equal(200);
+      expect(body).not.to.be.a('number');
       done();
     });
   });
@@ -689,7 +689,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(body).to.have.property('message', 'The requested query hint is invalid (400).');
       done();
     });
@@ -702,7 +702,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(body).to.have.property('message', "Hint can't be used with count (400).");
       done();
     });
@@ -715,7 +715,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       done();
     });
   });
@@ -727,7 +727,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       done();
     });
   });
@@ -739,7 +739,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(body).to.have.property('message', "Comment can't be used with count (400).");
       done();
     });
@@ -752,7 +752,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       done();
     });
   });
@@ -764,7 +764,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property('message', 'Hints are not enabled for this resource (403).');
       done();
     });
@@ -777,7 +777,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 1);
       done();
     });
@@ -790,17 +790,17 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       body.sort();
       expect(body).to.have.property('length', 8);
-      expect(body[0]).to.be('Carrot');
-      expect(body[1]).to.be('Lima Bean');
-      expect(body[2]).to.be('Pea');
-      expect(body[3]).to.be('Radicchio');
-      expect(body[4]).to.be('Shitake');
-      expect(body[5]).to.be('Spinach');
-      expect(body[6]).to.be('Turnip');
-      expect(body[7]).to.be('Zucchini');
+      expect(body[0]).to.equal('Carrot');
+      expect(body[1]).to.equal('Lima Bean');
+      expect(body[2]).to.equal('Pea');
+      expect(body[3]).to.equal('Radicchio');
+      expect(body[4]).to.equal('Shitake');
+      expect(body[5]).to.equal('Spinach');
+      expect(body[6]).to.equal('Turnip');
+      expect(body[7]).to.equal('Zucchini');
       done();
     });
   });
@@ -812,9 +812,9 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 1);
-      expect(body[0]).to.be('Carrot');
+      expect(body[0]).to.equal('Carrot');
       done();
     });
   });
@@ -826,7 +826,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property(
         'message',
         'You may not find distinct values for the requested path (403).'
@@ -843,7 +843,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 8);
       expect(body[0]).to.have.property('name', 'Turnip');
       done();
@@ -858,7 +858,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       // before:  'The conditions query string value was not valid JSON: "Unexpected token \'" (400).'
       // after:   'The conditions query string value was not valid JSON: "Unexpected token \' in JSON at position 2" (400).'
       // test changed to be less fragile
@@ -877,7 +877,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(body).to.have.property(
         'message',
         'Using $explain is disabled for this resource (400).'

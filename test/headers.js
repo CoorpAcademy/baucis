@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const mongoose = require('mongoose');
 const express = require('express');
 const passport = require('passport');
@@ -20,15 +20,15 @@ describe('Headers', function() {
     };
     request.head(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('last-modified');
       const modified = response.headers['last-modified'];
       const httpDate = new Date(modified).toUTCString();
-      expect(modified).to.be(httpDate);
+      expect(modified).to.equal(httpDate);
 
       request.get(options, function(error, response, body) {
         if (error) return done(error);
-        expect(response.statusCode).to.be(200);
+        expect(response.statusCode).to.equal(200);
         expect(response.headers).to.have.property('last-modified', httpDate);
         done();
       });
@@ -48,14 +48,14 @@ describe('Headers', function() {
 
     request.head(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('last-modified', httpDate);
       request.get(options, function(error, response, body) {
         if (error) return done(error);
-        expect(response.statusCode).to.be(200);
-        expect(response.headers.trailer).to.be('Last-Modified, Etag');
-        expect(response.headers['content-type']).to.be('application/json; charset=utf-8');
-        expect(response.headers['transfer-encoding']).to.be('chunked');
+        expect(response.statusCode).to.equal(200);
+        expect(response.headers.trailer).to.equal('Last-Modified, Etag');
+        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
+        expect(response.headers['transfer-encoding']).to.equal('chunked');
         expect(response.trailers).to.have.property('last-modified', httpDate);
         done();
       });
@@ -69,13 +69,13 @@ describe('Headers', function() {
     };
     request.head(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       const etag = response.headers.etag;
       expect(etag).to.match(/^"[0-9a-z]{32}"$/);
       request.get(options, function(error, response, body) {
         if (error) return done(error);
-        expect(response.statusCode).to.be(200);
-        expect(response.headers.etag).to.be(etag);
+        expect(response.statusCode).to.equal(200);
+        expect(response.headers.etag).to.equal(etag);
         done();
       });
     });
@@ -87,16 +87,16 @@ describe('Headers', function() {
     };
     request.head(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       const etag = response.headers.etag;
       expect(etag).to.match(/^"[0-9a-z]{32}"$/);
       request.get(options, function(error, response, body) {
         if (error) return done(error);
-        expect(response.statusCode).to.be(200);
-        expect(response.headers.trailer).to.be('Last-Modified, Etag');
-        expect(response.headers['content-type']).to.be('application/json; charset=utf-8');
-        expect(response.headers['transfer-encoding']).to.be('chunked');
-        expect(response.trailers.etag).to.be(etag);
+        expect(response.statusCode).to.equal(200);
+        expect(response.headers.trailer).to.equal('Last-Modified, Etag');
+        expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
+        expect(response.headers['transfer-encoding']).to.equal('chunked');
+        expect(response.trailers.etag).to.equal(etag);
         done();
       });
     });
@@ -108,7 +108,7 @@ describe('Headers', function() {
     };
     request.head(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).to.have.property('allow', 'HEAD,GET,POST,PUT,DELETE');
       done();
     });
@@ -123,7 +123,7 @@ describe('Headers', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(406);
+      expect(response.statusCode).to.equal(406);
       expect(response.headers).to.have.property('content-type', 'text/html; charset=utf-8');
       expect(body).to.contain(
         'Not Acceptable: The requested content type could not be provided (406).'
@@ -141,7 +141,7 @@ describe('Headers', function() {
     };
     request.post(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(415);
+      expect(response.statusCode).to.equal(415);
       expect(body).to.have.property('message', "The request's content type is unsupported (415).");
       done();
     });
@@ -158,7 +158,7 @@ describe('Headers', function() {
     };
     request.post(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(201);
+      expect(response.statusCode).to.equal(201);
       done();
     });
   });
@@ -169,7 +169,7 @@ describe('Headers', function() {
     };
     request.head(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(response.headers).not.to.have.property('x-powered-by');
       done();
     });

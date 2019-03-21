@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const request = require('request');
 
 const fixtures = require('./fixtures');
@@ -22,13 +22,13 @@ describe('DELETE singular', function() {
         json: true
       };
 
-      expect(response.statusCode).to.be(200);
-      expect(body).to.be(1); // count of deleted objects
+      expect(response.statusCode).to.equal(200);
+      expect(body).to.equal(1); // count of deleted objects
 
       request.del(options, function(error, response, body) {
         if (error) return done(error);
 
-        expect(response.statusCode).to.be(404);
+        expect(response.statusCode).to.equal(404);
         expect(body).to.have.property('message', 'Nothing matched the requested query (404).');
         done();
       });

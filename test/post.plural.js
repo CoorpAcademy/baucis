@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const request = require('request');
 const mongoose = require('mongoose');
 const baucis = require('..');
@@ -18,9 +18,9 @@ describe('POST plural', function() {
     request.post(options, function(error, response, body) {
       if (error) return done(error);
 
-      expect(response.statusCode).to.equal(201);
-      expect(body._id).not.to.be.empty();
-      expect(response.headers.location).to.equal(`/api/vegetables/${body._id}`);
+  expect(response.statusCode).to.equal(201);
+  expect(body._id).not.to.be.empty;
+  expect(response.headers.location).to.equal(`/api/vegetables/${body._id}`);
 
       const options = {
         url: `http://localhost:8012${response.headers.location}`,
@@ -28,6 +28,7 @@ describe('POST plural', function() {
       };
       request.get(options, function(error, response, body) {
         if (error) return done(error);
+        // FIXME BROKEN TEST
         expect(response.statusCode).to.equal(200);
         expect(body).to.have.property('name', 'Tomato');
         done();
@@ -44,7 +45,7 @@ describe('POST plural', function() {
       if (error) return done(error);
 
       expect(response.statusCode).to.equal(201);
-      expect(body._id).not.to.be.empty();
+      expect(body._id).not.to.be.empty;
       expect(response.headers.location).to.equal(`/api/vegetables/${body._id}`);
 
       done();
@@ -60,8 +61,8 @@ describe('POST plural', function() {
       if (error) return done(error);
 
       expect(response.statusCode).to.equal(201);
-      expect(body[0]._id).not.to.be.empty();
-      expect(body[1]._id).not.to.be.empty();
+      expect(body[0]._id).not.to.be.empty;
+      expect(body[1]._id).not.to.be.empty;
 
       const options = {
         url: `http://localhost:8012${response.headers.location}`,
@@ -106,7 +107,7 @@ describe('POST plural', function() {
     request.post(options, function(error, response, body) {
       if (error) return done(error);
 
-      expect(fixtures.vegetable.saveCount).to.be(1);
+      expect(fixtures.vegetable.saveCount).to.equal(1);
       done();
     });
   });

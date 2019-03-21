@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const request = require('request');
 
 const fixtures = require('./fixtures');
@@ -16,7 +16,7 @@ describe('GET singular', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('_id', turnip._id.toString());
       expect(body).to.have.property('name', 'Turnip');
       done();
@@ -30,7 +30,7 @@ describe('GET singular', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(404);
+      expect(response.statusCode).to.equal(404);
       expect(body).to.have.property('message', 'Nothing matched the requested query (404).');
       done();
     });

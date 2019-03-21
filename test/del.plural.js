@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const request = require('request');
 
 const fixtures = require('./fixtures');
@@ -15,9 +15,9 @@ describe('DEL plural', function() {
     };
     request.del(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       // Check that the correct number were deleted.
-      expect(body).to.be(8);
+      expect(body).to.equal(8);
       done();
     });
   });

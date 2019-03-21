@@ -1,5 +1,5 @@
 // __Dependencies__
-const expect = require('expect.js');
+const {expect} = require('chai');
 const request = require('request');
 const baucis = require('..');
 
@@ -18,7 +18,7 @@ describe('Inheritence', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 6);
       done();
     });
@@ -34,7 +34,7 @@ describe('Inheritence', function() {
     };
     request.get(options, function (err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 3);
       done();
     });

@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const express = require('express');
 const request = require('request');
 const baucis = require('..');
@@ -28,7 +28,7 @@ describe('Versioning', function() {
         .releases('1.0.0')
         .releases('abc');
     };
-    expect(fn).to.throwException(
+    expect(fn).to.throw(
       /^Release version "abc" is not a valid semver version [(]500[)][.]$/
     );
     done();
@@ -68,7 +68,7 @@ describe('Versioning', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(response.headers['content-type']).to.contain('text/html'); // I would expect JSON instead of html as negociated with json: true in the caller
       // now is HTML / before was plain/text
       expect(body).to.contain(
@@ -84,7 +84,7 @@ describe('Versioning', function() {
   ); /* , function (done) {
     baucis.rest('party').versions('>0.0.0');
     baucis.rest('party').versions('<2');
-    expect(baucis.bind(baucis)).to.throwException(/^Controllers with path "\/parties" exist more than once in a release that overlaps "<2" [(]500[)][.]$/);
+    expect(baucis.bind(baucis)).to.throw(/^Controllers with path "\/parties" exist more than once in a release that overlaps "<2" [(]500[)][.]$/);
     done();
   });*/
 
@@ -93,7 +93,7 @@ describe('Versioning', function() {
   ); /* , function (done) {
     baucis.rest('party').versions('0.0.1');
     baucis.rest('party').versions('0.0.1');
-    expect(baucis.bind(baucis)).to.throwException(/^Controllers with path "\/parties" exist more than once in a release that overlaps "0.0.1" [(]500[)][.]$/);
+    expect(baucis.bind(baucis)).to.throw(/^Controllers with path "\/parties" exist more than once in a release that overlaps "0.0.1" [(]500[)][.]$/);
     done();
   });*/
 
@@ -101,7 +101,7 @@ describe('Versioning', function() {
     const fn = function() {
       baucis.rest('party').versions('abc');
     };
-    expect(fn).to.throwException(
+    expect(fn).to.throw(
       /^Controller version range "abc" was not a valid semver range [(]500[)][.]$/
     );
     done();
@@ -112,7 +112,7 @@ describe('Versioning', function() {
   ); /* , function (done) {
     baucis.rest('party').versions('1.5.7');
     var fn = baucis.bind(baucis, { releases: [ '0.0.1', '1.5.7' ]});
-    expect(fn).to.throwException(/^There are no controllers in release "0[.]0[.]1" [(]500[)][.]$/);
+    expect(fn).to.throw(/^There are no controllers in release "0[.]0[.]1" [(]500[)][.]$/);
     done();
   });*/
 
@@ -121,7 +121,7 @@ describe('Versioning', function() {
   ); /* , function (done) {
     baucis.rest('party').versions('0.0.1');
     baucis.rest('party').versions('1.4.6');
-    expect(baucis.bind(baucis)).to.throwException(/^The controller version range "1[.]4[.]6" doesn't satisfy any API release [(]500[)][.]$/);
+    expect(baucis.bind(baucis)).to.throw(/^The controller version range "1[.]4[.]6" doesn't satisfy any API release [(]500[)][.]$/);
     done();
   });*/
 
@@ -157,7 +157,7 @@ describe('Versioning', function() {
     };
     request.post(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(201);
+      expect(response.statusCode).to.equal(201);
 
       const options = {
         url: `http://localhost:8012/api/versioned/pumpkins/${body._id}`,
@@ -168,11 +168,11 @@ describe('Versioning', function() {
       request.put(options, function(error, response, body) {
         if (error) return done(error);
 
-        expect(response.statusCode).to.be(200);
+        expect(response.statusCode).to.equal(200);
 
         request.put(options, function(error, response, body) {
           if (error) return done(error);
-          expect(response.statusCode).to.be(409);
+          expect(response.statusCode).to.equal(409);
           expect(body).to.have.property(
             'message',
             'The requested update would conflict with a previous update (409).'
@@ -190,9 +190,9 @@ describe('Versioning', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
-      expect(body).not.to.be(undefined);
-      expect(body).to.be.an(Array);
+      expect(response.statusCode).to.equal(200);
+      expect(body).not.to.equal(undefined);
+      expect(body).to.be.an('array');
       expect(body.length).to.be.above(0);
 
       const options = {
@@ -202,7 +202,7 @@ describe('Versioning', function() {
       };
       request.put(options, function(error, response, body) {
         if (error) return done(error);
-        expect(response.statusCode).to.be(409);
+        expect(response.statusCode).to.equal(409);
         expect(body).to.have.property(
           'message',
           'The requested update would conflict with a previous update (409).'
@@ -219,7 +219,7 @@ describe('Versioning', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
 
       const options = {
         url: `http://localhost:8012/api/versioned/pumpkins/${body[0]._id}`,
@@ -228,7 +228,7 @@ describe('Versioning', function() {
       };
       request.put(options, function(error, response, body) {
         if (error) return done(error);
-        expect(response.statusCode).to.be(200);
+        expect(response.statusCode).to.equal(200);
         done();
       });
     });
@@ -241,7 +241,7 @@ describe('Versioning', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
 
       const options = {
         url: `http://localhost:8012/api/versioned/pumpkins/${body[0]._id}`,
@@ -250,7 +250,7 @@ describe('Versioning', function() {
       };
       request.put(options, function(error, response, body) {
         if (error) return done(error);
-        expect(response.statusCode).to.be(422);
+        expect(response.statusCode).to.equal(422);
         expect(body).to.eql([
           {
             message:

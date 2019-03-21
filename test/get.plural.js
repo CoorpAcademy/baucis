@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const request = require('request');
 
 const fixtures = require('./fixtures');
@@ -15,12 +15,12 @@ describe('GET plural', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       body.forEach(function(doc, i) {
         const found = vegetables.some(function(vege) {
           return vege._id.toString() === doc._id;
         });
-        expect(found).to.be(true);
+        expect(found).to.equal(true);
       });
       done();
     });
@@ -33,12 +33,12 @@ describe('GET plural', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       body.forEach(function(doc, i) {
         const found = vegetables.some(function(vege) {
           return vege._id.toString() === doc._id;
         });
-        expect(found).to.be(true);
+        expect(found).to.equal(true);
       });
       done();
     });
@@ -52,7 +52,7 @@ describe('GET plural', function() {
     request.get(options, function(err, response, body) {
       console.dir(err);
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.eql([]);
       done();
     });
@@ -65,8 +65,8 @@ describe('GET plural', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(204);
-      expect(body).to.be(undefined);
+      expect(response.statusCode).to.equal(204);
+      expect(body).to.equal(undefined);
       done();
     });
   });
@@ -78,7 +78,7 @@ describe('GET plural', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(404);
+      expect(response.statusCode).to.equal(404);
       expect(body).to.have.property('message', 'Nothing matched the requested query (404).');
       done();
     });

@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const request = require('request');
 
 const fixtures = require('./fixtures');
@@ -15,7 +15,7 @@ describe('HEAD plural', function() {
     };
     request.head(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.equal(undefined);
       done();
     });

@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const mongoose = require('mongoose');
 const express = require('express');
 const passport = require('passport');
@@ -18,7 +18,7 @@ describe('Controllers', function() {
       baucis.Controller('unmade');
     };
     makeController();
-    expect(makeController).to.not.throwException();
+    expect(makeController).to.not.throw();
     done();
   });
 
@@ -26,7 +26,7 @@ describe('Controllers', function() {
     const makeController = function() {
       baucis.Controller(mongoose.model('unmade'));
     };
-    expect(makeController).to.not.throwException();
+    expect(makeController).to.not.throw();
     done();
   });
 
@@ -34,7 +34,7 @@ describe('Controllers', function() {
     const makeController = function() {
       baucis.Controller();
     };
-    expect(makeController).to.throwException(/You must pass in a model or model name [(]500[)][.]/);
+    expect(makeController).to.throw(/You must pass in a model or model name [(]500[)][.]/);
     done();
   });
 
@@ -42,7 +42,7 @@ describe('Controllers', function() {
     const makeController = function() {
       baucis.Controller({});
     };
-    expect(makeController).to.throwException(/You must pass in a model or model name [(]500[)][.]/);
+    expect(makeController).to.throw(/You must pass in a model or model name [(]500[)][.]/);
     done();
   });
 
@@ -52,7 +52,7 @@ describe('Controllers', function() {
       controller = baucis.Controller('unmade');
     };
     makeController();
-    expect(makeController).to.not.throwException();
+    expect(makeController).to.not.throw();
     expect(controller.methods()).to.eql(['head', 'get', 'put', 'post', 'delete']);
     done();
   });
@@ -64,7 +64,7 @@ describe('Controllers', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 3);
       expect(body[1]).to.have.property('color', 'Yellow');
       expect(body[1]).to.have.property('name', 'Cheddar');
@@ -80,7 +80,7 @@ describe('Controllers', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body[0]).to.have.property('_id');
       expect(body[0]).to.have.property('__v');
       expect(body[0]).not.to.have.property('title');
@@ -94,7 +94,7 @@ describe('Controllers', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body[0]).to.have.property('_id');
       expect(body[0]).to.have.property('__v');
       expect(body[0]).not.to.have.property('hpyhenated-field-name');
@@ -110,7 +110,7 @@ describe('Controllers', function() {
     };
     request.post(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(201);
+      expect(response.statusCode).to.equal(201);
       expect(body).to.have.property('color', 'Green');
       expect(body).to.have.property('name', 'Gorgonzola');
       expect(body).not.to.have.property('_id');
@@ -126,7 +126,7 @@ describe('Controllers', function() {
     };
     request.put(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('color', 'White');
       expect(body).to.have.property('name', 'Cheddar');
       expect(body).not.to.have.property('_id');
@@ -142,7 +142,7 @@ describe('Controllers', function() {
     };
     request.post(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(201);
+      expect(response.statusCode).to.equal(201);
       expect(body).to.have.property('_id');
       expect(body).to.have.property('__v');
       expect(body).to.have.property('name', "Lou's");
@@ -156,7 +156,7 @@ describe('Controllers', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('color', 'White');
       done();
     });
@@ -166,7 +166,7 @@ describe('Controllers', function() {
     const makeController = function() {
       baucis.Controller('cheese').findBy('color');
     };
-    expect(makeController).to.throwException(
+    expect(makeController).to.throw(
       /^`findBy` path for model "cheese" must be unique [(]500[)][.]$/
     );
     done();
@@ -178,7 +178,7 @@ describe('Controllers', function() {
       mongoose.model('rab', rab);
       baucis.Controller('rab').findBy('arb');
     };
-    expect(makeController).not.to.throwException();
+    expect(makeController).not.to.throw();
     done();
   });
 
@@ -188,7 +188,7 @@ describe('Controllers', function() {
       mongoose.model('barb', barb);
       baucis.Controller('barb').findBy('arb');
     };
-    expect(makeController).not.to.throwException();
+    expect(makeController).not.to.throw();
     done();
   });
 
@@ -198,8 +198,8 @@ describe('Controllers', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
-      expect(body).to.be('OK!');
+      expect(response.statusCode).to.equal(200);
+      expect(body).to.equal('OK!');
       done();
     });
   });
@@ -210,8 +210,8 @@ describe('Controllers', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
-      expect(body).to.be('XYZ');
+      expect(response.statusCode).to.equal(200);
+      expect(body).to.equal('XYZ');
       done();
     });
   });
@@ -223,7 +223,7 @@ describe('Controllers', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.eql([{name: 'Corner'}, {name: 'Westlake'}]);
       done();
     });
@@ -235,8 +235,8 @@ describe('Controllers', function() {
     };
     request.del(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
-      expect(response.headers['x-poncho']).to.be('Poncho!');
+      expect(response.statusCode).to.equal(200);
+      expect(response.headers['x-poncho']).to.equal('Poncho!');
       done();
     });
   });
@@ -247,8 +247,8 @@ describe('Controllers', function() {
     };
     request.post(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
-      expect(body).to.be('Poncho!');
+      expect(response.statusCode).to.equal(200);
+      expect(body).to.equal('Poncho!');
       done();
     });
   });
@@ -258,7 +258,7 @@ describe('Controllers', function() {
     const register = function() {
       controller.request('get dude', function() {});
     };
-    expect(register).to.throwException(/^Unrecognized HTTP method: "dude" [(]500[)][.]$/);
+    expect(register).to.throw(/^Unrecognized HTTP method: "dude" [(]500[)][.]$/);
     done();
   });
 
@@ -267,7 +267,7 @@ describe('Controllers', function() {
     const register = function() {
       controller.request('gargoyle', 'get put', function() {});
     };
-    expect(register).to.throwException(
+    expect(register).to.throw(
       /^End-point type must be either "instance" or "collection," not "gargoyle" [(]500[)][.]$/
     );
     done();
@@ -279,7 +279,7 @@ describe('Controllers', function() {
       controller.request('collection', 'get put head delete post', function() {});
       controller.request('instance', 'get put head delete post', function() {});
     };
-    expect(register).to.not.throwException();
+    expect(register).to.not.throw();
     done();
   });
 
@@ -288,7 +288,7 @@ describe('Controllers', function() {
     const register = function() {
       controller.query('get put head delete', function() {});
     };
-    expect(register).not.to.throwException();
+    expect(register).not.to.throw();
     done();
   });
 
@@ -299,7 +299,7 @@ describe('Controllers', function() {
       controller.query('post', function() {});
     };
 
-    expect(register).not.to.throwException();
+    expect(register).not.to.throw();
     done();
   });
 
@@ -324,7 +324,7 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property(
         'message',
         'The requested update operator "$push" is not enabled for this resource (403).'
@@ -341,7 +341,7 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property(
         'message',
         'This update path is forbidden for the requested update operator "$push" (403).'
@@ -358,7 +358,7 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
 
       expect(body).to.have.property('molds');
       expect(body.molds).to.have.property('length', 1);
@@ -376,7 +376,7 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property(
         'message',
         'The requested update operator "$pull" is not enabled for this resource (403).'
@@ -393,7 +393,7 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property(
         'message',
         'This update path is forbidden for the requested update operator "$pull" (403).'
@@ -410,7 +410,7 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
 
       expect(body).to.have.property('molds');
       expect(body.molds).to.have.property('length', 1);
@@ -421,7 +421,7 @@ describe('Controllers', function() {
       request.put(options, function(error, response, body) {
         if (error) return done(error);
 
-        expect(response.statusCode).to.be(200);
+        expect(response.statusCode).to.equal(200);
 
         expect(body).to.have.property('molds');
         expect(body.molds).to.have.property('length', 0);
@@ -439,7 +439,7 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property(
         'message',
         'The requested update operator "$set" is not enabled for this resource (403).'
@@ -456,7 +456,7 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property(
         'message',
         'This update path is forbidden for the requested update operator "$set" (403).'
@@ -473,7 +473,7 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
 
       expect(body).to.have.property('molds');
       expect(body.molds).to.have.property('length', 1);
@@ -492,18 +492,18 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
 
       expect(body).to.have.property('arbitrary');
       expect(body.arbitrary).to.have.property('length', 2);
       expect(body.arbitrary[0]).to.have.property('llama');
       expect(body.arbitrary[0].llama).to.have.property('length', 3);
-      expect(body.arbitrary[0].llama[0]).to.be(3);
-      expect(body.arbitrary[0].llama[1]).to.be(4);
-      expect(body.arbitrary[0].llama[2]).to.be(5);
+      expect(body.arbitrary[0].llama[0]).to.equal(3);
+      expect(body.arbitrary[0].llama[1]).to.equal(4);
+      expect(body.arbitrary[0].llama[2]).to.equal(5);
       expect(body.arbitrary[1].llama).to.have.property('length', 2);
-      expect(body.arbitrary[1].llama[0]).to.be(1);
-      expect(body.arbitrary[1].llama[1]).to.be(2);
+      expect(body.arbitrary[1].llama[0]).to.equal(1);
+      expect(body.arbitrary[1].llama[1]).to.equal(2);
 
       done();
     });
@@ -518,7 +518,7 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
 
       expect(body).to.have.property('arbitrary');
       expect(body.arbitrary).to.have.property('length', 2);
@@ -538,16 +538,16 @@ describe('Controllers', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
 
       expect(body).to.have.property('arbitrary');
       expect(body.arbitrary).to.have.property('length', 2);
       expect(body.arbitrary[0]).to.have.property('llama');
       expect(body.arbitrary[0].llama).to.have.property('length', 1);
-      expect(body.arbitrary[0].llama[0]).to.be(4);
+      expect(body.arbitrary[0].llama[0]).to.equal(4);
       expect(body.arbitrary[1].llama).to.have.property('length', 2);
-      expect(body.arbitrary[1].llama[0]).to.be(1);
-      expect(body.arbitrary[1].llama[1]).to.be(2);
+      expect(body.arbitrary[1].llama[0]).to.equal(1);
+      expect(body.arbitrary[1].llama[1]).to.equal(2);
 
       done();
     });
@@ -556,7 +556,7 @@ describe('Controllers', function() {
   it('should send 405 when a verb is disabled (GET)', function(done) {
     request.get('http://localhost:8012/api/beans', function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(405);
+      expect(response.statusCode).to.equal(405);
       expect(response.headers).to.have.property('allow', 'HEAD,POST,PUT,DELETE');
       expect(body).to.have.property(
         'message',
@@ -569,7 +569,7 @@ describe('Controllers', function() {
   it('should send 405 when a verb is disabled (DELETE)', function(done) {
     request.del('http://localhost:8012/api/liens', function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(405);
+      expect(response.statusCode).to.equal(405);
       expect(response.headers).to.have.property('allow', 'HEAD,GET,POST,PUT');
       expect(body).to.have.property(
         'message',
@@ -585,7 +585,7 @@ describe('Controllers', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(body).to.have.property(
         'message',
         'The requested document ID "bad" is not a valid document ID (400).'
@@ -600,7 +600,7 @@ describe('Controllers', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(400);
+      expect(response.statusCode).to.equal(400);
       expect(body).to.have.property(
         'message',
         'The requested document ID "0booze" is not a valid document ID (400).'
@@ -615,7 +615,7 @@ describe('Controllers', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.length(2);
       done();
     });
@@ -627,7 +627,7 @@ describe('Controllers', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('color', 'White');
       done();
     });
@@ -640,10 +640,10 @@ describe('Controllers', function() {
     };
     request.post(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(201);
+      expect(response.statusCode).to.equal(201);
       request.post(options, function(err, response, body) {
         if (err) return done(err);
-        expect(response.statusCode).to.be(422);
+        expect(response.statusCode).to.equal(422);
         expect(body).to.have.length(1);
         expect(body[0]).to.have.property('name');
         expect(body[0]).to.have.property('message', 'Path `name` (Gorgonzola) must be unique.');
@@ -670,10 +670,10 @@ describe('Controllers', function() {
     };
     request.post(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(201);
+      expect(response.statusCode).to.equal(201);
       request.post(options, function(err, response, body) {
         if (err) return done(err);
-        expect(response.statusCode).to.be(422);
+        expect(response.statusCode).to.equal(422);
         expect(body).to.be.a('string');
         expect(body).to.contain(
           'Unprocessable Entity: The request entity could not be processed (422)'
@@ -689,7 +689,7 @@ describe('Controllers', function() {
     };
     request.get(options, function(err, response, body) {
       if (err) return done(err);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 2);
       done();
     });

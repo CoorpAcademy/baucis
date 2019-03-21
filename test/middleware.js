@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const mongoose = require('mongoose');
 const express = require('express');
 const passport = require('passport');
@@ -21,7 +21,7 @@ describe('Middleware', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(401);
+      expect(response.statusCode).to.equal(401);
       done();
     });
   });
@@ -36,7 +36,7 @@ describe('Middleware', function() {
     request.get(options, function(error, response, body) {
       if (error) return done(error);
 
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('name', 'Turnip');
 
       done();
@@ -51,7 +51,7 @@ describe('Middleware', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('_id');
       expect(body).not.to.have.property('name');
       done();
@@ -67,7 +67,7 @@ describe('Middleware', function() {
     };
     request.post(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(201);
+      expect(response.statusCode).to.equal(201);
       expect(body).to.have.property('_id');
       expect(body).to.have.property('name', 'boom');
       done();
@@ -84,7 +84,7 @@ describe('Middleware', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('_id', radicchio._id.toString());
       expect(body).to.have.property('name', 'boom');
       done();
@@ -100,7 +100,7 @@ describe('Middleware', function() {
     };
     request.post(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(201);
+      expect(response.statusCode).to.equal(201);
       expect(body).to.have.property('_id');
       expect(body).to.have.property('name', 'bimm');
       done();
@@ -115,7 +115,7 @@ describe('Middleware', function() {
     };
     request.post(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property('message', 'Bento box (403).');
       done();
     });
@@ -131,7 +131,7 @@ describe('Middleware', function() {
     };
     request.put(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property('message', 'Bento box (403).');
       done();
     });
@@ -146,7 +146,7 @@ describe('Middleware', function() {
     };
     request.post(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property('message', 'Bento box (403).');
       done();
     });
@@ -160,7 +160,7 @@ describe('Middleware', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(403);
+      expect(response.statusCode).to.equal(403);
       expect(body).to.have.property('message', 'Bento box (403).');
       done();
     });
@@ -174,7 +174,7 @@ describe('Middleware', function() {
     };
     request.post(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(201);
+      expect(response.statusCode).to.equal(201);
       expect(body).to.have.property('_id');
       expect(body).to.have.property('name', 'zoom');
       done();
@@ -190,7 +190,7 @@ describe('Middleware', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 8);
       expect(body[0]).to.have.property('name', 'beam');
       expect(body[1]).to.have.property('name', 'beam');
@@ -208,7 +208,7 @@ describe('Middleware', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
+      expect(response.statusCode).to.equal(200);
       expect(body).to.have.property('length', 8);
       expect(body[0]).not.to.have.property('nutrients');
       done();
@@ -225,7 +225,7 @@ describe('Middleware', function() {
   //   };
   //   request.get(options, function (error, response, body) {
   //     if (error) return done(error);
-  //     expect(response.statusCode).to.be(201);
+  //     expect(response.statusCode).to.equal(201);
   //     expect(body).to.have.property('length', 8);
   //     expect(body[0]).to.have.property('name', 'beam');
   //     expect(body[1]).to.have.property('name', 'beam');
@@ -243,8 +243,8 @@ describe('Middleware', function() {
   //   };
   //   request.get(options, function (error, response, body) {
   //     if (error) return done(error);
-  //     expect(response.statusCode).to.be(404);
-  //     expect(body).to.be(1234);
+  //     expect(response.statusCode).to.equal(404);
+  //     expect(body).to.equal(1234);
   //     done();
   //   });
   // });
@@ -257,8 +257,8 @@ describe('Middleware', function() {
   //   };
   //   request.get(options, function (error, response, body) {
   //     if (error) return done(error);
-  //     expect(response.statusCode).to.be(200);
-  //     expect(body).to.be('Devonshire Clotted Cream.');
+  //     expect(response.statusCode).to.equal(200);
+  //     expect(body).to.equal('Devonshire Clotted Cream.');
   //     done();
   //   });
   // });

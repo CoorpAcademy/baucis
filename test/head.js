@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const request = require('request');
 
 const fixtures = require('./fixtures');
@@ -16,8 +16,8 @@ describe('HEAD singular', function() {
     };
     request.head(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(200);
-      expect(body).to.be(undefined);
+      expect(response.statusCode).to.equal(200);
+      expect(body).to.equal(undefined);
       done();
     });
   });
@@ -29,8 +29,8 @@ describe('HEAD singular', function() {
     };
     request.head(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.be(404);
-      expect(body).to.be(undefined);
+      expect(response.statusCode).to.equal(404);
+      expect(body).to.equal(undefined);
       done();
     });
   });
