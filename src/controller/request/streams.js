@@ -1,6 +1,6 @@
 // __Dependencies__
 const domain = require('domain');
-const es = require('event-stream');
+const eventStream = require('event-stream');
 
 // __Module Definition__
 module.exports = function(options, protect) {
@@ -19,7 +19,7 @@ module.exports = function(options, protect) {
       }
       // If it's a function, create a map stream with it.
       if (transmute) {
-        transmute = es.map(transmute);
+        transmute = eventStream.map(transmute);
         streams.push(transmute);
         d.add(transmute);
         return transmute;
@@ -27,11 +27,11 @@ module.exports = function(options, protect) {
       // If called without arguments, return a pipeline linking all streams.
       if (streams.length > 0) {
         return d.run(function() {
-          return es.pipeline(...streams);
+          return eventStream.pipeline(...streams);
         });
       }
       // But, if no streams were added, just pass back a through stream.
-      return d.run(es.through);
+      return d.run(eventStream.through);
     };
   };
   // __Middleware__

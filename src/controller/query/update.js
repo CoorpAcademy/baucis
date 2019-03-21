@@ -1,5 +1,5 @@
 // __Dependencies__
-const es = require('event-stream');
+const eventStream = require('event-stream');
 const RestError = require('rest-error');
 
 // __Private Module Members__
@@ -36,7 +36,7 @@ module.exports = function(options, protect) {
     // Check if the body was parsed by some external middleware e.g. `express.json`.
     // If so, create a one-document stream from the parsed body.
     if (request.body) {
-      pipeline(es.readArray([request.body]));
+      pipeline(eventStream.readArray([request.body]));
     } else {
       // Otherwise, stream and parse the request.
       parser = baucis.parser(request.get('content-type'));
@@ -120,7 +120,7 @@ module.exports = function(options, protect) {
     }
     // Ensure there is exactly one update document.
     pipeline(
-      es.through(
+      eventStream.through(
         function(context) {
           count += 1;
           if (count === 2) {

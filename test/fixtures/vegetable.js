@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
 const async = require('async');
-const es = require('event-stream');
+const eventStream = require('event-stream');
 const baucis = require('../..');
 const config = require('./config');
 
@@ -60,7 +60,7 @@ const fixture = {
     veggies.request(function(request, response, next) {
       if (request.query.failIt !== 'true') return next();
       request.baucis.incoming(
-        es.through(function(context) {
+        eventStream.through(function(context) {
           this.emit('error', baucis.Error.Forbidden('Bento box'));
         })
       );
@@ -96,7 +96,7 @@ const fixture = {
     veggies.request(function(request, response, next) {
       if (request.query.streamIn !== 'true') return next();
       request.baucis.incoming(
-        es.map(function(context, callback) {
+        eventStream.map(function(context, callback) {
           context.incoming.name = 'boom';
           return callback(null, context);
         })
@@ -118,7 +118,7 @@ const fixture = {
     veggies.request(function(request, response, next) {
       if (request.query.streamOut !== 'true') return next();
       request.baucis.outgoing(
-        es.map(function(context, callback) {
+        eventStream.map(function(context, callback) {
           context.doc.name = 'beam';
           return callback(null, context);
         })

@@ -1,6 +1,6 @@
 // __Dependencies__
 const util = require('util');
-const es = require('event-stream');
+const eventStream = require('event-stream');
 const mongoose = require('mongoose');
 const RestError = require('rest-error');
 
@@ -138,7 +138,7 @@ module.exports = function(options, protect) {
       const f = formatter(error instanceof RestError.UnprocessableEntity);
       f.on('error', next);
 
-      es
+      eventStream
         .readArray(errors)
         .pipe(f)
         .pipe(response);

@@ -1,6 +1,6 @@
 // __Dependencies__
 const util = require('util');
-const es = require('event-stream');
+const eventStream = require('event-stream');
 const RestError = require('rest-error');
 
 // __Module Definition__
@@ -20,7 +20,7 @@ module.exports = function(options, protect) {
     // Check if the body was parsed by some external middleware e.g. `express.json`.
     // If so, create a stream from the POST'd document or documents.
     if (request.body) {
-      pipeline(es.readArray([].concat(request.body)));
+      pipeline(eventStream.readArray([].concat(request.body)));
     } else {
       // Otherwise, stream and parse the request.
       parser = baucis.parser(request.get('content-type'));
@@ -76,7 +76,7 @@ module.exports = function(options, protect) {
     // Write the IDs to an array and process them.
     const s = pipeline();
     s.pipe(
-      es.writeArray(function(error, ids) {
+      eventStream.writeArray(function(error, ids) {
         if (error) return next(error);
         // URL location of newly created document or documents.
         let location;

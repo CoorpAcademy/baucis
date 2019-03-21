@@ -1,6 +1,6 @@
 // __Dependencies__
 const crypto = require('crypto');
-const es = require('event-stream');
+const eventStream = require('event-stream');
 const RestError = require('rest-error');
 
 // __Module Definition__
@@ -34,7 +34,7 @@ module.exports = function(options, protect) {
 
     const hash = crypto.createHash('md5');
 
-    return es.through(
+    return eventStream.through(
       function(chunk) {
         hash.update(chunk);
         this.emit('data', chunk);
@@ -54,7 +54,7 @@ module.exports = function(options, protect) {
   function etagImmediate(response) {
     const hash = crypto.createHash('md5');
 
-    return es.through(
+    return eventStream.through(
       function(chunk) {
         hash.update(JSON.stringify(chunk));
         response.set('Etag', `"${hash.digest('hex')}"`);
@@ -74,7 +74,7 @@ module.exports = function(options, protect) {
 
     let latest = null;
 
-    return es.through(
+    return eventStream.through(
       function(context) {
         if (!context) return;
         if (!context.doc) return this.emit('data', context);
@@ -100,7 +100,7 @@ module.exports = function(options, protect) {
 
   // Build a reduce stream.
   function reduce(accumulated, f) {
-    return es.through(
+    return eventStream.through(
       function(context) {
         accumulated = f(accumulated, context);
       },
@@ -135,7 +135,7 @@ module.exports = function(options, protect) {
     const pipeline = protect.pipeline(next);
     request.baucis.send = pipeline;
     // If documents were set in the baucis hash, use them.
-    if (documents) pipeline(es.readArray([].concat(documents)));
+    if (documents) pipeline(eventStream.readArray([].concat(documents)));
     else if (request.baucis.query.op === 'findOne') {
       // Otherwise, stream the relevant documents from Mongo, based on constructed query.
       pipeline(request.baucis.query.stream()); // findOne do not support cursor
@@ -149,7 +149,7 @@ module.exports = function(options, protect) {
     });
     // Check for not found.
     pipeline(
-      es.through(
+      eventStream.through(
         function(context) {
           count += 1;
           this.emit('data', context);
@@ -190,7 +190,7 @@ module.exports = function(options, protect) {
     request.baucis.send = pipeline;
     // If documents were set in the baucis hash, use them.
     if (documents) {
-      pipeline(es.readArray([].concat(documents)));
+      pipeline(eventStream.readArray([].concat(documents)));
     } else if (request.baucis.query.op === 'findOne') {
       // Otherwise, stream the relevant documents from Mongo, based on constructed query.
       pipeline(request.baucis.query.stream()); // findOne do not support cursor
@@ -204,7 +204,7 @@ module.exports = function(options, protect) {
     });
     // Check for not found.
     pipeline(
-      es.through(
+      eventStream.through(
         function(context) {
           count += 1;
           this.emit('data', context);
@@ -278,7 +278,7 @@ module.exports = function(options, protect) {
 
     if (request.baucis.count) {
       request.baucis.send(count());
-      request.baucis.send(es.stringify());
+      request.baucis.send(eventStream.stringify());
     } else {
       request.baucis.send(redoc);
       request.baucis.send(request.baucis.formatter(true));
@@ -310,13 +310,13 @@ module.exports = function(options, protect) {
     });
     // Respond with the count of deleted documents.
     request.baucis.send(count());
-    request.baucis.send(es.stringify());
+    request.baucis.send(eventStream.stringify());
     next();
   });
 
   protect.finalize(function(request, response, next) {
     request.baucis.send().pipe(
-      es.through(
+      eventStream.through(
         function(chunk) {
           response.write(chunk);
         },

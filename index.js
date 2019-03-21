@@ -33,7 +33,7 @@ baucis.empty = function() {
 baucis.formatters = function(response, callback) {
   // if (response._headerSent) {
   //   callback(null, function () {
-  //     return es.through(function (data) { console.log(data) }, function () {
+  //     return eventStream.through(function (data) { console.log(data) }, function () {
   //       this.emit('end');
   //     });
   //   });
