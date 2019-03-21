@@ -1,0 +1,16 @@
+{
+  "reporter": [
+    "lcov",
+    "text-summary",
+    "html"
+  ],
+  "include": [
+      "src/**/*.js",
+      "index.js"
+  ],
+  "exclude": [
+    "examples",
+    "test"
+  ],
+  "all": true
+}

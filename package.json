@@ -9,8 +9,9 @@
   "version": "1.6.8",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha --bail",
-    "coverage": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha"
+    "test": "mocha --bail --exit",
+    "cover": "nyc npm test",
+    "publish-coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "repository": {
     "type": "git",
@@ -55,11 +56,12 @@
   "devDependencies": {
     "async": "^2.6.2",
     "body-parser": "^1.18.3",
+    "codecov": "^3.2.0",
     "expect.js": "^0.3.1",
     "express": "^4.16.4",
-    "istanbul": "^0.4.5",
     "mocha": "^6.0.2",
     "mongoose": "^4.13.18",
+    "nyc": "^13.2.0",
     "parse-links": "^0.1.0",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
