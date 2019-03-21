@@ -1,7 +1,7 @@
 // __Dependencies__
 var mongoose = require('mongoose');
 var semver = require('semver');
-var Model = require('../Model');
+var Model = require('../model');
 var RestError = require('rest-error');
 
 // __Module Definition__
