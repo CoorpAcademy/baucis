@@ -5,7 +5,7 @@ var RestError = require('rest-error');
 
 // __Module Definition__
 var decorator = module.exports = function (options, protect) {
-  var baucis = require('..');
+  var baucis = require('../..');
   var controller = this;
   var lastModifiedPath = controller.model().lastModified();
   var trailers = {};

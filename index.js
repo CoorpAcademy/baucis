@@ -2,9 +2,9 @@
 var deco = require('deco');
 var es = require('event-stream');
 var mongoose = require('mongoose');
-var Api = require('./Api');
-var Controller = require('./Controller');
-var Model = require('./Model');
+var Api = require('./src/api');
+var Controller = require('./src/controller');
+var Model = require('./src/model');
 var RestError = require('rest-error');
 var plugins = {
   json: require('baucis-json'),

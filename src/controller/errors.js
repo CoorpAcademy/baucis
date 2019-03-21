@@ -6,7 +6,8 @@ var RestError = require('rest-error');
 
 // __Module Definition__
 var decorator = module.exports = function (options, protect) {
-  var baucis = require('..');
+  var baucis = require('../..');
+
   var controller = this;
   // A controller property used to set what error status code
   // and response is sent when a query to a collection endpoint

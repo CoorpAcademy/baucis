@@ -1,6 +1,6 @@
 // __Dependencies__
 var RestError = require('rest-error');
-var Controller = require('../Controller');
+var Controller = require('../controller');
 // __Private Module Members__
 // Expands route definitions based on generalized arguments.
 var defineRoutes = function (stage, params) {

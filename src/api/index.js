@@ -2,7 +2,7 @@
 var deco = require('deco');
 var semver = require('semver');
 var express = require('express');
-var Controller = require('../Controller');
+var Controller = require('../controller');
 var RestError = require('rest-error');
 
 // __Module Definition__
