@@ -1,12 +1,12 @@
 {
   "name": "baucis",
+  "version": "1.6.8",
   "author": {
     "name": "William Riley-Land",
     "email": "william@kun.io",
     "url": "http://kun.io"
   },
   "homepage": "https://github.com/wprl/baucis",
-  "version": "1.6.8",
   "main": "index.js",
   "scripts": {
     "test": "mocha --bail --exit",

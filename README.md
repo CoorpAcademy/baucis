@@ -6,6 +6,10 @@
 
 Baucis takes the boilerplate out of building and maintaining scalable [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS)/[Level 3](http://martinfowler.com/articles/richardsonMaturityModel.html) REST APIs.
 
+
+:warning: This is a from the Coorpacademy Tech team :warning:
+This is so far intended for intern use
+
 ## Features
 
  * Automatically build controllers from your Mongoose schemata, then easily configure them.

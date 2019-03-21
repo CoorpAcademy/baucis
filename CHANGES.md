@@ -1,11 +1,16 @@
 # Baucis Change Log
 
+
+***Coorpacademy Fork took place at v1.6.8***
+--------
+
+Changes from v1.0 to v1.6.8 were not documented
+
 ## v1.0.0-candidate.11
 
 Baucis was awarded the MongoDB Open Source Hack Contest 2014!
 
 Update readme and roadmap.
-
 
 ## v1.0.0-candidate.10
 
