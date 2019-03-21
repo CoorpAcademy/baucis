@@ -601,7 +601,7 @@ describe('Controllers', function () {
         expect(body[0]).to.have.property('originalMessage');
         expect(body[0].originalMessage).to.match(/E11000 duplicate key/);
         expect(body[0].originalMessage).to.match(/dup key/);
-        expect(body[0].originalMessage).to.match(/yYyBaUcIsTeStYyY[.]cheeses[.][$]name_1/);
+        expect(body[0].originalMessage).to.match(/yYyBaUcIsTeStYyY[.]cheeses([.][$]| index: )name_1/);
         expect(body[0]).to.have.property('name', 'MongoError');
         expect(body[0]).to.have.property('path', 'name');
         expect(body[0]).to.have.property('type', 'unique');

@@ -51,7 +51,8 @@ var decorator = module.exports = function (options, protect) {
     }
 
     var body = {};
-    var scrape = /[$](.+)[_]\d+\s+dup key: [{] : "([^"]+)" [}]/;
+    var scrape = /(?:[$]|index: )(.+)[_]\d+\s+dup key: [{] : "([^"]+)" [}]/;
+
     var scraped = scrape.exec(error.message);
     var path = scraped ? scraped[1] : '???';
     var value = scraped ? scraped[2] : '???';
