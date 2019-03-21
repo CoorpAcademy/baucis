@@ -11,6 +11,7 @@
   "scripts": {
     "test": "mocha --bail --exit",
     "cover": "nyc npm test",
+    "lint": "eslint src/ test/ index.js",
     "publish-coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
   "repository": {
@@ -54,9 +55,11 @@
     "express": "^4.12.0"
   },
   "devDependencies": {
+    "@coorpacademy/eslint-plugin-coorpacademy": "^8.1.1",
     "async": "^2.6.2",
     "body-parser": "^1.18.3",
     "codecov": "^3.2.0",
+    "eslint": "^5.15.3",
     "expect.js": "^0.3.1",
     "express": "^4.16.4",
     "mocha": "^6.0.2",
