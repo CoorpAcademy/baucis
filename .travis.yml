@@ -18,6 +18,7 @@ before_script:
   - docker-compose up -d
 
 script:
+  - npm run lint
   - npm test
 
 after_script:

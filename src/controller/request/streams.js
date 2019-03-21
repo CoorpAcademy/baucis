@@ -3,7 +3,7 @@ const domain = require('domain');
 const es = require('event-stream');
 
 // __Module Definition__
-const decorator = (module.exports = function(options, protect) {
+module.exports = function(options, protect) {
   // __Protected Module Members__
   // A utility method for ordering through streams.
   protect.pipeline = function(handler) {
@@ -27,7 +27,7 @@ const decorator = (module.exports = function(options, protect) {
       // If called without arguments, return a pipeline linking all streams.
       if (streams.length > 0) {
         return d.run(function() {
-          return es.pipeline.apply(es, streams);
+          return es.pipeline(...streams);
         });
       }
       // But, if no streams were added, just pass back a through stream.
@@ -41,4 +41,4 @@ const decorator = (module.exports = function(options, protect) {
     request.baucis.outgoing = protect.pipeline(next);
     next();
   });
-});
+};

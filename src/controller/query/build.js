@@ -1,5 +1,5 @@
 // __Module Definition__
-const decorator = (module.exports = function() {
+module.exports = function() {
   const controller = this;
 
   controller.query('collection', '*', function(request, response, next) {
@@ -11,4 +11,4 @@ const decorator = (module.exports = function() {
     request.baucis.query = controller.model().findOne(request.baucis.conditions);
     next();
   });
-});
+};

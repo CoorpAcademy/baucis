@@ -46,7 +46,7 @@ mongoose.model('timeentry', Cheese, 'cheeses').plural('timeentries');
 mongoose.model('mean', Fiends, 'fiends').locking(true);
 mongoose.model('bal', Stores, 'stores').plural('baloo');
 
-const fixture = (module.exports = {
+module.exports = {
   init(done) {
     mongoose.Promise = global.Promise;
     mongoose.connect(config.mongo.url, {useMongoClient: true});
@@ -152,4 +152,4 @@ const fixture = (module.exports = {
       });
     });
   }
-});
+};

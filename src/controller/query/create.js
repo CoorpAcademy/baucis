@@ -1,11 +1,10 @@
 // __Dependencies__
 const util = require('util');
-const domain = require('domain');
 const es = require('event-stream');
 const RestError = require('rest-error');
 
 // __Module Definition__
-const decorator = (module.exports = function(options, protect) {
+module.exports = function(options, protect) {
   const baucis = require('../../..');
   const controller = this;
 
@@ -82,7 +81,8 @@ const decorator = (module.exports = function(options, protect) {
         // URL location of newly created document or documents.
         let location;
         // Set the conditions used to build `request.baucis.query`.
-        const conditions = (request.baucis.conditions[findBy] = {$in: ids});
+        const conditions = {$in: ids};
+        request.baucis.conditions[findBy] = conditions;
         // Check for at least one document.
         if (ids.length === 0) {
           next(
@@ -108,4 +108,4 @@ const decorator = (module.exports = function(options, protect) {
     );
     s.resume();
   });
-});
+};

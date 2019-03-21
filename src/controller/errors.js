@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const RestError = require('rest-error');
 
 // __Module Definition__
-const decorator = (module.exports = function(options, protect) {
+module.exports = function(options, protect) {
   const baucis = require('../..');
 
   const controller = this;
@@ -144,4 +144,4 @@ const decorator = (module.exports = function(options, protect) {
         .pipe(response);
     });
   });
-});
+};

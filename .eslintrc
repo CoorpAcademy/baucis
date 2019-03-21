@@ -20,6 +20,7 @@
   ],
   "rules": {
     "strict": "off",
+    "no-console": "warn",
     "promise/no-native": "off",
     "no-shadow": "warn",
     "no-param-reassign": "warn",

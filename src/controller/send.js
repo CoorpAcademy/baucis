@@ -4,7 +4,7 @@ const es = require('event-stream');
 const RestError = require('rest-error');
 
 // __Module Definition__
-const decorator = (module.exports = function(options, protect) {
+module.exports = function(options, protect) {
   const baucis = require('../..');
   const controller = this;
   const lastModifiedPath = controller.model().lastModified();
@@ -132,17 +132,17 @@ const decorator = (module.exports = function(options, protect) {
   protect.finalize('collection', 'all', function(request, response, next) {
     let count = 0;
     const documents = request.baucis.documents;
-    const pipeline = (request.baucis.send = protect.pipeline(next));
+    const pipeline = protect.pipeline(next);
+    request.baucis.send = pipeline;
     // If documents were set in the baucis hash, use them.
     if (documents) pipeline(es.readArray([].concat(documents)));
-    else {
+    else if (request.baucis.query.op === 'findOne') {
       // Otherwise, stream the relevant documents from Mongo, based on constructed query.
-      if (request.baucis.query.op === 'findOne') {
-        pipeline(request.baucis.query.stream()); // findOne do not support cursor
-      } else {
-        pipeline(request.baucis.query.cursor());
-      }
+      pipeline(request.baucis.query.stream()); // findOne do not support cursor
+    } else {
+      pipeline(request.baucis.query.cursor());
     }
+
     // Map documents to contexts.
     pipeline(function(doc, callback) {
       callback(null, {doc, incoming: null});
@@ -186,17 +186,18 @@ const decorator = (module.exports = function(options, protect) {
   protect.finalize('instance', 'all', function(request, response, next) {
     let count = 0;
     const documents = request.baucis.documents;
-    const pipeline = (request.baucis.send = protect.pipeline(next));
+    const pipeline = protect.pipeline(next);
+    request.baucis.send = pipeline;
     // If documents were set in the baucis hash, use them.
-    if (documents) pipeline(es.readArray([].concat(documents)));
-    else {
+    if (documents) {
+      pipeline(es.readArray([].concat(documents)));
+    } else if (request.baucis.query.op === 'findOne') {
       // Otherwise, stream the relevant documents from Mongo, based on constructed query.
-      if (request.baucis.query.op === 'findOne') {
-        pipeline(request.baucis.query.stream()); // findOne do not support cursor
-      } else {
-        pipeline(request.baucis.query.cursor());
-      }
+      pipeline(request.baucis.query.stream()); // findOne do not support cursor
+    } else {
+      pipeline(request.baucis.query.cursor());
     }
+
     // Map documents to contexts.
     pipeline(function(doc, callback) {
       callback(null, {doc, incoming: null});
@@ -327,4 +328,4 @@ const decorator = (module.exports = function(options, protect) {
       )
     );
   });
-});
+};

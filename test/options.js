@@ -4,8 +4,15 @@ const request = require('request').defaults({json: true});
 const fixtures = require('./fixtures');
 
 describe.skip('OPTIONS instance/collection', function() {
+  let vegetables;
   before(fixtures.vegetable.init);
-  beforeEach(fixtures.vegetable.create);
+  beforeEach(done =>
+    fixtures.vegetable.create((err, legumes) => {
+      if (err) return done(err);
+      vegetables = legumes;
+      return done();
+    })
+  );
   after(fixtures.vegetable.deinit);
 
   it('provides options for the collection', function(done) {

@@ -1,7 +1,7 @@
 const RestError = require('rest-error');
 
 // __Module Definition__
-const decorator = (module.exports = function() {
+module.exports = function() {
   const controller = this;
   // Set the conditions used for finding/updating/removing documents.
   this.request(function(request, response, next) {
@@ -32,4 +32,4 @@ const decorator = (module.exports = function() {
     request.baucis.conditions = conditions;
     next();
   });
-});
+};

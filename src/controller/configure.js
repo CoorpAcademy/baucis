@@ -2,10 +2,9 @@
 const mongoose = require('mongoose');
 const semver = require('semver');
 const RestError = require('rest-error');
-const Model = require('../model');
 
 // __Module Definition__
-const decorator = (module.exports = function(model, protect) {
+module.exports = function(model, protect) {
   const controller = this;
 
   if (typeof model !== 'string' && (!model || !model.schema)) {
@@ -78,4 +77,4 @@ const decorator = (module.exports = function(model, protect) {
 
   // Set the controller model.
   controller.model(model);
-});
+};

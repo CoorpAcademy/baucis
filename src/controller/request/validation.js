@@ -1,14 +1,12 @@
 // __Dependencies__
-const util = require('util');
 const RestError = require('rest-error');
 
 // __Module Definition__
-const decorator = (module.exports = function(options, protect) {
+module.exports = function(options, protect) {
   const controller = this;
   const check = ['ObjectID', 'Number'];
 
   protect.isInvalid = function(id, instance, type) {
-    let error;
     if (!id) return false;
     if (check.indexOf(instance) === -1) return false;
     if (instance === 'ObjectID' && id.match(/^[a-f0-9]{24}$/i)) return false;
@@ -42,4 +40,4 @@ const decorator = (module.exports = function(options, protect) {
   controller.request('collection', 'put', function(request, response, next) {
     return next(RestError.NotImplemented('Cannot PUT to the collection'));
   });
-});
+};

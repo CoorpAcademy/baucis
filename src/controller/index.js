@@ -1,10 +1,9 @@
 // __Dependencies__
 const deco = require('deco');
 const express = require('express');
-const RestError = require('rest-error');
 
 // __Module Definition__
-const Controller = (module.exports = deco());
+const Controller = deco();
 
 Controller.factory(express.Router);
 Controller.decorators(__dirname, [
@@ -16,3 +15,4 @@ Controller.decorators(__dirname, [
   'send',
   'errors'
 ]);
+module.exports = Controller;

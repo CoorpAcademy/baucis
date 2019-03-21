@@ -11,49 +11,6 @@ const config = require('./config');
 let app;
 let server;
 
-// __Fixture Schemata__
-const Schema = mongoose.Schema;
-const Fungus = new Schema({'hyphenated-field-name': String});
-const Animal = new Schema({name: String});
-const Mineral = new Schema({
-  color: String,
-  enables: [{type: Schema.ObjectId, ref: 'fungus'}]
-});
-const Vegetable = new Schema({
-  name: {type: String, required: true},
-  lastModified: {type: Date, required: true, default: Date.now},
-  diseases: {type: [String], select: false},
-  species: {type: String, default: 'n/a', select: false},
-  related: {type: Schema.ObjectId, ref: 'vegetable'},
-  score: {type: Number, min: 1},
-  nutrients: [{type: Schema.ObjectId, ref: 'mineral'}]
-});
-
-Vegetable.pre('save', function(next) {
-  this.set('related', this._id);
-  next();
-});
-
-Vegetable.pre('save', function(next) {
-  this.set('lastModified', new Date());
-  next();
-});
-
-Vegetable.pre('save', function(next) {
-  fixture.saveCount += 1;
-  next();
-});
-
-Vegetable.pre('remove', function(next) {
-  fixture.removeCount += 1;
-  next();
-});
-
-mongoose.model('vegetable', Vegetable).lastModified('lastModified');
-mongoose.model('fungus', Fungus).plural('fungi');
-mongoose.model('mineral', Mineral);
-mongoose.model('animal', Animal);
-
 // __Module Definition__
 const fixture = {
   init(done) {
@@ -141,7 +98,7 @@ const fixture = {
       request.baucis.incoming(
         es.map(function(context, callback) {
           context.incoming.name = 'boom';
-          callback(null, context);
+          return callback(null, context);
         })
       );
       next();
@@ -163,7 +120,7 @@ const fixture = {
       request.baucis.outgoing(
         es.map(function(context, callback) {
           context.doc.name = 'beam';
-          callback(null, context);
+          return callback(null, context);
         })
       );
       next();
@@ -232,7 +189,7 @@ const fixture = {
         enables: fungus._id
       });
     });
-    vegetables = vegetableNames.map(function(name) {
+    const vegetables = vegetableNames.map(function(name) {
       // TODO leaked global
       return new Vegetable({
         name,
@@ -259,7 +216,54 @@ const fixture = {
 
     deferred.push(fungus.save.bind(fungus));
 
-    async.series(deferred, done);
+    async.series(deferred, err => {
+      if (err) return done(err);
+      return done(null, vegetables);
+    });
   }
 };
+
+// __Fixture Schemata__
+const Schema = mongoose.Schema;
+const Fungus = new Schema({'hyphenated-field-name': String});
+const Animal = new Schema({name: String});
+const Mineral = new Schema({
+  color: String,
+  enables: [{type: Schema.ObjectId, ref: 'fungus'}]
+});
+const Vegetable = new Schema({
+  name: {type: String, required: true},
+  lastModified: {type: Date, required: true, default: Date.now},
+  diseases: {type: [String], select: false},
+  species: {type: String, default: 'n/a', select: false},
+  related: {type: Schema.ObjectId, ref: 'vegetable'},
+  score: {type: Number, min: 1},
+  nutrients: [{type: Schema.ObjectId, ref: 'mineral'}]
+});
+
+Vegetable.pre('save', function(next) {
+  this.set('related', this._id);
+  next();
+});
+
+Vegetable.pre('save', function(next) {
+  this.set('lastModified', new Date());
+  next();
+});
+
+Vegetable.pre('save', function(next) {
+  fixture.saveCount += 1;
+  next();
+});
+
+Vegetable.pre('remove', function(next) {
+  fixture.removeCount += 1;
+  next();
+});
+
+mongoose.model('vegetable', Vegetable).lastModified('lastModified');
+mongoose.model('fungus', Fungus).plural('fungi');
+mongoose.model('mineral', Mineral);
+mongoose.model('animal', Animal);
+
 module.exports = fixture;

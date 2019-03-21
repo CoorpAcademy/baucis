@@ -1,5 +1,5 @@
 // __Module Definition__
-const decorator = (module.exports = function() {
+module.exports = function() {
   const controller = this;
   // Build the "Allow" response header
   controller.request(function(request, response, next) {
@@ -12,4 +12,4 @@ const decorator = (module.exports = function() {
     response.set('Allow', allowed.join());
     next();
   });
-});
+};

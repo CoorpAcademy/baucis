@@ -27,7 +27,7 @@ function isNonNegativeInteger(n) {
 }
 
 // __Module Definition__
-const decorator = (module.exports = function() {
+module.exports = function() {
   const controller = this;
 
   function checkBadSelection(select) {
@@ -191,4 +191,4 @@ const decorator = (module.exports = function() {
 
     next();
   });
-});
+};

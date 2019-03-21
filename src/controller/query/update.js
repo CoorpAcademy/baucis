@@ -1,6 +1,4 @@
 // __Dependencies__
-const util = require('util');
-const express = require('express');
 const es = require('event-stream');
 const RestError = require('rest-error');
 
@@ -8,18 +6,17 @@ const RestError = require('rest-error');
 const validOperators = ['$set', '$push', '$pull', '$addToSet', '$pop', '$pushAll', '$pullAll'];
 
 // __Module Definition__
-const decorator = (module.exports = function(options, protect) {
+module.exports = function(options, protect) {
   const baucis = require('../../..');
   const controller = this;
 
   function checkBadUpdateOperatorPaths(operator, paths) {
     let bad = false;
     const whitelisted = controller.operators(operator);
-    let parts;
 
     if (!whitelisted) return true;
 
-    parts = whitelisted.split(/\s+/);
+    const parts = whitelisted.split(/\s+/);
 
     paths.forEach(function(path) {
       if (parts.indexOf(path) !== -1) return;
@@ -215,4 +212,4 @@ const decorator = (module.exports = function(options, protect) {
     s.on('end', next);
     s.resume();
   });
-});
+};

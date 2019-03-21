@@ -2,15 +2,7 @@
 const RestError = require('rest-error');
 
 // __Private Module Members__
-// Expands route definitions based on generalized arguments.
-const defineRoutes = function(stage, params) {
-  const argumentsArray = Array.prototype.slice.call(params);
 
-  const options = last(0, ['endpoint', 'methods', 'middleware'], argumentsArray);
-  options.stage = stage;
-
-  return factor(options);
-};
 // A filter function for checking a given value is defined and not null.
 function exists(o) {
   return o !== undefined && o !== null;
@@ -38,12 +30,11 @@ function isRecognizedMethod(s) {
 function factor(options) {
   const factored = [];
   let methodString = options.methods;
-  let methods;
 
   if (methodString) methodString = methodString.toLowerCase();
 
   if (!methodString || methodString === '*') methodString = 'all';
-  methods = methodString.split(/\s+/);
+  const methods = methodString.split(/\s+/);
 
   methods.forEach(function(method) {
     if (!isRecognizedMethod(method))
@@ -92,6 +83,16 @@ function factor(options) {
 
   return factored;
 }
+
+// Expands route definitions based on generalized arguments.
+const defineRoutes = function(stage, params) {
+  const argumentsArray = Array.prototype.slice.call(params);
+
+  const options = last(0, ['endpoint', 'methods', 'middleware'], argumentsArray);
+  options.stage = stage;
+
+  return factor(options);
+};
 // __Module Definition__
 module.exports = function(options, protect) {
   const controller = this;

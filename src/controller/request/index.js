@@ -2,9 +2,4 @@
 const deco = require('deco');
 
 // __Module Definition__
-const middleware = (module.exports = deco(__dirname, [
-  'allow',
-  'validation',
-  'conditions',
-  'streams'
-]));
+module.exports = deco(__dirname, ['allow', 'validation', 'conditions', 'streams']);

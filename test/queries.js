@@ -5,8 +5,15 @@ const parselinks = require('parse-links');
 const fixtures = require('./fixtures');
 
 describe('Queries', function() {
+  let vegetables;
   before(fixtures.vegetable.init);
-  beforeEach(fixtures.vegetable.create);
+  beforeEach(done =>
+    fixtures.vegetable.create((err, legumes) => {
+      if (err) return done(err);
+      vegetables = legumes;
+      return done();
+    })
+  );
   after(fixtures.vegetable.deinit);
 
   it('should support skip 1', function(done) {
@@ -306,7 +313,7 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      const expected = '</api/minerals>; rel="search", ' + '</api/minerals?sort=color>; rel="self"';
+      const expected = '</api/minerals>; rel="search", </api/minerals?sort=color>; rel="self"';
       expect(response.statusCode).to.equal(200);
       expect(response.headers.link).to.equal(expected);
       done();
