@@ -24,7 +24,7 @@ const Liqueur = mongoose.model('liqueur', LiqueurSchema);
 const Amaro = Liqueur.discriminator('amaro', AmaroSchema).plural('amari');
 const Cordial = Liqueur.discriminator('cordial', CordialSchema);
 
-const fixture = (module.exports = {
+module.exports = {
   init(done) {
     mongoose.connect(config.mongo.url, {useMongoClient: true});
 
@@ -80,4 +80,4 @@ const fixture = (module.exports = {
 
     async.series(deferred, done);
   }
-});
+};

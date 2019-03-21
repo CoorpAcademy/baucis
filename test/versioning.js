@@ -1,5 +1,4 @@
 const {expect} = require('chai');
-const express = require('express');
 const request = require('request');
 const baucis = require('..');
 
@@ -28,9 +27,7 @@ describe('Versioning', function() {
         .releases('1.0.0')
         .releases('abc');
     };
-    expect(fn).to.throw(
-      /^Release version "abc" is not a valid semver version [(]500[)][.]$/
-    );
+    expect(fn).to.throw(/^Release version "abc" is not a valid semver version [(]500[)][.]$/);
     done();
   });
 

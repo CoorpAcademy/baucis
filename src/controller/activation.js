@@ -1,13 +1,12 @@
 // __Dependencies__
 const RestError = require('rest-error');
-const Controller = require('../controller');
+
 // __Private Module Members__
 // Expands route definitions based on generalized arguments.
 const defineRoutes = function(stage, params) {
-  let options;
   const argumentsArray = Array.prototype.slice.call(params);
 
-  options = last(0, ['endpoint', 'methods', 'middleware'], argumentsArray);
+  const options = last(0, ['endpoint', 'methods', 'middleware'], argumentsArray);
   options.stage = stage;
 
   return factor(options);
@@ -94,7 +93,7 @@ function factor(options) {
   return factored;
 }
 // __Module Definition__
-const decorator = (module.exports = function(options, protect) {
+module.exports = function(options, protect) {
   const controller = this;
   // __Private Instance Members__
   // A method used to activate middleware for a particular stage.
@@ -120,4 +119,4 @@ const decorator = (module.exports = function(options, protect) {
     defineRoutes('query', arguments).forEach(activate);
     return controller;
   };
-});
+};

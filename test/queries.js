@@ -1,10 +1,5 @@
 const {expect} = require('chai');
-const mongoose = require('mongoose');
-const express = require('express');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 const request = require('request');
-const baucis = require('..');
 const parselinks = require('parse-links');
 
 const fixtures = require('./fixtures');
@@ -336,10 +331,9 @@ describe('Queries', function() {
       request.get(options, function(error, response, body) {
         if (error) return done(error);
 
-        const expected =
-          `${'</api/minerals>; rel="collection", ' +
-            '</api/minerals>; rel="search", ' +
-            '</api/minerals/'}${id}>; rel="edit", ` + `</api/minerals/${id}>; rel="self"`;
+        const expected = `${'</api/minerals>; rel="collection", ' +
+          '</api/minerals>; rel="search", ' +
+          '</api/minerals/'}${id}>; rel="edit", </api/minerals/${id}>; rel="self"`;
         expect(response.statusCode).to.equal(200);
         expect(response.headers.link).to.equal(expected);
         done();

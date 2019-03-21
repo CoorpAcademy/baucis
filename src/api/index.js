@@ -6,7 +6,7 @@ const RestError = require('rest-error');
 const Controller = require('../controller');
 
 // __Module Definition__
-const Api = (module.exports = deco(function(options, protect) {
+const Api = deco(function(options, protect) {
   const api = this;
 
   api.use(function(request, response, next) {
@@ -58,7 +58,9 @@ const Api = (module.exports = deco(function(options, protect) {
     api.add(controller);
     return controller;
   };
-}));
+});
 
 Api.factory(express.Router);
 Api.decorators(__dirname, ['controllers']);
+
+module.exports = Api;

@@ -1,8 +1,5 @@
 const {expect} = require('chai');
 const mongoose = require('mongoose');
-const express = require('express');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 const request = require('request').defaults({json: true});
 const baucis = require('..');
 

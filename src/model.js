@@ -2,7 +2,7 @@ const deco = require('deco');
 const mongoose = require('mongoose');
 const pluralize = require('mongoose/lib/utils').toCollectionName;
 
-const Model = (module.exports = deco(function(options, protect) {
+const Model = deco(function(options, protect) {
   const model = this;
 
   protect.property('singular');
@@ -23,7 +23,7 @@ const Model = (module.exports = deco(function(options, protect) {
 
   model.singular(model.modelName);
   model.plural(pluralize(model.singular()));
-}));
+});
 
 // Wrap the mongoose model function to add this mixin to all registered models.
 const originalMongooseModel = mongoose.model;
@@ -32,3 +32,5 @@ mongoose.model = function() {
   if (!m.singular) Model.apply(m);
   return m;
 };
+
+module.exports = Model;

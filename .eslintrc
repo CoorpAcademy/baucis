@@ -20,7 +20,11 @@
   ],
   "rules": {
     "strict": "off",
-    "promise/no-native": "off"
+    "promise/no-native": "off",
+    "no-shadow": "warn",
+    "no-param-reassign": "warn",
+    "fp/no-arguments": "warn",
+    "prefer-rest-params": "warn"
   },
   "overrides": [
     {

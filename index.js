@@ -1,7 +1,4 @@
 // __Dependencies__
-const deco = require('deco');
-const es = require('event-stream');
-const mongoose = require('mongoose');
 const RestError = require('rest-error');
 const Api = require('./src/api');
 const Controller = require('./src/controller');
@@ -15,12 +12,11 @@ const plugins = {
 let instance;
 const parsers = {};
 const formatters = {};
-const errorFormatters = {};
 
 // __Module Definition__
-var baucis = (module.exports = function(options) {
+const baucis = function(options) {
   return baucis.empty();
-});
+};
 
 // __Public Members__
 baucis.rest = function(model) {
@@ -50,10 +46,11 @@ baucis.formatters = function(response, callback) {
     }
   };
 
-  Object.keys(formatters).map(function(mime) {
+  Object.keys(formatters).forEach(function(mime) {
     handlers[mime] = formatters[mime](callback);
   });
   response.format(handlers);
+  return;
 };
 
 // Adds a formatter for the given mime type.  Needs a function that returns a stream.
@@ -71,7 +68,7 @@ baucis.parser = function(mime, handler) {
   mime = mime || 'application/json';
   // Not interested in any additional parameters at this point.
   mime = mime.split(';')[0].trim();
-  var handler = parsers[mime];
+  handler = parsers[mime];
   return handler ? handler() : undefined;
 };
 
@@ -95,3 +92,5 @@ Model.container(baucis);
 // __Plugins__
 plugins.json.apply(baucis);
 plugins.links.apply(baucis);
+
+module.exports = baucis;

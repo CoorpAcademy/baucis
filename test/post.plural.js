@@ -1,7 +1,6 @@
 const {expect} = require('chai');
 const request = require('request');
 const mongoose = require('mongoose');
-const baucis = require('..');
 
 const fixtures = require('./fixtures');
 
@@ -18,9 +17,9 @@ describe('POST plural', function() {
     request.post(options, function(error, response, body) {
       if (error) return done(error);
 
-  expect(response.statusCode).to.equal(201);
-  expect(body._id).not.to.be.empty;
-  expect(response.headers.location).to.equal(`/api/vegetables/${body._id}`);
+      expect(response.statusCode).to.equal(201);
+      expect(body._id).not.to.be.empty;
+      expect(response.headers.location).to.equal(`/api/vegetables/${body._id}`);
 
       const options = {
         url: `http://localhost:8012${response.headers.location}`,

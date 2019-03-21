@@ -50,7 +50,6 @@ describe('GET plural', function() {
       json: true
     };
     request.get(options, function(err, response, body) {
-      console.dir(err);
       if (err) return done(err);
       expect(response.statusCode).to.equal(200);
       expect(body).to.eql([]);

@@ -14,7 +14,7 @@ mongoose.model('party', Party);
 mongoose.model('dungeon', Dungeon);
 mongoose.model('pumpkin', Pumpkin).locking(true);
 
-const fixture = (module.exports = {
+module.exports = {
   init(done) {
     mongoose.connect(config.mongo.url, {useMongoClient: true});
 
@@ -46,4 +46,4 @@ const fixture = (module.exports = {
     mongoose.disconnect();
     done();
   }
-});
+};

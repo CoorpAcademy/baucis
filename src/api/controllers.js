@@ -1,10 +1,8 @@
 // __Dependencies__
-const util = require('util');
 const semver = require('semver');
-const RestError = require('rest-error');
 
 // __Module Definition__
-const plugin = (module.exports = function(options, protect) {
+module.exports = function(options, protect) {
   const api = this;
   const controllers = [];
 
@@ -43,4 +41,4 @@ const plugin = (module.exports = function(options, protect) {
     request.baucis.controller = controllers[0];
     request.baucis.controller(request, response, next);
   });
-});
+};

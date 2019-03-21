@@ -22,7 +22,7 @@ const Task = new Schema({
 mongoose.model('user', User);
 mongoose.model('task', Task);
 
-const fixture = (module.exports = {
+module.exports = {
   init(done) {
     mongoose.connect(config.mongo.url, {useMongoClient: true});
     const users = baucis.rest('user');
@@ -83,4 +83,4 @@ const fixture = (module.exports = {
       });
     });
   }
-});
+};

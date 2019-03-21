@@ -55,7 +55,7 @@ mongoose.model('mineral', Mineral);
 mongoose.model('animal', Animal);
 
 // __Module Definition__
-var fixture = (module.exports = {
+const fixture = {
   init(done) {
     mongoose.connect(config.mongo.url, {useMongoClient: true});
 
@@ -261,4 +261,5 @@ var fixture = (module.exports = {
 
     async.series(deferred, done);
   }
-});
+};
+module.exports = fixture;
