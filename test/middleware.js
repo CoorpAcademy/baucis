@@ -1,39 +1,39 @@
-var expect = require('expect.js');
-var mongoose = require('mongoose');
-var express = require('express');
-var passport = require('passport')
-var LocalStrategy = require('passport-local').Strategy;
-var request = require('request');
-var baucis = require('..');
+const expect = require('expect.js');
+const mongoose = require('mongoose');
+const express = require('express');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const request = require('request');
+const baucis = require('..');
 
-var fixtures = require('./fixtures');
+const fixtures = require('./fixtures');
 
-describe('Middleware', function () {
+describe('Middleware', function() {
   before(fixtures.vegetable.init);
   beforeEach(fixtures.vegetable.create);
   after(fixtures.vegetable.deinit);
 
-  it('should prevent resource from being loaded when block is set', function (done) {
-    var options = {
-      url : 'http://localhost:8012/api/vegetables/' + vegetables[0]._id,
-      qs  : { block: true },
+  it('should prevent resource from being loaded when block is set', function(done) {
+    const options = {
+      url: `http://localhost:8012/api/vegetables/${vegetables[0]._id}`,
+      qs: {block: true},
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(401);
       done();
     });
   });
 
-  it('should allow resource to be loaded when block is not set', function (done) {
-    var options = {
-      url : 'http://localhost:8012/api/vegetables/' + vegetables[0]._id,
-      qs  : { block: false },
+  it('should allow resource to be loaded when block is not set', function(done) {
+    const options = {
+      url: `http://localhost:8012/api/vegetables/${vegetables[0]._id}`,
+      qs: {block: false},
       json: true
     };
 
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
 
       expect(response.statusCode).to.be(200);
@@ -43,13 +43,13 @@ describe('Middleware', function () {
     });
   });
 
-  it('should allow query middleware to alter query', function (done) {
-    var options = {
-      url: 'http://localhost:8012/api/vegetables/' + vegetables[0]._id,
-      qs: { testQuery: true },
+  it('should allow query middleware to alter query', function(done) {
+    const options = {
+      url: `http://localhost:8012/api/vegetables/${vegetables[0]._id}`,
+      qs: {testQuery: true},
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('_id');
@@ -58,14 +58,14 @@ describe('Middleware', function () {
     });
   });
 
-  it('should allow custom stream handlers (IN/POST)', function (done) {
+  it('should allow custom stream handlers (IN/POST)', function(done) {
     // should set all fields to a string
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/vegetables/',
-      qs: { streamIn: true },
-      json: { name: 'zoom' }
+      qs: {streamIn: true},
+      json: {name: 'zoom'}
     };
-    request.post(options, function (error, response, body) {
+    request.post(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(201);
       expect(body).to.have.property('_id');
@@ -74,15 +74,15 @@ describe('Middleware', function () {
     });
   });
 
-  it('should allow custom stream handlers (IN/PUT)', function (done) {
+  it('should allow custom stream handlers (IN/PUT)', function(done) {
     // should set all fields to a string
-    var radicchio = vegetables[7];
-    var options = {
-      url: 'http://localhost:8012/api/vegetables/' + radicchio._id,
-      qs: { streamIn: true },
-      json: { name: 'zoom' }
+    const radicchio = vegetables[7];
+    const options = {
+      url: `http://localhost:8012/api/vegetables/${radicchio._id}`,
+      qs: {streamIn: true},
+      json: {name: 'zoom'}
     };
-    request.put(options, function (error, response, body) {
+    request.put(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('_id', radicchio._id.toString());
@@ -91,14 +91,14 @@ describe('Middleware', function () {
     });
   });
 
-  it('should allow custom stream handlers (FUNCTION)', function (done) {
+  it('should allow custom stream handlers (FUNCTION)', function(done) {
     // should set all fields to a string
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/vegetables/',
-      qs: { streamInFunction: true },
-      json: { name: 'zoom' }
+      qs: {streamInFunction: true},
+      json: {name: 'zoom'}
     };
-    request.post(options, function (error, response, body) {
+    request.post(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(201);
       expect(body).to.have.property('_id');
@@ -107,13 +107,13 @@ describe('Middleware', function () {
     });
   });
 
-  it('should handle errors in user streams (IN/POST)', function (done) {
-    var options = {
+  it('should handle errors in user streams (IN/POST)', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables/',
-      qs: { failIt: true },
-      json: { name: 'zoom' }
+      qs: {failIt: true},
+      json: {name: 'zoom'}
     };
-    request.post(options, function (error, response, body) {
+    request.post(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
       expect(body).to.have.property('message', 'Bento box (403).');
@@ -121,15 +121,15 @@ describe('Middleware', function () {
     });
   });
 
-  it('should handle errors in user streams (IN/PUT)', function (done) {
+  it('should handle errors in user streams (IN/PUT)', function(done) {
     // should set all fields to a string
-    var radicchio = vegetables[7];
-    var options = {
-      url: 'http://localhost:8012/api/vegetables/' + radicchio._id,
-      qs: { failIt: true },
-      json: { name: 'zoom' }
+    const radicchio = vegetables[7];
+    const options = {
+      url: `http://localhost:8012/api/vegetables/${radicchio._id}`,
+      qs: {failIt: true},
+      json: {name: 'zoom'}
     };
-    request.put(options, function (error, response, body) {
+    request.put(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
       expect(body).to.have.property('message', 'Bento box (403).');
@@ -137,14 +137,14 @@ describe('Middleware', function () {
     });
   });
 
-  it('should handle errors in user streams (FUNCTION)', function (done) {
+  it('should handle errors in user streams (FUNCTION)', function(done) {
     // should set all fields to a string
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/vegetables/',
-      qs: { failItFunction: true },
-      json: { name: 'zoom' }
+      qs: {failItFunction: true},
+      json: {name: 'zoom'}
     };
-    request.post(options, function (error, response, body) {
+    request.post(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
       expect(body).to.have.property('message', 'Bento box (403).');
@@ -152,13 +152,13 @@ describe('Middleware', function () {
     });
   });
 
-  it('should handle errors in user streams (OUT)', function (done) {
-    var options = {
+  it('should handle errors in user streams (OUT)', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables/',
-      qs: { failIt2: true },
+      qs: {failIt2: true},
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
       expect(body).to.have.property('message', 'Bento box (403).');
@@ -166,13 +166,13 @@ describe('Middleware', function () {
     });
   });
 
-  it('should skip streaming documents in if request.body is already present', function (done) {
-    var options = {
+  it('should skip streaming documents in if request.body is already present', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables/',
-      qs: { parse: true },
-      json: { name: 'zoom' }
+      qs: {parse: true},
+      json: {name: 'zoom'}
     };
-    request.post(options, function (error, response, body) {
+    request.post(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(201);
       expect(body).to.have.property('_id');
@@ -181,14 +181,14 @@ describe('Middleware', function () {
     });
   });
 
-  it('should allow custom stream handlers (OUT)', function (done) {
+  it('should allow custom stream handlers (OUT)', function(done) {
     // should set all fields to a string
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/vegetables/',
-      qs: { streamOut: true },
+      qs: {streamOut: true},
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('length', 8);
@@ -199,14 +199,14 @@ describe('Middleware', function () {
     });
   });
 
-  it('allows custom stream handlers to alter documents (delete)', function (done) {
+  it('allows custom stream handlers to alter documents (delete)', function(done) {
     // should set all fields to a string
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/vegetables/',
-      qs: { deleteNutrients: true },
+      qs: {deleteNutrients: true},
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('length', 8);
@@ -216,7 +216,7 @@ describe('Middleware', function () {
   });
 
   it('should prevent mixing streaming and documents middleware (maybe)');
-  it('should allow streaming out into request.baucis.documents (maybe)');//, function (done) {
+  it('should allow streaming out into request.baucis.documents (maybe)'); // , function (done) {
   //   // should set all fields to a string
   //   var options = {
   //     url: 'http://localhost:8012/api/vegetables/',
@@ -234,7 +234,7 @@ describe('Middleware', function () {
   //   });
   // });
 
-  it('should 404 if request.baucis.documents is undefined, null, or 0 (maybe)');//, function (done) {
+  it('should 404 if request.baucis.documents is undefined, null, or 0 (maybe)'); // , function (done) {
   //       // should set all fields to a string
   //   var options = {
   //     url: 'http://localhost:8012/api/vegetables/',
@@ -249,7 +249,7 @@ describe('Middleware', function () {
   //   });
   // });
 
-  it('should skip streaming documents out if request.baucis.documents is present (maybe)');//, function (done) {
+  it('should skip streaming documents out if request.baucis.documents is present (maybe)'); // , function (done) {
   //   var options = {
   //     url: 'http://localhost:8012/api/vegetables/',
   //     qs: { creamIt: true },
@@ -262,5 +262,4 @@ describe('Middleware', function () {
   //     done();
   //   });
   // });
-
 });

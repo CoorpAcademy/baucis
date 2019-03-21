@@ -1,17 +1,17 @@
-var mongoose = require('mongoose');
-var express = require('express');
-var baucis = require('../..');
-var config = require('./config');
+const mongoose = require('mongoose');
+const express = require('express');
+const baucis = require('../..');
+const config = require('./config');
 
-var app;
-var server;
-var Schema = mongoose.Schema;
+let app;
+let server;
+const Schema = mongoose.Schema;
 
-var User = new Schema({
+const User = new Schema({
   name: String,
-  tasks: [{ type: Schema.ObjectId, ref: 'task' }]
+  tasks: [{type: Schema.ObjectId, ref: 'task'}]
 });
-var Task = new Schema({
+const Task = new Schema({
   name: String,
   user: {
     type: Schema.Types.ObjectId,
@@ -22,22 +22,21 @@ var Task = new Schema({
 mongoose.model('user', User);
 mongoose.model('task', Task);
 
-var fixture = module.exports = {
-  init: function (done) {
+const fixture = (module.exports = {
+  init(done) {
+    mongoose.connect(config.mongo.url, {useMongoClient: true});
+    const users = baucis.rest('user');
+    const tasks = users.vivify('tasks');
 
-    mongoose.connect(config.mongo.url, { useMongoClient: true });
-    var users = baucis.rest('user');
-    var tasks = users.vivify('tasks');
-
-    tasks.request(function (request, response, next) {
-      request.baucis.outgoing(function (context, callback) {
+    tasks.request(function(request, response, next) {
+      request.baucis.outgoing(function(context, callback) {
         context.doc.name = 'Changed by Middleware';
         callback(null, context);
       });
       next();
     });
 
-    tasks.query(function (request, response, next) {
+    tasks.query(function(request, response, next) {
       request.baucis.query.where('user', request.params._id);
       next();
     });
@@ -49,30 +48,34 @@ var fixture = module.exports = {
 
     done();
   },
-  deinit: function (done) {
+  deinit(done) {
     server.close();
     mongoose.disconnect();
     done();
   },
-  create: function (done) {
+  create(done) {
     // clear all first
-    mongoose.model('user').remove({}, function (error) {
+    mongoose.model('user').remove({}, function(error) {
       if (error) return done(error);
 
-      mongoose.model('task').remove({}, function (error) {
+      mongoose.model('task').remove({}, function(error) {
         if (error) return done(error);
 
         mongoose.model('user').create(
-          ['Alice', 'Bob'].map(function (name) { return { name: name } }),
-          function (error, alice) {
+          ['Alice', 'Bob'].map(function(name) {
+            return {name};
+          }),
+          function(error, alice) {
             if (error) return done(error);
 
             mongoose.model('task').create(
-              ['Mow the Lawn', 'Make the Bed', 'Darn the Socks'].map(function (name) { return { name: name } }),
-              function (error,task) {
+              ['Mow the Lawn', 'Make the Bed', 'Darn the Socks'].map(function(name) {
+                return {name};
+              }),
+              function(error, task) {
                 if (error) return done(error);
                 task.user = alice._id;
-                task.save(done)
+                task.save(done);
               }
             );
           }
@@ -80,4 +83,4 @@ var fixture = module.exports = {
       });
     });
   }
-};
+});

@@ -1,23 +1,22 @@
-var mongoose = require('mongoose');
-var express = require('express');
-var baucis = require('../..');
-var config = require('./config');
+const mongoose = require('mongoose');
+const express = require('express');
+const baucis = require('../..');
+const config = require('./config');
 
-var app;
-var server;
-var Schema = mongoose.Schema;
-var Party = new Schema({ hobbits: Number, dwarves: Number });
-var Dungeon = new Schema({ treasures: Number });
-var Pumpkin = new Schema({ title: String });
+let app;
+let server;
+const Schema = mongoose.Schema;
+const Party = new Schema({hobbits: Number, dwarves: Number});
+const Dungeon = new Schema({treasures: Number});
+const Pumpkin = new Schema({title: String});
 
 mongoose.model('party', Party);
 mongoose.model('dungeon', Dungeon);
 mongoose.model('pumpkin', Pumpkin).locking(true);
 
-var fixture = module.exports = {
-  init: function (done) {
-
-    mongoose.connect(config.mongo.url, { useMongoClient: true });
+const fixture = (module.exports = {
+  init(done) {
+    mongoose.connect(config.mongo.url, {useMongoClient: true});
 
     app = express();
 
@@ -26,7 +25,13 @@ var fixture = module.exports = {
     baucis.rest('party').versions('2.1.0');
     baucis.rest('party').versions('~3');
 
-    app.use('/api/versioned', baucis().releases('1.0.0').releases('2.1.0').releases('3.0.1'));
+    app.use(
+      '/api/versioned',
+      baucis()
+        .releases('1.0.0')
+        .releases('2.1.0')
+        .releases('3.0.1')
+    );
 
     baucis.rest('dungeon');
 
@@ -36,9 +41,9 @@ var fixture = module.exports = {
 
     done();
   },
-  deinit: function (done) {
+  deinit(done) {
     server.close();
     mongoose.disconnect();
     done();
   }
-};
+});

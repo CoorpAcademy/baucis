@@ -1,10 +1,10 @@
 // __Dependencies__
-var deco = require('deco');
-var express = require('express');
-var RestError = require('rest-error');
+const deco = require('deco');
+const express = require('express');
+const RestError = require('rest-error');
 
 // __Module Definition__
-var Controller = module.exports = deco();
+const Controller = (module.exports = deco());
 
 Controller.factory(express.Router);
 Controller.decorators(__dirname, [

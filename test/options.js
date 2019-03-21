@@ -1,17 +1,17 @@
-var expect = require('expect.js');
-var request = require('request').defaults({ json: true });
+const expect = require('expect.js');
+const request = require('request').defaults({json: true});
 
-var fixtures = require('./fixtures');
+const fixtures = require('./fixtures');
 
-describe.skip('OPTIONS instance/collection', function () {
+describe.skip('OPTIONS instance/collection', function() {
   before(fixtures.vegetable.init);
   beforeEach(fixtures.vegetable.create);
   after(fixtures.vegetable.deinit);
 
-  it('provides options for the collection', function (done) {
-    var url = 'http://localhost:8012/api/vegetables/';
+  it('provides options for the collection', function(done) {
+    const url = 'http://localhost:8012/api/vegetables/';
 
-    request({ method: 'OPTIONS', url: url }, function (error, response, body) {
+    request({method: 'OPTIONS', url}, function(error, response, body) {
       if (error) return done(error);
 
       expect(response.statusCode).to.be(200);
@@ -27,11 +27,11 @@ describe.skip('OPTIONS instance/collection', function () {
     });
   });
 
-  it('provides options for the instance', function (done) {
-    var shitake = vegetables[3];
-    var url = 'http://localhost:8012/api/vegetables/' + shitake._id;
+  it('provides options for the instance', function(done) {
+    const shitake = vegetables[3];
+    const url = `http://localhost:8012/api/vegetables/${shitake._id}`;
 
-    request({ method: 'OPTIONS', url: url }, function (error, response, body) {
+    request({method: 'OPTIONS', url}, function(error, response, body) {
       if (error) return done(error);
 
       expect(response.statusCode).to.be(200);
@@ -43,9 +43,7 @@ describe.skip('OPTIONS instance/collection', function () {
       expect(response.headers).to.have.property('date');
       expect(response.headers).to.have.property('connection', 'keep-alive');
 
-
       done();
     });
   });
-
 });

@@ -1,14 +1,14 @@
 // __Dependencies__
-var RestError = require('rest-error');
+const RestError = require('rest-error');
 
 // __Private Methods__
-function isDefinedAndNotNull (n) {
+function isDefinedAndNotNull(n) {
   if (n === null) return false;
   if (n === undefined) return false;
   return true;
 }
 
-function isPositiveInteger (n) {
+function isPositiveInteger(n) {
   if (!isDefinedAndNotNull(n)) return false;
   n = Number(n);
   if (n < 1) return false;
@@ -16,10 +16,10 @@ function isPositiveInteger (n) {
 }
 
 function getAsInt(n) {
-	return Math.ceil(Number(n));
+  return Math.ceil(Number(n));
 }
 
-function isNonNegativeInteger (n) {
+function isNonNegativeInteger(n) {
   if (!isDefinedAndNotNull(n)) return false;
   n = Number(n);
   if (n < 0) return false;
@@ -27,54 +27,54 @@ function isNonNegativeInteger (n) {
 }
 
 // __Module Definition__
-var decorator = module.exports = function () {
-  var controller = this;
+const decorator = (module.exports = function() {
+  const controller = this;
 
-  function checkBadSelection (select) {
-    var bad = false;
-    controller.deselected().forEach(function (path) {
-      var badPath = new RegExp('[+]?' + path + '\\b', 'i');
+  function checkBadSelection(select) {
+    let bad = false;
+    controller.deselected().forEach(function(path) {
+      const badPath = new RegExp(`[+]?${path}\\b`, 'i');
       if (badPath.exec(select)) bad = true;
     });
     return bad;
   }
 
   // Perform distinct query.
-  this.query(function (request, response, next) {
-    var distinct = request.query.distinct;
+  this.query(function(request, response, next) {
+    const distinct = request.query.distinct;
     if (!distinct) return next();
     if (controller.deselected(distinct)) {
       next(RestError.Forbidden('You may not find distinct values for the requested path'));
       return;
     }
-    var query = controller.model().distinct(distinct, request.baucis.conditions);
-    query.exec(function (error, values) {
+    const query = controller.model().distinct(distinct, request.baucis.conditions);
+    query.exec(function(error, values) {
       if (error) return next(error);
       request.baucis.documents = values;
       next();
     });
   });
   // Apply controller sort options to the query.
-  this.query(function (request, response, next) {
-    var sort = controller.sort();
+  this.query(function(request, response, next) {
+    const sort = controller.sort();
     if (sort) request.baucis.query.sort(sort);
     next();
   });
   // Apply incoming request sort.
-  this.query(function (request, response, next) {
-    var sort = request.query.sort;
+  this.query(function(request, response, next) {
+    const sort = request.query.sort;
     if (sort) request.baucis.query.sort(sort);
     next();
   });
   // Apply controller select options to the query.
-  this.query(function (request, response, next) {
-    var select = controller.select();
+  this.query(function(request, response, next) {
+    const select = controller.select();
     if (select) request.baucis.query.select(select);
     next();
   });
   // Apply incoming request select to the query.
-  this.query(function (request, response, next) {
-    var select = request.query.select;
+  this.query(function(request, response, next) {
+    const select = request.query.select;
     if (!select) return next();
 
     if (select.indexOf('+') !== -1) {
@@ -88,10 +88,10 @@ var decorator = module.exports = function () {
     next();
   });
   // Apply incoming request populate.
-  this.query(function (request, response, next) {
-    var populate = request.query.populate;
-    var allowPopulateSelect = request.baucis.allowPopulateSelect;
-    var error = null;
+  this.query(function(request, response, next) {
+    let populate = request.query.populate;
+    const allowPopulateSelect = request.baucis.allowPopulateSelect;
+    let error = null;
 
     if (populate) {
       if (typeof populate === 'string') {
@@ -99,17 +99,22 @@ var decorator = module.exports = function () {
         else if (populate.indexOf('[') !== -1) populate = JSON.parse(populate);
       }
 
-      if (!Array.isArray(populate)) populate = [ populate ];
+      if (!Array.isArray(populate)) populate = [populate];
 
-      populate.forEach(function (field) {
+      populate.forEach(function(field) {
         if (error) return;
         if (checkBadSelection(field.path || field)) {
-          return error = RestError.Forbidden('Including excluded fields is not permitted');
+          return (error = RestError.Forbidden('Including excluded fields is not permitted'));
         }
         // Don't allow selecting fields from client when populating
         if (field.select) {
-	  if (!allowPopulateSelect) return error = RestError.Forbidden('Selecting fields of populated documents is not permitted');
-	  console.warn('WARNING: Allowing populate with select is experimental and bypasses security.');
+          if (!allowPopulateSelect)
+            return (error = RestError.Forbidden(
+              'Selecting fields of populated documents is not permitted'
+            ));
+          console.warn(
+            'WARNING: Allowing populate with select is experimental and bypasses security.'
+          );
         }
 
         request.baucis.query.populate(field);
@@ -119,8 +124,8 @@ var decorator = module.exports = function () {
     next(error);
   });
   // Apply incoming request skip.
-  this.query(function (request, response, next) {
-    var skip = request.query.skip;
+  this.query(function(request, response, next) {
+    const skip = request.query.skip;
     if (skip === undefined || skip === null) return next();
     if (!isNonNegativeInteger(skip)) {
       return next(RestError.BadRequest('Skip must be a non-negative integer if set'));
@@ -129,8 +134,8 @@ var decorator = module.exports = function () {
     next();
   });
   // Apply incoming request limit.
-  this.query(function (request, response, next) {
-    var limit = request.query.limit;
+  this.query(function(request, response, next) {
+    const limit = request.query.limit;
     if (limit === undefined || limit === null) return next();
     if (!isPositiveInteger(limit)) {
       return next(RestError.BadRequest('Limit must be a positive integer if set'));
@@ -139,7 +144,7 @@ var decorator = module.exports = function () {
     next();
   });
   // Set count flag.
-  this.query(function (request, response, next) {
+  this.query(function(request, response, next) {
     if (!request.query.count) return next();
     if (request.query.count === 'false') return next();
     if (request.query.count !== 'true') {
@@ -148,12 +153,12 @@ var decorator = module.exports = function () {
     }
 
     if (request.query.hint) {
-      next(RestError.BadRequest('Hint can\'t be used with count'));
+      next(RestError.BadRequest("Hint can't be used with count"));
       return;
     }
 
     if (request.query.comment) {
-      next(RestError.BadRequest('Comment can\'t be used with count'));
+      next(RestError.BadRequest("Comment can't be used with count"));
       return;
     }
 
@@ -161,16 +166,16 @@ var decorator = module.exports = function () {
     next();
   });
   // Check for query comment.
-  this.query(function (request, response, next) {
-    var comment = request.query.comment;
+  this.query(function(request, response, next) {
+    const comment = request.query.comment;
     if (!comment) return next();
     if (controller.comments()) request.baucis.query.comment(comment);
     else console.warn('Query comment was ignored.');
     next();
   });
   // Check for query hint.
-  this.query(function (request, response, next) {
-    var hint = request.query.hint;
+  this.query(function(request, response, next) {
+    let hint = request.query.hint;
 
     if (!hint) return next();
     if (!controller.hints()) {
@@ -179,11 +184,11 @@ var decorator = module.exports = function () {
 
     if (typeof hint === 'string') hint = JSON.parse(hint);
     // Convert the value for each path from stirng to number.
-    Object.keys(hint).forEach(function (path) {
+    Object.keys(hint).forEach(function(path) {
       hint[path] = Number(hint[path]);
     });
     request.baucis.query.hint(hint);
 
     next();
   });
-};
+});

@@ -1,25 +1,25 @@
-var expect = require('expect.js');
-var mongoose = require('mongoose');
-var express = require('express');
-var passport = require('passport')
-var LocalStrategy = require('passport-local').Strategy;
-var request = require('request');
-var baucis = require('..');
-var parselinks = require('parse-links');
+const expect = require('expect.js');
+const mongoose = require('mongoose');
+const express = require('express');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const request = require('request');
+const baucis = require('..');
+const parselinks = require('parse-links');
 
-var fixtures = require('./fixtures');
+const fixtures = require('./fixtures');
 
-describe('Queries', function () {
+describe('Queries', function() {
   before(fixtures.vegetable.init);
   beforeEach(fixtures.vegetable.create);
   after(fixtures.vegetable.deinit);
 
-  it('should support skip 1', function (done) {
-    var options = {
+  it('should support skip 1', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?skip=1',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('length', vegetables.length - 1);
@@ -27,12 +27,12 @@ describe('Queries', function () {
     });
   });
 
-  it('should support skip 2', function (done) {
-    var options = {
+  it('should support skip 2', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?skip=2',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('length', vegetables.length - 2);
@@ -40,12 +40,12 @@ describe('Queries', function () {
     });
   });
 
-  it('should support limit 1', function (done) {
-    var options = {
+  it('should support limit 1', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit=1',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('length', 1);
@@ -53,12 +53,12 @@ describe('Queries', function () {
     });
   });
 
-  it('should support limit 2', function (done) {
-    var options = {
+  it('should support limit 2', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit=2',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('length', 2);
@@ -66,12 +66,12 @@ describe('Queries', function () {
     });
   });
 
-  it('disallows selecting deselected fields', function (done) {
-    var options = {
+  it('disallows selecting deselected fields', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?select=species+lastModified',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
       expect(body).to.have.property('message', 'Including excluded fields is not permitted (403).');
@@ -79,12 +79,12 @@ describe('Queries', function () {
     });
   });
 
-  it('disallows populating deselected fields 1', function (done) {
-    var options = {
+  it('disallows populating deselected fields 1', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?populate=species',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
       expect(body).to.have.property('message', 'Including excluded fields is not permitted (403).');
@@ -92,12 +92,12 @@ describe('Queries', function () {
     });
   });
 
-  it('disallows populating deselected fields 2', function (done) {
-    var options = {
+  it('disallows populating deselected fields 2', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?populate={ "path": "species" }',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
       expect(body).to.have.property('message', 'Including excluded fields is not permitted (403).');
@@ -105,12 +105,12 @@ describe('Queries', function () {
     });
   });
 
-  it('should support default express query parser when using populate', function (done) {
-    var options = {
+  it('should support default express query parser when using populate', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?populate[path]=species',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
       expect(body).to.have.property('message', 'Including excluded fields is not permitted (403).');
@@ -118,25 +118,28 @@ describe('Queries', function () {
     });
   });
 
-  it('disallows using +fields with populate', function (done) {
-    var options = {
+  it('disallows using +fields with populate', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?populate={ "select": "%2Bboiler" }',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
-      expect(body).to.have.property('message', 'Selecting fields of populated documents is not permitted (403).');
+      expect(body).to.have.property(
+        'message',
+        'Selecting fields of populated documents is not permitted (403).'
+      );
       done();
     });
   });
 
-  it('disallows using +fields with select', function (done) {
-    var options = {
+  it('disallows using +fields with select', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?select=%2Bboiler',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
       expect(body).to.have.property('message', 'Including excluded fields is not permitted (403).');
@@ -144,52 +147,62 @@ describe('Queries', function () {
     });
   });
 
-  it('disallows selecting fields when populating', function (done) {
-    var options = {
+  it('disallows selecting fields when populating', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?populate={ "path": "a", "select": "arbitrary" }',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
-      expect(body).to.have.property('message', 'Selecting fields of populated documents is not permitted (403).');
+      expect(body).to.have.property(
+        'message',
+        'Selecting fields of populated documents is not permitted (403).'
+      );
       done();
     });
   });
 
-  it('should not crash when disallowing selecting fields when populating', function (done) {
-    var options = {
-      url: 'http://localhost:8012/api/vegetables?populate=[{ "path": "a", "select": "arbitrary actuary" }, { "path": "b", "select": "arbitrary actuary" }]',
+  it('should not crash when disallowing selecting fields when populating', function(done) {
+    const options = {
+      url:
+        'http://localhost:8012/api/vegetables?populate=[{ "path": "a", "select": "arbitrary actuary" }, { "path": "b", "select": "arbitrary actuary" }]',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
-      expect(body).to.have.property('message', 'Selecting fields of populated documents is not permitted (403).');
+      expect(body).to.have.property(
+        'message',
+        'Selecting fields of populated documents is not permitted (403).'
+      );
       done();
     });
   });
 
-  it('disallows selecting fields when populating', function (done) {
-    var options = {
+  it('disallows selecting fields when populating', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?populate={ "path": "a", "select": "arbitrary" }',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
-      expect(body).to.have.property('message', 'Selecting fields of populated documents is not permitted (403).');
+      expect(body).to.have.property(
+        'message',
+        'Selecting fields of populated documents is not permitted (403).'
+      );
       done();
     });
   });
 
-  it('allows populating children', function (done) {
-    var id = vegetables[0]._id;
-    var options = {
-      url: 'http://localhost:8012/api/vegetables/' + id + '/?populate=nutrients',
+  it('allows populating children', function(done) {
+    const id = vegetables[0]._id;
+    const options = {
+      url: `http://localhost:8012/api/vegetables/${id}/?populate=nutrients`,
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('nutrients');
@@ -199,13 +212,13 @@ describe('Queries', function () {
     });
   });
 
-  it('allows query by Id', function (done) {
-    var id = vegetables[0]._id;
-    var options = {
-      url: 'http://localhost:8012/api/vegetables/' + id,
+  it('allows query by Id', function(done) {
+    const id = vegetables[0]._id;
+    const options = {
+      url: `http://localhost:8012/api/vegetables/${id}`,
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('name', 'Turnip');
@@ -213,27 +226,26 @@ describe('Queries', function () {
     });
   });
 
-
   it('allows default express query string format', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?conditions[name]=Radicchio',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('length', 1);
-      expect(body[0]).to.have.property('name', 'Radicchio')
+      expect(body[0]).to.have.property('name', 'Radicchio');
       done();
     });
   });
 
-  it('allows selecting fields', function (done) {
-    var options = {
+  it('allows selecting fields', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?select=-_id lastModified',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body[0]).not.to.have.property('_id');
@@ -243,16 +255,16 @@ describe('Queries', function () {
     });
   });
 
-  it('allows setting default sort', function (done) {
-    var options = {
+  it('allows setting default sort', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/minerals',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
-      var lastMineral = '';
-      body.forEach(function (mineral) {
+      let lastMineral = '';
+      body.forEach(function(mineral) {
         expect(mineral.color).to.be.above(lastMineral);
         lastMineral = mineral.color;
       });
@@ -260,16 +272,16 @@ describe('Queries', function () {
     });
   });
 
-  it('allows overriding default sort', function (done) {
-    var options = {
+  it('allows overriding default sort', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/minerals?sort=-color',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
-      var lastMineral = '';
-      body.forEach(function (mineral) {
+      let lastMineral = '';
+      body.forEach(function(mineral) {
         if (lastMineral) expect(mineral.color).to.be.below(lastMineral);
         lastMineral = mineral.color;
       });
@@ -277,12 +289,12 @@ describe('Queries', function () {
     });
   });
 
-  it('allows deselecting hyphenated field names', function (done) {
-    var options = {
+  it('allows deselecting hyphenated field names', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?select=-hyphenated-field-name',
       json: true
     };
-    request.get(options, function (err, response, body) {
+    request.get(options, function(err, response, body) {
       if (err) return done(err);
       expect(response.statusCode).to.be(200);
       expect(body[0]).to.have.property('_id');
@@ -292,43 +304,42 @@ describe('Queries', function () {
     });
   });
 
-  it('should not add query string to the search link (collection)', function (done) {
-    var options = {
+  it('should not add query string to the search link (collection)', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/minerals?sort=color',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
-      var expected = '</api/minerals>; rel="search", '
-        + '</api/minerals?sort=color>; rel="self"';
+      const expected = '</api/minerals>; rel="search", ' + '</api/minerals?sort=color>; rel="self"';
       expect(response.statusCode).to.be(200);
       expect(response.headers.link).to.be(expected);
       done();
     });
   });
 
-  it('should not add query string to the search link (instance)', function (done) {
-    var options = {
+  it('should not add query string to the search link (instance)', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/minerals',
       json: true
     };
 
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
 
-      var id = body[0]._id;
-      var options = {
-        url: 'http://localhost:8012/api/minerals/' + id + '?sort=color',
+      const id = body[0]._id;
+      const options = {
+        url: `http://localhost:8012/api/minerals/${id}?sort=color`,
         json: true
       };
 
-      request.get(options, function (error, response, body) {
+      request.get(options, function(error, response, body) {
         if (error) return done(error);
 
-        var expected = '</api/minerals>; rel="collection", '
-          + '</api/minerals>; rel="search", '
-          + '</api/minerals/' + id + '>; rel="edit", '
-          + '</api/minerals/' + id + '>; rel="self"';
+        const expected =
+          `${'</api/minerals>; rel="collection", ' +
+            '</api/minerals>; rel="search", ' +
+            '</api/minerals/'}${id}>; rel="edit", ` + `</api/minerals/${id}>; rel="self"`;
         expect(response.statusCode).to.be(200);
         expect(response.headers.link).to.be(expected);
         done();
@@ -337,11 +348,11 @@ describe('Queries', function () {
   });
 
   it('should send 400 if limit is invalid', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit=-1',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(400);
       expect(response.headers).not.to.have.property('link');
@@ -351,11 +362,11 @@ describe('Queries', function () {
   });
 
   it('should send 400 if limit is invalid', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit=0',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(400);
       expect(response.headers).not.to.have.property('link');
@@ -365,11 +376,11 @@ describe('Queries', function () {
   });
 
   it('should send 400 if limit is invalid', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit=3.6',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(400);
       expect(response.headers).not.to.have.property('link');
@@ -379,11 +390,11 @@ describe('Queries', function () {
   });
 
   it('should send 400 if limit is invalid', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit= asd  asd ',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(400);
       expect(response.headers).not.to.have.property('link');
@@ -393,11 +404,11 @@ describe('Queries', function () {
   });
 
   it('should send 400 if skip is invalid', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?skip=1.1',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(400);
       expect(response.headers).not.to.have.property('link');
@@ -407,11 +418,11 @@ describe('Queries', function () {
   });
 
   it('should send 400 if count is invalid', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?count=1',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(400);
       expect(response.headers).not.to.have.property('link');
@@ -421,11 +432,11 @@ describe('Queries', function () {
   });
 
   it('allows adding paging links', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit=2',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(response.headers).to.have.property('link');
@@ -434,11 +445,11 @@ describe('Queries', function () {
   });
 
   it('should not return paging links if limit not set', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?sort=name',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(response.headers.link).to.contain('rel="self"');
@@ -452,11 +463,11 @@ describe('Queries', function () {
   });
 
   it('should not return paging links if relations are not enabled', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/vegetables',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(response.headers.link).to.be(undefined);
@@ -464,29 +475,29 @@ describe('Queries', function () {
     });
   });
 
-  it('allows using relations: true with sorted queries', function (done) {
-    var options = {
+  it('allows using relations: true with sorted queries', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/minerals?sort=color&limit=2&skip=2&select=-__v -_id -enables',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(response.headers.link).to.contain('rel="first"');
       expect(response.headers.link).to.contain('rel="last"');
       expect(response.headers.link).to.contain('rel="next"');
       expect(response.headers.link).to.contain('rel="previous"');
-      expect(body).to.eql([ { color: 'Indigo' }, { color: 'Orange' } ]);
+      expect(body).to.eql([{color: 'Indigo'}, {color: 'Orange'}]);
       done();
     });
   });
 
   it('should return next for first page', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit=2',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(response.headers).to.have.property('link');
@@ -496,11 +507,11 @@ describe('Queries', function () {
   });
 
   it('should return previous for second page', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit=2&skip=2',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(response.headers).to.have.property('link');
@@ -510,11 +521,11 @@ describe('Queries', function () {
   });
 
   it('should not return paging links previous for first page', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit=2',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(response.headers).to.have.property('link');
@@ -524,11 +535,11 @@ describe('Queries', function () {
   });
 
   it('should not return paging links next for last page', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit=2&skip=6',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(response.headers).to.have.property('link');
@@ -538,119 +549,119 @@ describe('Queries', function () {
   });
 
   it('should preserve query in paging links', function(done) {
-    var conditions = JSON.stringify({ color: { $regex: '.*e.*' } });
-    var options = {
-      url: 'http://localhost:8012/api/minerals?limit=1&skip=0&conditions=' + conditions,
+    const conditions = JSON.stringify({color: {$regex: '.*e.*'}});
+    const options = {
+      url: `http://localhost:8012/api/minerals?limit=1&skip=0&conditions=${conditions}`,
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(response.headers).to.have.property('link');
       expect(response.headers.link).to.contain('rel="next"');
-      var links = parselinks(response.headers.link);
-      expect(links.next).to.contain('conditions=' + encodeURIComponent(conditions));
+      const links = parselinks(response.headers.link);
+      expect(links.next).to.contain(`conditions=${encodeURIComponent(conditions)}`);
       done();
     });
   });
 
   it('allows retrieving paging links next', function(done) {
-    var options = {
+    const options = {
       url: 'http://localhost:8012/api/minerals?limit=2&skip=0',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
 
       expect(response.statusCode).to.be(200);
       expect(response.headers).to.have.property('link');
 
-      var links = parselinks(response.headers.link);
+      const links = parselinks(response.headers.link);
       expect(links).to.have.property('next');
 
-      var options = {
-        url: 'http://localhost:8012' + links.next,
+      const options = {
+        url: `http://localhost:8012${links.next}`,
         json: true
       };
-      request.get(options, function (error, response, body) {
-        expect(response.statusCode).to.be(200);
-        done();
-      })
-    });
-  });
-
-  it('allows retrieving paging links previous', function(done) {
-    var options = {
-      url: 'http://localhost:8012/api/minerals?limit=2&skip=2',
-      json: true
-    };
-    request.get(options, function (error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.be(200);
-      expect(response.headers).to.have.property('link');
-      var links = parselinks(response.headers.link);
-      expect(links).to.have.property('previous');
-      var options = {
-        url: 'http://localhost:8012' + links.previous,
-        json: true
-      };
-      request.get(options, function (error, response, body) {
-        expect(response.statusCode).to.be(200);
-        done();
-      })
-    });
-  });
-
-  it('allows retrieving paging links last', function(done) {
-    var options = {
-      url: 'http://localhost:8012/api/minerals?limit=2&skip=6',
-      json: true
-    };
-    request.get(options, function (error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.be(200);
-      expect(response.headers).to.have.property('link');
-      var links = parselinks(response.headers.link);
-      expect(links).to.have.property('first');
-      var options = {
-        url: 'http://localhost:8012' + links.first,
-        json: true
-      };
-      request.get(options, function (error, response, body) {
-        expect(response.statusCode).to.be(200);
-        done();
-      })
-    });
-  });
-
-  it('allows retrieving paging links first', function(done) {
-    var options = {
-      url: 'http://localhost:8012/api/minerals?limit=2&skip=0',
-      json: true
-    };
-    request.get(options, function (error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.be(200);
-      expect(response.headers).to.have.property('link');
-      var links = parselinks(response.headers.link);
-      expect(links).to.have.property('last');
-      var options = {
-        url: 'http://localhost:8012' + links.last,
-        json: true
-      };
-      request.get(options, function (error, response, body) {
+      request.get(options, function(error, response, body) {
         expect(response.statusCode).to.be(200);
         done();
       });
     });
   });
 
-  it('allows retrieving count instead of documents', function (done) {
-    var options = {
+  it('allows retrieving paging links previous', function(done) {
+    const options = {
+      url: 'http://localhost:8012/api/minerals?limit=2&skip=2',
+      json: true
+    };
+    request.get(options, function(error, response, body) {
+      if (error) return done(error);
+      expect(response.statusCode).to.be(200);
+      expect(response.headers).to.have.property('link');
+      const links = parselinks(response.headers.link);
+      expect(links).to.have.property('previous');
+      const options = {
+        url: `http://localhost:8012${links.previous}`,
+        json: true
+      };
+      request.get(options, function(error, response, body) {
+        expect(response.statusCode).to.be(200);
+        done();
+      });
+    });
+  });
+
+  it('allows retrieving paging links last', function(done) {
+    const options = {
+      url: 'http://localhost:8012/api/minerals?limit=2&skip=6',
+      json: true
+    };
+    request.get(options, function(error, response, body) {
+      if (error) return done(error);
+      expect(response.statusCode).to.be(200);
+      expect(response.headers).to.have.property('link');
+      const links = parselinks(response.headers.link);
+      expect(links).to.have.property('first');
+      const options = {
+        url: `http://localhost:8012${links.first}`,
+        json: true
+      };
+      request.get(options, function(error, response, body) {
+        expect(response.statusCode).to.be(200);
+        done();
+      });
+    });
+  });
+
+  it('allows retrieving paging links first', function(done) {
+    const options = {
+      url: 'http://localhost:8012/api/minerals?limit=2&skip=0',
+      json: true
+    };
+    request.get(options, function(error, response, body) {
+      if (error) return done(error);
+      expect(response.statusCode).to.be(200);
+      expect(response.headers).to.have.property('link');
+      const links = parselinks(response.headers.link);
+      expect(links).to.have.property('last');
+      const options = {
+        url: `http://localhost:8012${links.last}`,
+        json: true
+      };
+      request.get(options, function(error, response, body) {
+        expect(response.statusCode).to.be(200);
+        done();
+      });
+    });
+  });
+
+  it('allows retrieving count instead of documents', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?count=true',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.be(8);
@@ -658,12 +669,12 @@ describe('Queries', function () {
     });
   });
 
-  it('should not send count if count is not set to true', function (done) {
-    var options = {
+  it('should not send count if count is not set to true', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?count=false',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).not.to.be.a(Number);
@@ -671,100 +682,100 @@ describe('Queries', function () {
     });
   });
 
-  it('should report bad hints', function (done) {
-    var options = {
+  it('should report bad hints', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?hint={ "foogle": 1 }',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(400);
-      expect(body).to.have.property('message', 'The requested query hint is invalid (400).')
+      expect(body).to.have.property('message', 'The requested query hint is invalid (400).');
       done();
     });
   });
 
-  it('sets status to 400 if hint used with count', function (done) {
-    var options = {
+  it('sets status to 400 if hint used with count', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?count=true&hint={ "foogle": 1 }',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(400);
-      expect(body).to.have.property('message', 'Hint can\'t be used with count (400).')
+      expect(body).to.have.property('message', "Hint can't be used with count (400).");
       done();
     });
   });
 
-  it('allows adding index hint', function (done) {
-    var options = {
+  it('allows adding index hint', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?hint={ "_id": 1 }',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       done();
     });
   });
 
-  it('allows adding index hint', function (done) {
-    var options = {
+  it('allows adding index hint', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?hint[_id]=1',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       done();
     });
   });
 
-  it('sets status to 400 if comment used with count', function (done) {
-    var options = {
+  it('sets status to 400 if comment used with count', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?count=true&comment=salve',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(400);
-      expect(body).to.have.property('message', 'Comment can\'t be used with count (400).')
+      expect(body).to.have.property('message', "Comment can't be used with count (400).");
       done();
     });
   });
 
-  it('allows adding a query comment', function (done) {
-    var options = {
+  it('allows adding a query comment', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?comment=testing testing 123',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       done();
     });
   });
 
-  it('should not allow adding an index hint if not enabled', function (done) {
-    var options = {
+  it('should not allow adding an index hint if not enabled', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/fungi?hint={ "_id": 1 }',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
-      expect(body).to.have.property('message', 'Hints are not enabled for this resource (403).')
+      expect(body).to.have.property('message', 'Hints are not enabled for this resource (403).');
       done();
     });
   });
 
-  it('should ignore query comments if not enabled', function (done) {
-    var options = {
+  it('should ignore query comments if not enabled', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/fungi?comment=testing testing 123',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('length', 1);
@@ -772,12 +783,12 @@ describe('Queries', function () {
     });
   });
 
-  it('allows querying for distinct values', function (done) {
-    var options = {
+  it('allows querying for distinct values', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?distinct=name',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       body.sort();
@@ -794,12 +805,12 @@ describe('Queries', function () {
     });
   });
 
-  it('allows querying for distinct values restricted by conditions', function (done) {
-    var options = {
+  it('allows querying for distinct values restricted by conditions', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?distinct=name&conditions={ "name": "Carrot" }',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('length', 1);
@@ -808,25 +819,29 @@ describe('Queries', function () {
     });
   });
 
-  it('should not allow querying for distinct values of deselected paths', function (done) {
-    var options = {
+  it('should not allow querying for distinct values of deselected paths', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/fungi?distinct=hyphenated-field-name',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(403);
-      expect(body).to.have.property('message', 'You may not find distinct values for the requested path (403).');
+      expect(body).to.have.property(
+        'message',
+        'You may not find distinct values for the requested path (403).'
+      );
       done();
     });
   });
 
-  it('allows using query operators with _id', function (done) {
-    var options = {
-      url: 'http://localhost:8012/api/vegetables?conditions={ "_id": { "$gt": "111111111111111111111111" } }',
+  it('allows using query operators with _id', function(done) {
+    const options = {
+      url:
+        'http://localhost:8012/api/vegetables?conditions={ "_id": { "$gt": "111111111111111111111111" } }',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(200);
       expect(body).to.have.property('length', 8);
@@ -835,34 +850,39 @@ describe('Queries', function () {
     });
   });
 
-  it('should give a 400 if the query string is unpar using query operators with _id', function (done) {
-    var options = {
-      url: 'http://localhost:8012/api/vegetables?conditions={ \'_id\': { \'$gt\': \'111111111111111111111111\' } }',
+  it('should give a 400 if the query string is unpar using query operators with _id', function(done) {
+    const options = {
+      url:
+        "http://localhost:8012/api/vegetables?conditions={ '_id': { '$gt': '111111111111111111111111' } }",
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(400);
       // before:  'The conditions query string value was not valid JSON: "Unexpected token \'" (400).'
       // after:   'The conditions query string value was not valid JSON: "Unexpected token \' in JSON at position 2" (400).'
       // test changed to be less fragile
       expect(body).to.have.property('message');
-      expect(body.message).to.contain('The conditions query string value was not valid JSON: "Unexpected token \'');
+      expect(body.message).to.contain(
+        'The conditions query string value was not valid JSON: "Unexpected token \''
+      );
       done();
     });
   });
 
-  it('disallows $explain by default', function (done) {
-    var options = {
+  it('disallows $explain by default', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables?conditions={ "$explain": true }',
       json: true
     };
-    request.get(options, function (error, response, body) {
+    request.get(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.be(400);
-      expect(body).to.have.property('message', 'Using $explain is disabled for this resource (400).');
+      expect(body).to.have.property(
+        'message',
+        'Using $explain is disabled for this resource (400).'
+      );
       done();
     });
   });
-
 });

@@ -1,16 +1,16 @@
 // __Dependencies__
-var express = require('express');
+const express = require('express');
 
 // __Module Definition__
-var decorator = module.exports = function (options, protect) {
-  var controller = this;
-  var initial = express.Router();
-  var controllerForStage = protect.controllerForStage = {
-    initial: initial,
+const decorator = (module.exports = function(options, protect) {
+  const controller = this;
+  const initial = express.Router();
+  const controllerForStage = (protect.controllerForStage = {
+    initial,
     request: express.Router(),
     query: express.Router(),
     finalize: express.Router()
-  };
+  });
   // __Stage Controllers__
   controller.use(initial);
   controller.use(controllerForStage.request);
@@ -28,4 +28,4 @@ var decorator = module.exports = function (options, protect) {
   controller.post = initial.post.bind(initial);
   controller.put = initial.put.bind(initial);
   controller.delete = initial.delete.bind(initial);
-};
+});

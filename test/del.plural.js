@@ -1,19 +1,19 @@
-var expect = require('expect.js');
-var request = require('request');
+const expect = require('expect.js');
+const request = require('request');
 
-var fixtures = require('./fixtures');
+const fixtures = require('./fixtures');
 
-describe('DEL plural', function () {
+describe('DEL plural', function() {
   before(fixtures.vegetable.init);
   beforeEach(fixtures.vegetable.create);
   after(fixtures.vegetable.deinit);
 
-  it('should delete all documents in addressed collection', function (done) {
-    var options = {
+  it('should delete all documents in addressed collection', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables/',
       json: true
     };
-    request.del(options, function (err, response, body) {
+    request.del(options, function(err, response, body) {
       if (err) return done(err);
       expect(response.statusCode).to.be(200);
       // Check that the correct number were deleted.
@@ -22,19 +22,17 @@ describe('DEL plural', function () {
     });
   });
 
-  it('should invoke "remove" middleware', function (done) {
-    var options = {
+  it('should invoke "remove" middleware', function(done) {
+    const options = {
       url: 'http://localhost:8012/api/vegetables/',
       json: true
     };
 
     fixtures.vegetable.removeCount = 0;
-    request.del(options, function (error, response, body) {
+    request.del(options, function(error, response, body) {
       if (error) return done(error);
       expect(fixtures.vegetable).to.have.property('removeCount', 8);
       done();
     });
-
   });
-
 });

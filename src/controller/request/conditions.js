@@ -1,18 +1,22 @@
-var RestError = require('rest-error');
+const RestError = require('rest-error');
 
 // __Module Definition__
-var decorator = module.exports = function () {
-  var controller = this;
+const decorator = (module.exports = function() {
+  const controller = this;
   // Set the conditions used for finding/updating/removing documents.
-  this.request(function (request, response, next) {
-    var conditions = request.query.conditions || {};
+  this.request(function(request, response, next) {
+    let conditions = request.query.conditions || {};
 
     if (typeof conditions === 'string') {
       try {
         conditions = JSON.parse(conditions);
-      }
-      catch (exception) {
-        next(RestError.BadRequest('The conditions query string value was not valid JSON: "%s"', exception.message));
+      } catch (exception) {
+        next(
+          RestError.BadRequest(
+            'The conditions query string value was not valid JSON: "%s"',
+            exception.message
+          )
+        );
         return;
       }
     }
@@ -28,4 +32,4 @@ var decorator = module.exports = function () {
     request.baucis.conditions = conditions;
     next();
   });
-};
+});

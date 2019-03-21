@@ -1,16 +1,16 @@
 // __Dependencies__
-var es = require('event-stream');
-var domain = require('domain');
+const domain = require('domain');
+const es = require('event-stream');
 
 // __Module Definition__
-var decorator = module.exports = function (options, protect) {
+const decorator = (module.exports = function(options, protect) {
   // __Protected Module Members__
   // A utility method for ordering through streams.
-  protect.pipeline = function (handler) {
-    var streams = [];
-    var d = domain.create();
+  protect.pipeline = function(handler) {
+    const streams = [];
+    const d = domain.create();
     d.on('error', handler);
-    return function (transmute) {
+    return function(transmute) {
       // If it's a stream, add it to the reserve pipeline.
       if (transmute && (transmute.writable || transmute.readable)) {
         streams.push(transmute);
@@ -36,9 +36,9 @@ var decorator = module.exports = function (options, protect) {
   };
   // __Middleware__
   // Create the pipeline interface the user interacts with.
-  this.request(function (request, response, next) {
+  this.request(function(request, response, next) {
     request.baucis.incoming = protect.pipeline(next);
     request.baucis.outgoing = protect.pipeline(next);
     next();
   });
-};
+});
