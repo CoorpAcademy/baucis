@@ -1,6 +1,8 @@
 # baucis
 
-[![NPM](https://nodei.co/npm/baucis.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/baucis/)
+<!--[![NPM](https://nodei.co/npm/baucis.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/baucis/)-->
+[![Build Status](https://travis-ci.com/CoorpAcademy/baucis.svg?branch=master)](https://travis-ci.com/CoorpAcademy/baucis)
+[![codecov](https://codecov.io/gh/CoorpAcademy/baucis/branch/master/graph/badge.svg)](https://codecov.io/gh/CoorpAcademy/baucis)
 
 > Build scalable REST APIs using the open source tools and standards you and your team already know — *Mongoose, Express, and Node.js streams*. 
 
