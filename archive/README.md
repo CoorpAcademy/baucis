@@ -1,10 +1,23 @@
 # baucis
 
+![Codeship](https://codeship.com/projects/43c2fac0-bfa5-0133-3ab4-4e7013906a8c/status?branch=master)
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/wprl/baucis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![NPM](https://nodei.co/npm/baucis.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/baucis/)
 
-> Build scalable REST APIs using the open source tools and standards you and your team already know — *Mongoose, Express, and Node.js streams*. 
+Build scalable REST APIs using the open source tools and standards you and your team already know — *Mongoose, Express, and Node.js streams*.  Baucis takes the boilerplate out of building and maintaining scalable [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS)/[Level 3](http://martinfowler.com/articles/richardsonMaturityModel.html) REST APIs.
 
-Baucis takes the boilerplate out of building and maintaining scalable [HATEOAS](https://en.wikipedia.org/wiki/HATEOAS)/[Level 3](http://martinfowler.com/articles/richardsonMaturityModel.html) REST APIs.
+Baucis has tens of thousands of users and is used in production by startups, departments, and Fortune 500 companies, and at hackathons and conferences worldwide.  MongoDB, Inc. awarded baucis first place in their 2014 Open Source Hack Contest.
+
+Baucis is easy for beginners, easy to scale, yet flexible enough in the long term to be extended to solve complex use cases.
+
+### Who's using Baucis?
+
+[![Hivepod.io](http://github.com/wprl/baucis/raw/master/hivepod-io-logo.png "Hivepod.io")](https://hivepod.io) [![Kun.io App Studio LLC](http://github.com/wprl/baucis/raw/master/kunio.png "Kun.io App Studio LLC")](http://kun.io) [![Pixel Press](http://github.com/wprl/baucis/raw/master/pixel-press.jpg "Pixel Press")](http://www.projectpixelpress.com)
+
+If you like baucis please consider adding bounties to issues in the [issue tracker](https://github.com/wprl/baucis/issues) or contributing via [GitTip](https://www.gittip.com/wprl/).
+
 
 ## Features
 
@@ -49,7 +62,7 @@ That's it!  Now you have an RFC-compliant, flexible, and semantically rich API d
 
 ## Examples
 
- * [Example REST API server built with Node and Baucis](http://github.com/wprl/baucis-example)
+ * [Example REST API server built with Node and Baucis](//github.com/wprl/baucis-example)
  * [Examples with Backbone.js](examples/Backbone.js)
  * [Examples with AngularJS](examples/angular-example-resource.html)
  * [Examples with Restangular](examples/angular-example-restangular.html)
@@ -60,3 +73,20 @@ That's it!  Now you have an RFC-compliant, flexible, and semantically rich API d
 ## Documentation
 
 [Check out the Wiki](https://github.com/wprl/baucis/wiki) for documentation and more in-depth information about baucis.  Check the [change log](CHANGES.md) for info on recently implemented features.
+
+
+## Coming Soon
+
+ * Real time browser/client [subscription with EventSource](https://github.com/wprl/baucis-subscribe) (server sent events)
+ * [Web hooks](https://github.com/wprl/baucis-hooks)
+ * To see everything that's in store [visit the GitHub milestones page](https://github.com/wprl/baucis/milestones) for this repo.
+
+
+## Contact
+
+ * Twitter [@wprl](https://twitter.com/wprl)
+ * [LinkedIn](https://linkedin.com/in/willprl)
+ * Email [william@kun.io](mailto:william@kun.io)
+
+&copy; 2012-2015 Kun.io App Studio LLC
+
