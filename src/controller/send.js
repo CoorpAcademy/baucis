@@ -160,9 +160,13 @@ module.exports = function(options, protect) {
           const status = controller.emptyCollection();
           response.status(status);
 
-          if (status === 204) return this.emit('end');
+          if (status === 204) {
+            response.removeHeader('Trailer');
+            return this.emit('end');
+          }
           if (status === 200) {
             response.removeHeader('Transfer-Encoding');
+            response.removeHeader('Trailer');
             response.json([]); // TODO other content types
             this.emit('end');
             return;
