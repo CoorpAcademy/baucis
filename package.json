@@ -1,0 +1,32 @@
+{
+  "name": "baucisses",
+  "version": "0.1.2",
+  "description": "Baucisses",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint 'packages/**/*.js'",
+    "publish": "lerna publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoorpAcademy/baucis.git"
+  },
+  "keywords": [
+    "baucis",
+    "mongoose",
+    "mongo",
+    "express"
+  ],
+  "author": "Adriean Khisbe <adriean.khisbe@live.fr> (https://github.com/AdrieanKhisbe/)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CoorpAcademy/baucis/issues"
+  },
+  "homepage": "https://github.com/CoorpAcademy/baucis#readme",
+  "devDependencies": {
+    "@coorpacademy/eslint-plugin-coorpacademy": "^8.1.1",
+    "eslint": "^5.15.3",
+    "lerna": "^3.13.1"
+  }
+}
