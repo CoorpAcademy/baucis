@@ -1,11 +1,12 @@
 {
   "name": "baucisses",
   "version": "0.1.2",
-  "description": "Baucisses",
+  "description": "Baucisses packages",
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint 'packages/**/*.js'",
+    "postinstall": "lerna bootstrap",
     "publish": "lerna publish"
   },
   "repository": {
