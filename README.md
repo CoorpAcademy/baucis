@@ -1,6 +1,7 @@
 # baucis
 
 <!--[![NPM](https://nodei.co/npm/baucis.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/baucis/)-->
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 [![Npm version](https://img.shields.io/npm/v/@coorpacademy/baucis.svg)](https://www.npmjs.com/package/@coorpacademy/baucis)
 [![Build Status](https://travis-ci.com/CoorpAcademy/baucis.svg?branch=master)](https://travis-ci.com/CoorpAcademy/baucis)
 [![codecov](https://codecov.io/gh/CoorpAcademy/baucis/branch/master/graph/badge.svg)](https://codecov.io/gh/CoorpAcademy/baucis)

@@ -4,8 +4,8 @@ const ControllerFactory = require('./src/controller');
 const extendMongooseModel = require('./src/model');
 
 const plugins = {
-  json: require('baucis-json'),
-  links: require('baucis-links')
+  json: require('@coorpacademy/baucis-json'),
+  links: require('@coorpacademy/baucis-links')
 };
 
 module.exports = function(mongoose, express) {

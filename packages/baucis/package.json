@@ -43,8 +43,8 @@
     "http"
   ],
   "dependencies": {
-    "baucis-json": "^1.0.0",
-    "baucis-links": "^1.0.1",
+    "@coorpacademy/baucis-json": "^0.1.0",
+    "@coorpacademy/baucis-links": "^0.1.1",
     "deco": "^0.12.3",
     "event-stream": "^4.0.1",
     "mongoose-legacy-pluralize": "^1.0.2",
