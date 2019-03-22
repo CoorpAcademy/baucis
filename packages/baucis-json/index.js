@@ -1,18 +1,16 @@
-// __Dependencies__
-var es = require('event-stream');
+const es = require('event-stream');
 
-// __Module Definition__
-var plugin = module.exports = function () {
-  var baucis = this;
+module.exports = function() {
+  const baucis = this;
 
   // __Private Methods__
   // Default formatter — emit a single JSON object or an array of them.
-  function singleOrArray (alwaysArray) {
-    var first = false;
-    var multiple = false;
+  function singleOrArray(alwaysArray) {
+    let first = false;
+    let multiple = false;
 
     return es.through(
-      function (doc) {
+      function(doc) {
         // Start building the output.  If this is the first document,
         // store it for a moment.
         if (!first) {
@@ -25,7 +23,7 @@ var plugin = module.exports = function () {
           multiple = true;
           this.emit('data', '[');
           this.emit('data', JSON.stringify(first));
-          this.emit('data', ',\n')
+          this.emit('data', ',\n');
           this.emit('data', JSON.stringify(doc));
           return;
         }
@@ -33,40 +31,42 @@ var plugin = module.exports = function () {
         this.emit('data', ',\n');
         this.emit('data', JSON.stringify(doc));
       },
-      function () {
+      function() {
         // If no documents, simply end the stream.
         if (!first) return this.emit('end');
         // If only one document emit it unwrapped, unless always returning an array.
         if (!multiple && alwaysArray) this.emit('data', '[');
         if (!multiple) this.emit('data', JSON.stringify(first));
-        // For greater than one document, emit the closing array.
-        else this.emit('data', ']');
+        else
+          // For greater than one document, emit the closing array.
+          this.emit('data', ']');
         if (!multiple && alwaysArray) this.emit('data', ']');
         // Done.  End the stream.
         this.emit('end');
       }
     );
-  };
+  }
 
   // Default parser.  Parses incoming JSON string into an object or objects.
   // Works whether an array or single object is sent as the request body.  It's
   // very lenient with input outside of first-level braces.  This means that
   // a collection of JSON objects can be sent in different ways e.g. separated
-  // by whitespace or in a fully JSON-compatible array with objects split by 
+  // by whitespace or in a fully JSON-compatible array with objects split by
   // commas.
-  function JSONParser () {
-    var depth = 0;
-    var buffer = '';
+  function JSONParser() {
+    let depth = 0;
+    let buffer = '';
 
-    return es.through(function (chunk) {
-      var match;
-      var head;
-      var brace;
-      var tail;
-      var emission;
-      var remaining = chunk.toString();
+    return es.through(function(chunk) {
+      let match;
+      let head;
+      let brace;
+      let tail;
+      let emission;
+      let remaining = chunk.toString();
+      // eslint-disable-next-line fp/no-loops
       while (remaining !== '') {
-        match = remaining.match(/[\}\{]/);
+        match = remaining.match(/[}{]/);
         // The head of the string is all characters up to the first brace, if any.
         head = match ? remaining.substr(0, match.index) : remaining;
         // The first brace in the string, if any.
@@ -82,8 +82,7 @@ var plugin = module.exports = function () {
             depth += 1;
             buffer += brace;
           }
-        }
-        else {
+        } else {
           // The parser is inside an object.
           // Add the head of the string to the buffer.
           buffer += head;
@@ -96,9 +95,14 @@ var plugin = module.exports = function () {
           if (depth === 0) {
             try {
               emission = JSON.parse(buffer);
-            }
-            catch (error) {
-              this.emit('error', baucis.Error.BadSyntax('The body of this request was invalid and could not be parsed. "%s"', error.message));
+            } catch (error) {
+              this.emit(
+                'error',
+                baucis.Error.BadSyntax(
+                  'The body of this request was invalid and could not be parsed. "%s"',
+                  error.message
+                )
+              );
             }
 
             this.emit('data', emission);

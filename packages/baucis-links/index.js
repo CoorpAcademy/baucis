@@ -1,9 +1,8 @@
 'use strict';
 
-var middleware = require('./middleware');
+const middleware = require('./middleware');
 
-// __Module Definition__
-var decorator = module.exports = function () {
-  var baucis = this;
+module.exports = function() {
+  const baucis = this;
   baucis.Controller.decorators(middleware);
 };
