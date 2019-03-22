@@ -6,7 +6,7 @@ const RestError = require('rest-error');
 const Controller = require('./controller');
 
 // __Module Definition__
-const Api = deco(function(options, protect) {
+const Api = deco(function(options) {
   const api = this;
 
   api.use(function(request, response, next) {
@@ -45,31 +45,38 @@ const Api = deco(function(options, protect) {
     next();
   });
 
-  // __Public Members___
-  protect.property('releases', ['0.0.1'], function(release) {
-    if (!semver.valid(release)) {
-      throw RestError.Misconfigured('Release version "%s" is not a valid semver version', release);
+  this._releases = ['0.0.1'];
+  this.releases = function(release) {
+    if (arguments.length === 1) {
+      if (!semver.valid(release)) {
+        throw RestError.Misconfigured(
+          'Release version "%s" is not a valid semver version',
+          release
+        );
+      }
+      this._releases = this._releases.concat(release);
+      return this;
     }
-    return this.releases().concat(release);
-  });
+    return this._releases;
+  };
 
-  api.rest = function(model) {
+  this.rest = function(model) {
     const controller = Controller(model);
     api.add(controller);
     return controller;
   };
 
-  const controllers = [];
+  this._controllers = [];
 
   // __Public Instance Members__
   // Add a controller to the API.
-  api.add = function(controller) {
-    controllers.push(controller);
+  this.add = function(controller) {
+    this._controllers.push(controller);
     return api;
   };
   // Return a copy of the controllers array, optionally filtered by release.
-  protect.controllers = function(release, fragment) {
-    const all = [].concat(controllers);
+  this.controllers = function(release, fragment) {
+    const all = [].concat(this._controllers);
 
     if (!release) return all;
 
@@ -87,9 +94,9 @@ const Api = deco(function(options, protect) {
     });
   };
   // Find the correct controller to handle the request.
-  api.use('/:path', function(request, response, next) {
+  api.use('/:path', (request, response, next) => {
     const fragment = `/${request.params.path}`;
-    const controllers = protect.controllers(request.baucis.release, fragment);
+    const controllers = this.controllers(request.baucis.release, fragment);
     // If not found, bail.
     if (controllers.length === 0) return next();
 
