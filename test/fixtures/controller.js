@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
-const baucis = require('../..');
+const baucis = require('../..')(mongoose, express);
 const config = require('./config');
 
 let app;
@@ -44,7 +44,7 @@ mongoose.model('fiend', Fiends);
 mongoose.model('unmade', Unmades);
 mongoose.model('timeentry', Cheese, 'cheeses').plural('timeentries');
 mongoose.model('mean', Fiends, 'fiends').locking(true);
-mongoose.model('bal', Stores, 'stores').plural('baloo');
+console.log('>>>',mongoose.model('bal', Stores, 'stores').plural('baloo'));
 
 module.exports = {
   init(done) {

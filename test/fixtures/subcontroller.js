@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
-const baucis = require('../..');
+const baucis = require('../..')(mongoose, express);
 const config = require('./config');
 
 let app;

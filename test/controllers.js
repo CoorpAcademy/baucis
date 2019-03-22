@@ -1,7 +1,8 @@
 const {expect} = require('chai');
 const mongoose = require('mongoose');
+const express = require('express');
 const request = require('request').defaults({json: true});
-const baucis = require('..');
+const baucis = require('..')(mongoose, express);
 
 const fixtures = require('./fixtures');
 

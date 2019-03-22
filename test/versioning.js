@@ -1,6 +1,6 @@
 const {expect} = require('chai');
 const request = require('request');
-const baucis = require('..');
+const baucis = require('..')();
 
 const fixtures = require('./fixtures');
 

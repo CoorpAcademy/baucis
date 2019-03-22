@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const deco = require('deco');
 const async = require('async');
-const baucis = require('../..');
+const baucis = require('../..')(mongoose, express);
 const config = require('./config');
 
 // __Private Module Members__

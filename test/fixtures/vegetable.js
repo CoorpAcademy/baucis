@@ -4,7 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const async = require('async');
 const eventStream = require('event-stream');
-const baucis = require('../..');
+const baucis = require('../..')(mongoose, express);
 const config = require('./config');
 
 // __Private Module Members__
