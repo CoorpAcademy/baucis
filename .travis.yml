@@ -19,7 +19,8 @@ before_script:
 
 script:
   - npm run lint
-  - npm run cover
+  - (cd packages/baucis && npm run cover)
+  - (cd packages/baucis-swagger && npm run cover)
 
 after_script:
   - npm run publish-coverage
