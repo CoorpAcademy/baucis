@@ -1,0 +1,29 @@
+language: node_js
+
+node_js:
+  - 8
+  - 10
+
+matrix:
+  allow_failures:
+    - node_js: 10
+
+services:
+- docker
+
+install:
+  - npm install
+
+before_script:
+  - docker-compose up -d
+
+script:
+  - npm run lint
+  - npm run cover
+
+after_script:
+  - npm run publish-coverage
+
+cache:
+  directories:
+      - node_modules
