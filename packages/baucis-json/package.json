@@ -1,0 +1,25 @@
+{
+  "name": "baucis-json",
+  "version": "1.0.0",
+  "description": "Baucis uses this to parse and format streams of JSON.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "baucis", "stream", "json", "parse", "parser", "format"
+  ],
+  "author": "William Riley-Land <william@kun.io>",
+  "license": "MIT",
+  "dependencies": {
+    "event-stream": "~3.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wprl/baucis-json.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wprl/baucis-json/issues/new",
+    "email": "william@kun.io"
+  }
+}
