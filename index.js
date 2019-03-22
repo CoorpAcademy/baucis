@@ -86,7 +86,6 @@ baucis.Model = Model;
 
 Controller.container(baucis);
 RestError.container(baucis);
-Model.container(baucis);
 
 // __Plugins__
 plugins.json.apply(baucis);

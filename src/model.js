@@ -1,15 +1,26 @@
-const deco = require('deco');
 const mongoose = require('mongoose');
 const pluralize = require('mongoose/lib/utils').toCollectionName;
 const pluralizer = require('mongoose-legacy-pluralize');
 
-const Model = deco(function(options, protect) {
-  const model = this;
-
-  protect.property('singular');
-  protect.property('plural');
-  protect.property('locking', false);
-  protect.property('lastModified');
+function extendModel(model) {
+  model._locking = false;
+  model.locking = function(value) {
+    if (arguments.length === 1) {
+      model._locking = value;
+      return model;
+    } else {
+      return model._locking;
+    }
+  };
+  model._lastModified = undefined;
+  model.lastModified = function(value) {
+    if (arguments.length === 1) {
+      model._lastModified = value;
+      return model;
+    } else {
+      return model._lastModified;
+    }
+  };
 
   model.deselected = function(path) {
     const deselected = [];
@@ -22,16 +33,36 @@ const Model = deco(function(options, protect) {
     else return deselected.indexOf(path) !== -1;
   };
 
-  model.singular(model.modelName);
-  model.plural(pluralize(model.singular(), pluralizer));
-});
+  model._singular = model.modelName;
+  model.singular = function(value) {
+    if (arguments.length === 1) {
+      model._singular = value;
+      return model;
+    } else {
+      return model._singular;
+    }
 
-// Wrap the mongoose model function to add this mixin to all registered models.
+  };
+
+  model._plural = pluralize(model.singular(), pluralizer);
+  model.plural = function(value) {
+    if (arguments.length === 1) {
+      model._plural = value;
+      return model;
+    } else {
+      return model._plural;
+    }
+  };
+  return model;
+}
+
 const originalMongooseModel = mongoose.model;
 mongoose.model = function() {
   const m = originalMongooseModel.apply(mongoose, arguments);
-  if (!m.singular) Model.apply(m);
+  if (!m.singular) {
+    extendModel(m);
+  }
   return m;
 };
 
-module.exports = Model;
+module.exports = extendModel;

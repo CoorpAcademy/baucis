@@ -1,4 +1,3 @@
-const util = require('util');
 const semver = require('semver');
 const express = require('express');
 const RestError = require('rest-error');
@@ -6,6 +5,7 @@ const Controller = require('./controller');
 
 function Api() {
   const api = express.Router.apply(this, arguments);
+
   api.use(function(request, response, next) {
     if (request.baucis)
       return next(RestError.Misconfigured('Baucis request property already created'));
@@ -65,13 +65,15 @@ function Api() {
 
   api._controllers = [];
 
-  // __Public Instance Members__
   // Add a controller to the API.
   api.add = function(controller) {
     this._controllers.push(controller);
     return api;
   };
-  // Return a copy of the controllers array, optionally filtered by release.
+
+  /**
+   * Return a copy of the controllers array, optionally filtered by release.
+   */
   api.controllers = function(release, fragment) {
     const all = [].concat(this._controllers);
 
@@ -90,7 +92,9 @@ function Api() {
       return fragment === controller.fragment();
     });
   };
-  // Find the correct controller to handle the request.
+  /**
+   * Find the correct controller to handle the request.
+   */
   api.use('/:path', (request, response, next) => {
     const fragment = `/${request.params.path}`;
     const controllers = api.controllers(request.baucis.release, fragment);
