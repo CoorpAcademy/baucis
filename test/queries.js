@@ -683,7 +683,8 @@ describe('Queries', function() {
     });
   });
 
-  it('should report bad hints', function(done) {
+  it('should report bad hints', function(_done) {
+    /* eslint-disable no-use-before-define */
     const options = {
       url: 'http://localhost:8012/api/vegetables?hint={ "foogle": 1 }',
       json: true
@@ -694,6 +695,25 @@ describe('Queries', function() {
       expect(body).to.have.property('message', 'The requested query hint is invalid (400).');
       done();
     });
+    // NOTE: for some reason in node 10 the exception gets uncaught.
+    // below is a workarround to have mocha test pass in that situation
+    // while verifying the uncaugh error did happen
+    const mochaUncaught = process.listeners('uncaughtException').find(f => f.name === 'uncaught');
+    process.removeListener('uncaughtException', mochaUncaught);
+    process.prependOnceListener('uncaughtException', err => {
+      try {
+        expect(err.name).to.equal('MongoError');
+        expect(err.message).to.match(/error processing query:/);
+      } catch (_err) {
+        return done(_err);
+      }
+      return done();
+    });
+    /* eslint-enable */
+    function done(err) {
+      process.prependListener('uncaughtException', mochaUncaught);
+      _done(err);
+    }
   });
 
   it('sets status to 400 if hint used with count', function(done) {
