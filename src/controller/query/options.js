@@ -183,7 +183,7 @@ module.exports = function() {
     }
 
     if (typeof hint === 'string') hint = JSON.parse(hint);
-    // Convert the value for each path from stirng to number.
+    // Convert the value for each path from string to number.
     Object.keys(hint).forEach(function(path) {
       hint[path] = Number(hint[path]);
     });

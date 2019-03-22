@@ -190,7 +190,6 @@ const fixture = {
       });
     });
     const vegetables = vegetableNames.map(function(name) {
-      // TODO leaked global
       return new Vegetable({
         name,
         nutrients: [minerals[0]._id]
