@@ -1,4 +1,3 @@
-// __Dependencies__
 const RestError = require('rest-error');
 const ApiFactory = require('./src/api');
 const ControllerFactory = require('./src/controller');
@@ -20,12 +19,10 @@ module.exports = function(mongoose, express) {
   const parsers = {};
   const formatters = {};
 
-  // __Module Definition__
   const baucis = function(options) {
     return baucis.empty();
   };
 
-  // __Public Members__
   baucis.rest = function(model) {
     if (!instance) instance = new Api();
     return instance.rest(model);
@@ -60,7 +57,9 @@ module.exports = function(mongoose, express) {
     return;
   };
 
-  // Adds a formatter for the given mime type.  Needs a function that returns a stream.
+  /**
+   * Adds a formatter for the given mime type.  Needs a function that returns a stream.
+   */
   baucis.setFormatter = function(mime, f) {
     formatters[mime] = function(callback) {
       return function() {
@@ -70,8 +69,10 @@ module.exports = function(mongoose, express) {
     return baucis;
   };
 
+  /**
+   * Baucis parser that Default to JSON when no MIME type is provided
+   */
   baucis.parser = function(mime, handler) {
-    // Default to JSON when no MIME type is provided.
     mime = mime || 'application/json';
     // Not interested in any additional parameters at this point.
     mime = mime.split(';')[0].trim();
@@ -79,22 +80,21 @@ module.exports = function(mongoose, express) {
     return handler ? handler() : undefined;
   };
 
-  // Adds a parser for the given mime type.  Needs a function that returns a stream.
+  /**
+   * Adds a parser for the given mime type.  Needs a function that returns a stream.
+   */
   baucis.setParser = function(mime, f) {
     parsers[mime] = f;
     return baucis;
   };
 
-  // __Expose Modules__
   baucis.Api = Api;
   baucis.Controller = Controller;
   baucis.Error = RestError;
-  /////baucis.Model = Model;
+  // ///baucis.Model = Model;
 
   Controller.container(baucis);
-  RestError.container(baucis);
 
-  // __Plugins__
   plugins.json.apply(baucis);
   plugins.links.apply(baucis);
 

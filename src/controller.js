@@ -29,7 +29,6 @@ module.exports = function(mongoose, express) {
       throw RestError.Misconfigured('You must pass in a model or model name');
     }
 
-    // __Property Definitions__
     protect.property('comments', false);
     protect.property('explain', false);
     protect.property('hints', false);
@@ -98,7 +97,6 @@ module.exports = function(mongoose, express) {
 
     // §STAGE:
     protect.controllerForStage = controllerForStage;
-    // __Stage Controllers__
     controller.use(initial);
     controller.use(controllerForStage.request);
     controller.use(controllerForStage.query);
@@ -129,7 +127,6 @@ module.exports = function(mongoose, express) {
       defineRoutes('finalize', arguments).forEach(activate);
       return controller;
     };
-    // __Public Instance Members__
     // A method used to activate request-stage middleware.
     controller.request = function(endpoint, methods, middleware) {
       defineRoutes('request', arguments).forEach(activate);
@@ -180,13 +177,17 @@ module.exports = function(mongoose, express) {
       next(RestError.MethodNotAllowed('The requested method has been disabled for this resource'));
     });
 
-    // Treat the addressed document as a collection, and push the addressed object
-    // to it.  (Not implemented.)
+    /**
+     *   Treat the addressed document as a collection, and push the addressed object
+     * to it.  (Not implemented.)
+     */
     controller.request('instance', 'post', function(request, response, next) {
       return next(RestError.NotImplemented('Cannot POST to an instance'));
     });
 
-    // Update all given docs.  (Not implemented.)
+    /**
+     * Update all given docs.  (Not implemented.)
+     */
     controller.request('collection', 'put', function(request, response, next) {
       return next(RestError.NotImplemented('Cannot PUT to the collection'));
     });
@@ -223,7 +224,9 @@ module.exports = function(mongoose, express) {
     });
 
     // ※ Stream
-    // A utility method for ordering through streams.
+    /**
+     * A utility method for ordering through streams.
+     */
     protect.pipeline = function(handler) {
       const streams = [];
       const d = domain.create();
@@ -252,7 +255,6 @@ module.exports = function(mongoose, express) {
         return d.run(eventStream.through);
       };
     };
-    // __Middleware__
     // Create the pipeline interface the user interacts with.
     this.request(function(request, response, next) {
       request.baucis.incoming = protect.pipeline(next);
@@ -366,8 +368,8 @@ module.exports = function(mongoose, express) {
     });
 
     // /※Update
-
     const validOperators = ['$set', '$push', '$pull', '$addToSet', '$pop', '$pushAll', '$pullAll'];
+    // §todo: maybe make it configurable
 
     function checkBadUpdateOperatorPaths(operator, paths) {
       let bad = false;
@@ -751,22 +753,29 @@ module.exports = function(mongoose, express) {
     const lastModifiedPath = controller.model().lastModified();
     const trailers = {};
 
-    // __Private Module Members__
-    // Format the Trailer header.
+    /**
+     *  Format the Trailer header.
+     */
     function addTrailer(response, header) {
       const current = response.get('Trailer');
       if (!current) response.set('Trailer', header);
       else response.set('Trailer', `${current}, ${header}`);
     }
-    // A map that is used to create empty response body.
+    /**
+     * A map that is used to create empty response body.
+     */
     function empty(context, callback) {
       callback(null, '');
     }
-    // Map contexts back into documents.
+    /**
+     * Map contexts back into documents.
+     */
     function redoc(context, callback) {
       callback(null, context.doc);
     }
-    // Generate a respone Etag from a context.
+    /**
+     * Generate a respone Etag from a context.
+     */
     function etag(response, useTrailer) {
       if (useTrailer) {
         addTrailer(response, 'Etag');
@@ -806,7 +815,9 @@ module.exports = function(mongoose, express) {
         }
       );
     }
-    // Generate a Last-Modified header/trailer
+    /**
+     * Generate a Last-Modified header/trailer
+     */
     function lastModified(response, useTrailer) {
       if (useTrailer) {
         addTrailer(response, 'Last-Modified');
@@ -839,7 +850,9 @@ module.exports = function(mongoose, express) {
       );
     }
 
-    // Build a reduce stream.
+    /**
+     * Build a reduce stream.
+     */
     function reduce(accumulated, f) {
       return eventStream.through(
         function(context) {
@@ -851,7 +864,9 @@ module.exports = function(mongoose, express) {
         }
       );
     }
-    // Count emissions.
+    /**
+     * Count emissions.
+     */
     function count() {
       return reduce(0, function(a, b) {
         return a + 1;
