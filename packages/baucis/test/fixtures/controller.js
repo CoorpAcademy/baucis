@@ -44,7 +44,7 @@ mongoose.model('fiend', Fiends);
 mongoose.model('unmade', Unmades);
 mongoose.model('timeentry', Cheese, 'cheeses').plural('timeentries');
 mongoose.model('mean', Fiends, 'fiends').locking(true);
-console.log('>>>',mongoose.model('bal', Stores, 'stores').plural('baloo'));
+mongoose.model('bal', Stores, 'stores').plural('baloo');
 
 module.exports = {
   init(done) {
