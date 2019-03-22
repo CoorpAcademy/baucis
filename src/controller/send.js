@@ -136,10 +136,8 @@ module.exports = function(options, protect) {
     request.baucis.send = pipeline;
     // If documents were set in the baucis hash, use them.
     if (documents) pipeline(eventStream.readArray([].concat(documents)));
-    else if (request.baucis.query.op === 'findOne') {
+    else {
       // Otherwise, stream the relevant documents from Mongo, based on constructed query.
-      pipeline(request.baucis.query.stream()); // findOne do not support cursor
-    } else {
       pipeline(request.baucis.query.cursor());
     }
 
@@ -195,10 +193,8 @@ module.exports = function(options, protect) {
     // If documents were set in the baucis hash, use them.
     if (documents) {
       pipeline(eventStream.readArray([].concat(documents)));
-    } else if (request.baucis.query.op === 'findOne') {
-      // Otherwise, stream the relevant documents from Mongo, based on constructed query.
-      pipeline(request.baucis.query.stream()); // findOne do not support cursor
     } else {
+      // Otherwise, stream the relevant documents from Mongo, based on constructed query.
       pipeline(request.baucis.query.cursor());
     }
 

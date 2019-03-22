@@ -1,6 +1,7 @@
 const deco = require('deco');
 const mongoose = require('mongoose');
 const pluralize = require('mongoose/lib/utils').toCollectionName;
+const pluralizer = require('mongoose-legacy-pluralize');
 
 const Model = deco(function(options, protect) {
   const model = this;
@@ -22,7 +23,7 @@ const Model = deco(function(options, protect) {
   };
 
   model.singular(model.modelName);
-  model.plural(pluralize(model.singular()));
+  model.plural(pluralize(model.singular(), pluralizer));
 });
 
 // Wrap the mongoose model function to add this mixin to all registered models.

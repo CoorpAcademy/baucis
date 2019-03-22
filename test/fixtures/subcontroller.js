@@ -5,11 +5,11 @@ const config = require('./config');
 
 let app;
 let server;
-const Schema = mongoose.Schema;
+const {Schema} = mongoose;
 
 const User = new Schema({
   name: String,
-  tasks: [{type: Schema.ObjectId, ref: 'task'}]
+  tasks: [{type: Schema.Types.ObjectId, ref: 'task'}]
 });
 const Task = new Schema({
   name: String,
@@ -24,7 +24,7 @@ mongoose.model('task', Task);
 
 module.exports = {
   init(done) {
-    mongoose.connect(config.mongo.url, {useMongoClient: true});
+    mongoose.connect(config.mongo.url, {useNewUrlParser: true});
     const users = baucis.rest('user');
     const tasks = users.vivify('tasks');
 

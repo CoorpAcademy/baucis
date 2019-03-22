@@ -14,7 +14,7 @@ let server;
 // __Module Definition__
 const fixture = {
   init(done) {
-    mongoose.connect(config.mongo.url, {useMongoClient: true});
+    mongoose.connect(config.mongo.url, {useNewUrlParser: true});
 
     fixture.saveCount = 0;
     fixture.removeCount = 0;
@@ -223,21 +223,21 @@ const fixture = {
 };
 
 // __Fixture Schemata__
-const Schema = mongoose.Schema;
+const {Schema} = mongoose;
 const Fungus = new Schema({'hyphenated-field-name': String});
 const Animal = new Schema({name: String});
 const Mineral = new Schema({
   color: String,
-  enables: [{type: Schema.ObjectId, ref: 'fungus'}]
+  enables: [{type: Schema.Types.ObjectId, ref: 'fungus'}]
 });
 const Vegetable = new Schema({
   name: {type: String, required: true},
   lastModified: {type: Date, required: true, default: Date.now},
   diseases: {type: [String], select: false},
   species: {type: String, default: 'n/a', select: false},
-  related: {type: Schema.ObjectId, ref: 'vegetable'},
+  related: {type: Schema.Types.ObjectId, ref: 'vegetable'},
   score: {type: Number, min: 1},
-  nutrients: [{type: Schema.ObjectId, ref: 'mineral'}]
+  nutrients: [{type: Schema.Types.ObjectId, ref: 'mineral'}]
 });
 
 Vegetable.pre('save', function(next) {
