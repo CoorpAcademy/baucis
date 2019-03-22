@@ -20,13 +20,13 @@ const baucis = function(options) {
 
 // __Public Members__
 baucis.rest = function(model) {
-  if (!instance) instance = Api();
+  if (!instance) instance = new Api();
   return instance.rest(model);
 };
 
 baucis.empty = function() {
   const previous = instance;
-  instance = Api();
+  instance = new Api();
   return previous;
 };
 
@@ -84,7 +84,6 @@ baucis.Controller = Controller;
 baucis.Error = RestError;
 baucis.Model = Model;
 
-Api.container(baucis);
 Controller.container(baucis);
 RestError.container(baucis);
 Model.container(baucis);

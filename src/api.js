@@ -1,14 +1,11 @@
-// __Dependencies__
-const deco = require('deco');
+const util = require('util');
 const semver = require('semver');
 const express = require('express');
 const RestError = require('rest-error');
 const Controller = require('./controller');
 
-// __Module Definition__
-const Api = deco(function(options) {
-  const api = this;
-
+function Api() {
+  const api = express.Router.apply(this, arguments);
   api.use(function(request, response, next) {
     if (request.baucis)
       return next(RestError.Misconfigured('Baucis request property already created'));
@@ -45,8 +42,8 @@ const Api = deco(function(options) {
     next();
   });
 
-  this._releases = ['0.0.1'];
-  this.releases = function(release) {
+  api._releases = ['0.0.1'];
+  api.releases = function(release) {
     if (arguments.length === 1) {
       if (!semver.valid(release)) {
         throw RestError.Misconfigured(
@@ -60,22 +57,22 @@ const Api = deco(function(options) {
     return this._releases;
   };
 
-  this.rest = function(model) {
+  api.rest = model => {
     const controller = Controller(model);
     api.add(controller);
     return controller;
   };
 
-  this._controllers = [];
+  api._controllers = [];
 
   // __Public Instance Members__
   // Add a controller to the API.
-  this.add = function(controller) {
+  api.add = function(controller) {
     this._controllers.push(controller);
     return api;
   };
   // Return a copy of the controllers array, optionally filtered by release.
-  this.controllers = function(release, fragment) {
+  api.controllers = function(release, fragment) {
     const all = [].concat(this._controllers);
 
     if (!release) return all;
@@ -96,15 +93,15 @@ const Api = deco(function(options) {
   // Find the correct controller to handle the request.
   api.use('/:path', (request, response, next) => {
     const fragment = `/${request.params.path}`;
-    const controllers = this.controllers(request.baucis.release, fragment);
+    const controllers = api.controllers(request.baucis.release, fragment);
     // If not found, bail.
     if (controllers.length === 0) return next();
 
     request.baucis.controller = controllers[0];
     request.baucis.controller(request, response, next);
   });
-});
 
-Api.factory(express.Router);
+  return api;
+}
 
 module.exports = Api;
