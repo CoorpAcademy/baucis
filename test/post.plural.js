@@ -56,6 +56,7 @@ describe('POST plural', function() {
       url: 'http://localhost:8012/api/vegetables/',
       json: [{name: 'Catnip'}, {name: 'Cattail'}]
     };
+    // §FIXME
     request.post(options, function(error, response, body) {
       if (error) return done(error);
 
