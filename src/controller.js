@@ -1,16 +1,14 @@
 // __Dependencies__
+const path = require('path');
 const deco = require('deco');
 const express = require('express');
-
 // __Module Definition__
 const Controller = deco();
 
 Controller.factory(express.Router);
-Controller.decorators(__dirname, [
+Controller.decorators(path.join(__dirname, 'controller'), [
   'configure',
-  'stages',
-  'activation',
-  'request',
+  'MERGE',
   'query',
   'send',
   'errors'
