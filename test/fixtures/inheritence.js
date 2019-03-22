@@ -26,7 +26,7 @@ const Cordial = Liqueur.discriminator('cordial', CordialSchema);
 
 module.exports = {
   init(done) {
-    mongoose.connect(config.mongo.url, {useMongoClient: true});
+    mongoose.connect(config.mongo.url, {useNewUrlParser: true});
 
     baucis.rest(Liqueur);
     baucis.rest(Amaro);
@@ -52,9 +52,9 @@ module.exports = {
     ];
     const cordials = [{name: 'Blackberry', sweetness: 5}, {name: 'Peach', sweetness: 7}];
     let deferred = [
-      Liqueur.remove.bind(Liqueur),
-      Amaro.remove.bind(Amaro),
-      Cordial.remove.bind(Cordial)
+      Liqueur.deleteMany.bind(Liqueur),
+      Amaro.deleteMany.bind(Amaro),
+      Cordial.deleteMany.bind(Cordial)
     ];
 
     deferred = deferred.concat(

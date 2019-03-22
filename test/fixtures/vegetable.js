@@ -196,9 +196,9 @@ const fixture = {
       });
     });
     let deferred = [
-      Vegetable.remove.bind(Vegetable),
-      Mineral.remove.bind(Mineral),
-      Fungus.remove.bind(Fungus)
+      Vegetable.deleteMany.bind(Vegetable),
+      Mineral.deleteMany.bind(Mineral),
+      Fungus.deleteMany.bind(Fungus)
     ];
 
     deferred = deferred.concat(

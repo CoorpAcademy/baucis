@@ -49,7 +49,7 @@ mongoose.model('bal', Stores, 'stores').plural('baloo');
 module.exports = {
   init(done) {
     mongoose.Promise = global.Promise;
-    mongoose.connect(config.mongo.url, {useNewUrlParser: true});
+    mongoose.connect(config.mongo.url, {useNewUrlParser: true, useCreateIndex: true});
 
     // Stores controller
     const stores = baucis
@@ -120,10 +120,10 @@ module.exports = {
   },
   create(done) {
     // clear all first
-    mongoose.model('store').remove({}, function(error) {
+    mongoose.model('store').deleteMany({}, function(error) {
       if (error) return done(error);
 
-      mongoose.model('cheese').remove({}, function(error) {
+      mongoose.model('cheese').deleteMany({}, function(error) {
         // create stores and tools
         mongoose.model('store').create(
           ['Westlake', 'Corner'].map(function(name) {

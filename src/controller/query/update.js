@@ -204,7 +204,7 @@ module.exports = function(options, protect) {
           request.baucis.conditions[versionKey] = Number(context.incoming[versionKey]);
         }
         // Update the doc using the supplied operator and bypassing validation.
-        controller.model().update(request.baucis.conditions, wrapper, callback);
+        controller.model().updateMany(request.baucis.conditions, wrapper, callback);
       });
     }
 
