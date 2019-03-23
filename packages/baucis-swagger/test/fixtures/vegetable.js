@@ -1,13 +1,13 @@
-// __Dependencies__
 const mongoose = require('mongoose');
 const express = require('express');
 const async = require('async');
 
 const baucisSwagger = require('../..');
-const baucis = baucisSwagger(require('../../../baucis')(mongoose, express));
+const baucis = require('../../../baucis')(mongoose, express);
 const config = require('./config');
 
-// __Private Module Members__
+baucis.addPlugin(baucisSwagger);
+
 let app;
 let server;
 const Schema = mongoose.Schema;
@@ -34,7 +34,6 @@ mongoose.model('vegetable', Vegetable);
 mongoose.model('fungus', Fungus).plural('fungi');
 mongoose.model('goose', Goose).plural('geese');
 
-// __Module Definition__
 const fixture = {
   init(done) {
     mongoose.connect(config.mongo.url);

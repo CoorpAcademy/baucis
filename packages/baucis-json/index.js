@@ -1,15 +1,12 @@
-const es = require('event-stream');
+const eventStream = require('event-stream');
 
-module.exports = function() {
-  const baucis = this;
-
-  // __Private Methods__
+module.exports = function(baucis) {
   // Default formatter — emit a single JSON object or an array of them.
   function singleOrArray(alwaysArray) {
     let first = false;
     let multiple = false;
 
-    return es.through(
+    return eventStream.through(
       function(doc) {
         // Start building the output.  If this is the first document,
         // store it for a moment.
@@ -57,7 +54,7 @@ module.exports = function() {
     let depth = 0;
     let buffer = '';
 
-    return es.through(function(chunk) {
+    return eventStream.through(function(chunk) {
       let match;
       let head;
       let brace;

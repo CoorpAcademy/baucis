@@ -108,13 +108,13 @@ module.exports = (express, Controller) => {
       request.baucis.controller(request, response, next);
     });
 
-    Api._extensions.map(ext => ext(api));
+    Api.__extensions__.map(ext => ext(api));
     return api;
   }
   Api.Controller = Controller;
-  Api._extensions = [];
+  Api.__extensions__ = [];
   Api.addExtension = extension => {
-    Api._extensions.push(extension);
+    Api.__extensions__.push(extension);
   };
   return Api;
 };

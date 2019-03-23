@@ -2,7 +2,9 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const baucisSwagger = require('..');
-const baucis = baucisSwagger(require('../../baucis')(mongoose, express));
+const baucis = require('../../baucis')(mongoose, express);
+
+baucis.addPlugin(baucisSwagger);
 
 const config = {mongo: {url: 'mongodb://127.0.0.1/legumes'}};
 

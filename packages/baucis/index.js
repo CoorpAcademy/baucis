@@ -88,13 +88,18 @@ module.exports = function(mongoose, express) {
     return baucis;
   };
 
+  baucis.addPlugin = plugin => {
+    plugin(baucis);
+    return baucis;
+  };
+
   baucis.Api = Api;
   baucis.Controller = Controller;
   baucis.Error = RestError;
   baucis.Api.Controller = Controller;
 
-  plugins.json.apply(baucis); // FIXME
-  plugins.links.apply(baucis);
+  baucis.addPlugin(plugins.links);
+  baucis.addPlugin(plugins.json);
 
   return baucis;
 };
