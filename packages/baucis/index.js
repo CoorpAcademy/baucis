@@ -91,11 +91,9 @@ module.exports = function(mongoose, express) {
   baucis.Api = Api;
   baucis.Controller = Controller;
   baucis.Error = RestError;
-
-  Controller.container(baucis);
   baucis.Api.Controller = Controller;
 
-  plugins.json.apply(baucis);
+  plugins.json.apply(baucis); // FIXME
   plugins.links.apply(baucis);
 
   return baucis;

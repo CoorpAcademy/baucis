@@ -1,7 +1,6 @@
 const util = require('util');
 const crypto = require('crypto');
 const domain = require('domain');
-const deco = require('deco');
 const RestError = require('rest-error');
 const eventStream = require('event-stream');
 const semver = require('semver');
@@ -14,8 +13,8 @@ const {
 const {defineRoutes} = require('./utils/routing');
 
 module.exports = function(mongoose, express) {
-  const Controller = deco(function(model, protect) {
-    const controller = this;
+  const Controller = function(model) {
+    const controller = express.Router.apply(this, arguments);
     const initial = express.Router();
     const controllerForStage = {
       initial,
@@ -29,50 +28,137 @@ module.exports = function(mongoose, express) {
       throw RestError.Misconfigured('You must pass in a model or model name');
     }
 
-    protect.property('comments', false);
-    protect.property('explain', false);
-    protect.property('hints', false);
-    protect.property('select', '');
-    protect.property('sort', '');
+    // §FIXME: in a second time use real getter
+    controller._comments = false;
+    controller.comments = function(value) {
+      if (arguments.length === 1) {
+        controller._comments = value;
+        return controller;
+      } else {
+        return controller._comments;
+      }
+    };
+    controller._explain = false;
+    controller.explain = function(value) {
+      if (arguments.length === 1) {
+        controller._explain = value;
+        return controller;
+      } else {
+        return controller._explain;
+      }
+    };
+    controller._hints = false;
+    controller.hints = function(value) {
+      if (arguments.length === 1) {
+        controller._hints = value;
+        return controller;
+      } else {
+        return controller._hints;
+      }
+    };
+    controller._select = '';
+    controller.select = function(value) {
+      if (arguments.length === 1) {
+        controller._select = value;
+        return controller;
+      } else {
+        return controller._select;
+      }
+    };
+    controller._sort = '';
+    controller.sort = function(value) {
+      if (arguments.length === 1) {
+        controller._sort = value;
+        return controller;
+      } else {
+        return controller._sort;
+      }
+    };
 
-    protect.property('versions', '*', function(range) {
-      if (semver.validRange(range)) return range;
-      throw RestError.Misconfigured(
-        'Controller version range "%s" was not a valid semver range',
-        range
-      );
-    });
-
-    protect.property('model', undefined, function(m) {
-      // TODO readonly
-      if (typeof m === 'string') return mongoose.model(m);
-      return m;
-    });
-
-    protect.property('fragment', function(value) {
+    controller._versions = '*';
+    controller.versions = function(range) {
+      if (arguments.length === 1) {
+        if (!semver.validRange(range))
+          throw RestError.Misconfigured(
+            `Controller version range "${range}" was not a valid semver range`
+          );
+        controller._versions = range;
+        return controller;
+      } else {
+        return controller._versions;
+      }
+    };
+    controller._model = undefined;
+    controller.controller = function(m) {
+      if (arguments.length === 1) {
+        controller._model = typeof m === 'string' ? mongoose.controller(m) : m;
+        return controller;
+      } else {
+        return controller._model;
+      }
+    };
+    controller._fragment = function(value) {
       if (value === undefined) return `/${controller.model().plural()}`;
       if (value.indexOf('/') !== 0) return `/${value}`;
       return value;
-    });
-
-    protect.property('findBy', '_id', function(path) {
-      const findByPath = controller.model().schema.path(path);
-      if (
-        !findByPath.options.unique &&
-        !(findByPath.options.index && findByPath.options.index.unique)
-      ) {
-        throw RestError.Misconfigured(
-          '`findBy` path for model "%s" must be unique',
-          controller.model().modelName
-        );
+    };
+    controller.fragment = function(value) {
+      if (arguments.length === 1) {
+        controller._fragment = value;
+        return controller;
+      } else {
+        return controller._fragment;
       }
-      return path;
-    });
+    };
 
-    protect.multiproperty('operators', undefined, false);
+    controller._findBy = '_id';
+    controller.findBy = function(path) {
+      if (arguments.length === 1) {
+        const findByPath = controller.model().schema.path(path);
+        if (
+          !findByPath.options.unique &&
+          !(findByPath.options.index && findByPath.options.index.unique)
+        ) {
+          throw RestError.Misconfigured(
+            '`findBy` path for model "%s" must be unique',
+            controller.model().modelName
+          );
+        }
+        controller._findBy = path;
+        return controller;
+      } else {
+        return controller._findBy;
+      }
+    };
+
+   /* protect.multiproperty('operators', undefined, false);
     protect.multiproperty('methods', 'head get put post delete', true, function(enabled) {
       return !!enabled;
-    });
+    });*/
+
+
+    controller._emptyCollection = 200;
+    controller.emptyCollection = function(value) {
+      if (arguments.length === 1) {
+        controller._emptyCollection = value;
+        return controller;
+      } else {
+        return controller._emptyCollection;
+      }
+    };
+    controller._handleError = true;
+    /**
+     * A controller property that sets whether errors should be
+    * handled if possible, or just set status code.
+     */
+    controller.handleErrors = function(value) {
+      if (arguments.length === 1) {
+        controller._handleErrors = !!value;
+        return controller;
+      } else {
+        return controller._handleErrors;
+      }
+    };
 
     controller.deselected = function(path) {
       const deselected = controller.model().deselected();
@@ -96,13 +182,13 @@ module.exports = function(mongoose, express) {
     controller.model(model);
 
     // §STAGE:
-    protect.controllerForStage = controllerForStage;
+    controller.controllerForStage = controllerForStage;
     controller.use(initial);
     controller.use(controllerForStage.request);
     controller.use(controllerForStage.query);
     controller.use(controllerForStage.finalize);
     // Expose the original `use` function as a protected method.
-    protect.use = controller.use.bind(controller);
+    // ////protect.use = controller.use.bind(controller);
     // Pass the method calls through to the "initial" stage middleware controller,
     // so that it precedes all other stages and middleware that might have been
     // already added.
@@ -117,13 +203,13 @@ module.exports = function(mongoose, express) {
     //  §ACTIVATION
     // A method used to activate middleware for a particular stage.
     function activate(definition) {
-      const stage = protect.controllerForStage[definition.stage];
+      const stage = controller.controllerForStage[definition.stage];
       const f = stage[definition.method].bind(stage);
       if (definition.endpoint === 'instance') f('/:id', definition.middleware);
       else f('/', definition.middleware);
     }
     // __Protected Instance Members__
-    protect.finalize = function(endpoint, methods, middleware) {
+    controller.finalize = function(endpoint, methods, middleware) {
       defineRoutes('finalize', arguments).forEach(activate);
       return controller;
     };
@@ -153,7 +239,7 @@ module.exports = function(mongoose, express) {
 
     const check = ['ObjectID', 'Number'];
 
-    protect.isInvalid = function(id, instance, type) {
+    controller.isInvalid = function(id, instance, type) {
       if (!id) return false;
       if (check.indexOf(instance) === -1) return false;
       if (instance === 'ObjectID' && id.match(/^[a-f0-9]{24}$/i)) return false;
@@ -165,7 +251,7 @@ module.exports = function(mongoose, express) {
     controller.request(function(request, response, next) {
       const id = request.params.id;
       const instance = controller.model().schema.path(controller.findBy()).instance;
-      const invalid = protect.isInvalid(request.params.id, instance, 'url.id');
+      const invalid = controller.isInvalid(request.params.id, instance, 'url.id');
       if (!invalid) return next();
       next(RestError.BadRequest('The requested document ID "%s" is not a valid document ID', id));
     });
@@ -227,7 +313,7 @@ module.exports = function(mongoose, express) {
     /**
      * A utility method for ordering through streams.
      */
-    protect.pipeline = function(handler) {
+    controller.pipeline = function(handler) {
       const streams = [];
       const d = domain.create();
       d.on('error', handler);
@@ -257,8 +343,8 @@ module.exports = function(mongoose, express) {
     };
     // Create the pipeline interface the user interacts with.
     this.request(function(request, response, next) {
-      request.baucis.incoming = protect.pipeline(next);
-      request.baucis.outgoing = protect.pipeline(next);
+      request.baucis.incoming = controller.pipeline(next);
+      request.baucis.outgoing = controller.pipeline(next);
       next();
     });
 
@@ -269,7 +355,7 @@ module.exports = function(mongoose, express) {
     controller.query('post', function(request, response, next) {
       let url = request.originalUrl || request.url;
       const findBy = controller.findBy();
-      const pipeline = protect.pipeline(next);
+      const pipeline = controller.pipeline(next);
       let parser;
       // Add trailing slash to URL if needed.
       if (url.lastIndexOf('/') === url.length - 1) url = url.slice(0, url.length - 1);
@@ -393,7 +479,7 @@ module.exports = function(mongoose, express) {
       let count = 0;
       const operator = request.headers['update-operator'];
       const versionKey = controller.model().schema.get('versionKey');
-      const pipeline = protect.pipeline(next);
+      const pipeline = controller.pipeline(next);
       // Check if the body was parsed by some external middleware e.g. `express.json`.
       // If so, create a one-document stream from the parsed body.
       if (request.body) {
@@ -874,7 +960,7 @@ module.exports = function(mongoose, express) {
     }
 
     // If counting get the count and send it back directly.
-    protect.finalize(function(request, response, next) {
+    controller.finalize(function(request, response, next) {
       if (!request.baucis.count) return next();
 
       request.baucis.query.count(function(error, n) {
@@ -885,10 +971,10 @@ module.exports = function(mongoose, express) {
     });
 
     // If not counting, create the basic stream pipeline.
-    protect.finalize('collection', 'all', function(request, response, next) {
+    controller.finalize('collection', 'all', function(request, response, next) {
       let count = 0;
       const documents = request.baucis.documents;
-      const pipeline = protect.pipeline(next);
+      const pipeline = controller.pipeline(next);
       request.baucis.send = pipeline;
       // If documents were set in the baucis hash, use them.
       if (documents) pipeline(eventStream.readArray([].concat(documents)));
@@ -941,10 +1027,10 @@ module.exports = function(mongoose, express) {
       });
     });
 
-    protect.finalize('instance', 'all', function(request, response, next) {
+    controller.finalize('instance', 'all', function(request, response, next) {
       let count = 0;
       const documents = request.baucis.documents;
-      const pipeline = protect.pipeline(next);
+      const pipeline = controller.pipeline(next);
       request.baucis.send = pipeline;
       // If documents were set in the baucis hash, use them.
       if (documents) {
@@ -991,7 +1077,7 @@ module.exports = function(mongoose, express) {
     // });
 
     // HEAD
-    protect.finalize('instance', 'head', function(request, response, next) {
+    controller.finalize('instance', 'head', function(request, response, next) {
       if (lastModifiedPath) {
         request.baucis.send(lastModified(response, false));
       }
@@ -1003,7 +1089,7 @@ module.exports = function(mongoose, express) {
       next();
     });
 
-    protect.finalize('collection', 'head', function(request, response, next) {
+    controller.finalize('collection', 'head', function(request, response, next) {
       if (lastModifiedPath) {
         request.baucis.send(lastModified(response, false));
       }
@@ -1016,7 +1102,7 @@ module.exports = function(mongoose, express) {
     });
 
     // GET
-    protect.finalize('instance', 'get', function(request, response, next) {
+    controller.finalize('instance', 'get', function(request, response, next) {
       if (lastModifiedPath) {
         request.baucis.send(lastModified(response, false));
       }
@@ -1027,7 +1113,7 @@ module.exports = function(mongoose, express) {
       next();
     });
 
-    protect.finalize('collection', 'get', function(request, response, next) {
+    controller.finalize('collection', 'get', function(request, response, next) {
       if (lastModifiedPath) {
         request.baucis.send(lastModified(response, true));
       }
@@ -1045,21 +1131,21 @@ module.exports = function(mongoose, express) {
     });
 
     // POST
-    protect.finalize('collection', 'post', function(request, response, next) {
+    controller.finalize('collection', 'post', function(request, response, next) {
       request.baucis.send(redoc);
       request.baucis.send(request.baucis.formatter());
       next();
     });
 
     // PUT
-    protect.finalize('put', function(request, response, next) {
+    controller.finalize('put', function(request, response, next) {
       request.baucis.send(redoc);
       request.baucis.send(request.baucis.formatter());
       next();
     });
 
     // DELETE
-    protect.finalize('delete', function(request, response, next) {
+    controller.finalize('delete', function(request, response, next) {
       // Remove each document from the database.
       request.baucis.send(function(context, callback) {
         context.doc.remove(callback);
@@ -1070,7 +1156,7 @@ module.exports = function(mongoose, express) {
       next();
     });
 
-    protect.finalize(function(request, response, next) {
+    controller.finalize(function(request, response, next) {
       request.baucis.send().pipe(
         eventStream.through(
           function(chunk) {
@@ -1085,15 +1171,8 @@ module.exports = function(mongoose, express) {
       );
     });
 
-    // §errors
-    protect.property('emptyCollection', 200);
-    // A controller property that sets whether errors should be
-    // handled if possible, or just set status code.
-    protect.property('handleErrors', true, function(handle) {
-      return !!handle;
-    });
     // If it's a Mongo bad hint error, convert to a bad request error.
-    protect.use(function(error, request, response, next) {
+    controller.use(function(error, request, response, next) {
       if (!error) return next();
       if (!error.message) return next(error);
 
@@ -1117,7 +1196,7 @@ module.exports = function(mongoose, express) {
       next(error);
     });
     // Convert Mongo duplicate key error to an unprocessible entity error
-    protect.use(function(error, request, response, next) {
+    controller.use(function(error, request, response, next) {
       if (!error) return next();
       if (!error.message) return next(error);
       if (error.message.indexOf('E11000 duplicate key error') === -1) {
@@ -1146,7 +1225,7 @@ module.exports = function(mongoose, express) {
       next(translatedError);
     });
     // Convert Mongo validation errors to unprocessable entity errors.
-    protect.use(function(error, request, response, next) {
+    controller.use(function(error, request, response, next) {
       if (!error) return next();
       if (!(error instanceof mongoose.Error.ValidationError)) return next(error);
       const newError = RestError.UnprocessableEntity();
@@ -1154,13 +1233,13 @@ module.exports = function(mongoose, express) {
       next(newError);
     });
     // Convert Mongoose version conflict error to LockConflict.
-    protect.use(function(error, request, response, next) {
+    controller.use(function(error, request, response, next) {
       if (!error) return next();
       if (!(error instanceof mongoose.Error.VersionError)) return next(error);
       next(RestError.LockConflict());
     });
     // Translate other errors to internal server errors.
-    protect.use(function(error, request, response, next) {
+    controller.use(function(error, request, response, next) {
       if (!error) return next();
       if (error instanceof RestError) return next(error);
       const error2 = RestError.InternalServerError(error.message);
@@ -1168,7 +1247,7 @@ module.exports = function(mongoose, express) {
       next(error2);
     });
     // Format the error based on the Accept header.
-    protect.use(function(error, request, response, next) {
+    controller.use(function(error, request, response, next) {
       if (!error) return next();
 
       // Always set the status code if available.
@@ -1218,7 +1297,7 @@ module.exports = function(mongoose, express) {
           .pipe(response);
       });
     });
-  });
-  Controller.factory(express.Router);
+    return controller;
+  };
   return Controller;
 };
