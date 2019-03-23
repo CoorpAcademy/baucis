@@ -1,8 +1,8 @@
 // __Dependencies__
 const mongoose = require('mongoose');
 const express = require('express');
-const baucis = require('@coorpacademy/baucis');
-require('..');
+const baucisSwagger = require('..');
+const baucis = baucisSwagger(require('../../baucis')(mongoose, express));
 
 const config = {mongo: {url: 'mongodb://127.0.0.1/legumes'}};
 
@@ -31,7 +31,7 @@ mongoose.model('vegetable', Vegetable);
 mongoose.model('fungus', Fungus).plural('fungi');
 mongoose.model('goose', Goose).plural('geese');
 
-mongoose.connect(config.mongo.url);
+mongoose.connect(config.mongo.url, {useNewUrlParser: true});
 
 const controller = baucis
   .rest('vegetable')

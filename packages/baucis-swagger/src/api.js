@@ -1,7 +1,4 @@
-// __Dependencies__
 const deco = require('deco');
-
-// __Private Module Members__
 
 // Figure out the basePath for Swagger API definition
 function getBase(request, extra) {
@@ -28,16 +25,13 @@ function generateResourceListing(options) {
   return listing;
 }
 
-// __Module Definition__
-module.exports = function(options, protect) {
-  const api = this;
-
+module.exports = function extendApi(api) {
   // Middleware for the documentation index.
   api.get('/documentation', function(request, response) {
     response.json(
       generateResourceListing({
         version: request.baucis.release,
-        controllers: protect.controllers(request.baucis.release),
+        controllers: api.controllers(request.baucis.release),
         basePath: getBase(request, 1)
       })
     );
@@ -46,7 +40,7 @@ module.exports = function(options, protect) {
   // Find the correct controller to handle the request.
   api.get('/documentation/:path', function(request, response, next) {
     const fragment = `/${request.params.path}`;
-    const controllers = protect.controllers(request.baucis.release, fragment);
+    const controllers = api.controllers(request.baucis.release, fragment);
     // If not found, bail.
     if (controllers.lenth === 0) return next();
 

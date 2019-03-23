@@ -2,8 +2,9 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const async = require('async');
-const baucis = require('@coorpacademy/baucis');
-require('../..');
+
+const baucisSwagger = require('../..');
+const baucis = baucisSwagger(require('../../../baucis')(mongoose, express));
 const config = require('./config');
 
 // __Private Module Members__

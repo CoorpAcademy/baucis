@@ -28,11 +28,8 @@ function capitalize(s) {
 }
 
 // __Module Definition__
-module.exports = function() {
-  const controller = this;
-
-  // __Private Instance Members__
-
+module.exports = function extendController () {
+  const controller = this
   // A method used to generated a Swagger property for a model
   function generatePropertyDefinition(name, path) {
     const property = {};
@@ -257,7 +254,9 @@ module.exports = function() {
     return errorResponses;
   }
 
-  // Generate a list of a controller's operations
+  /**
+   * Generate a list of a controller's operations
+   */
   function generateOperations(plural) {
     const operations = [];
 
@@ -296,7 +295,6 @@ module.exports = function() {
     return operations;
   }
 
-  // __Build the Definition__
   controller.generateSwagger = function() {
     if (controller.swagger) return controller;
 

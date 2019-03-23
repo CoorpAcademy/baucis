@@ -1,9 +1,11 @@
-// __Dependencies__
 const path = require('path');
-const baucis = require('@coorpacademy/baucis');
 const deco = require('deco');
+const extendApi = require('./src/api');
 
-const decorators = deco.require(path.join(__dirname, 'src'), ['controller', 'api']).hash;
-
-baucis.Controller.decorators(decorators.controller);
-baucis.Api.decorators(decorators.api);
+module.exports = baucis => {
+  const {controller} = deco.require(path.join(__dirname, 'src'), ['controller']).hash;
+  baucis.Api.addExtension(extendApi);
+  baucis.Controller.decorators(controller);
+  baucis.Api.Controller = baucis.Controller;
+  return baucis;
+};

@@ -1,4 +1,3 @@
-const pluralize = require('mongoose/lib/utils').toCollectionName;
 const pluralizer = require('mongoose-legacy-pluralize');
 
 module.exports = function(mongoose) {
@@ -43,7 +42,7 @@ module.exports = function(mongoose) {
       }
     };
 
-    model._plural = pluralize(model.singular(), pluralizer);
+    model._plural = pluralizer(model.singular());
     model.plural = function(value) {
       if (arguments.length === 1) {
         model._plural = value;

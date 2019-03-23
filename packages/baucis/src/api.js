@@ -1,7 +1,7 @@
 const semver = require('semver');
 const RestError = require('rest-error');
 
-module.exports = (express, Controller) =>
+module.exports = (express, Controller) => {
   function Api() {
     const api = express.Router.apply(this, arguments);
 
@@ -60,7 +60,8 @@ module.exports = (express, Controller) =>
     };
 
     api.rest = model => {
-      const controller = Controller(model);
+      const Ctrl = Api.Controller; // ¤hack: for some reason Api.Controller(model) dont run
+      const controller = Ctrl(model);
       api.add(controller);
       return controller;
     };
@@ -107,5 +108,13 @@ module.exports = (express, Controller) =>
       request.baucis.controller(request, response, next);
     });
 
+    Api._extensions.map(ext => ext(api))
     return api;
+  }
+  Api.Controller = Controller;
+  Api._extensions = [];
+  Api.addExtension = extension => {
+    Api._extensions.push(extension);
   };
+  return Api;
+};

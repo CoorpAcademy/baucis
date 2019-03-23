@@ -1,12 +1,12 @@
 const expect = require('expect.js');
 const request = require('request');
 
-const fixtures = require('./fixtures');
+const fixtures = require('./fixtures/vegetable');
 
 describe('Swagger Resource Listing', function() {
-  before(fixtures.vegetable.init);
-  beforeEach(fixtures.vegetable.create);
-  after(fixtures.vegetable.deinit);
+  before(fixtures.init);
+  beforeEach(fixtures.create);
+  after(fixtures.deinit);
 
   it('should generate the correct listing', function(done) {
     const options = {
@@ -112,7 +112,7 @@ describe('Swagger Resource Listing', function() {
   });
 
   it('should allow adding custom APIs', function(done) {
-    fixtures.vegetable.controller.swagger.apis.push({
+    fixtures.controller.swagger.apis.push({
       path: '/vegetables/best',
       description: 'Operations on the best vegetable.',
       operations: [
