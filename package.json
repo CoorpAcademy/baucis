@@ -28,6 +28,8 @@
   "devDependencies": {
     "@coorpacademy/eslint-plugin-coorpacademy": "^8.1.1",
     "eslint": "^5.15.3",
-    "lerna": "^3.13.1"
+    "express": "^4.16.4",
+    "lerna": "^3.13.1",
+    "mongoose": "^5.4.19"
   }
 }
