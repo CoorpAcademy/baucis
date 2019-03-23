@@ -1,6 +1,6 @@
 {
-  "name": "baucis-swagger2",
-  "version": "0.3.15",
+  "name": "@coorpacademy/baucis-swagger2",
+  "version": "0.0.3",
   "description": "Generate customizable swagger version 2.0 definitions for your Baucis REST API.",
   "homepage": "https://github.com/icinetic/baucis-swagger2",
   "repository": {
