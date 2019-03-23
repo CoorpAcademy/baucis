@@ -80,5 +80,5 @@ function extendControllerWithLinks(controller) {
 }
 
 module.exports = function(baucis) {
-  baucis.Controller.addExtension(baucis);
+  baucis.Controller.addExtension(extendControllerWithLinks);
 };

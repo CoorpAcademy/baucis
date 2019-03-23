@@ -3,7 +3,7 @@ const RestError = require('rest-error');
 
 module.exports = (express, Controller) => {
   function Api() {
-    const api = express.Router.apply(this, arguments);
+    const api = express.Router(arguments); //§FIXME tocheck
 
     api.use(function(request, response, next) {
       if (request.baucis)
@@ -61,7 +61,7 @@ module.exports = (express, Controller) => {
 
     api.rest = model => {
       const Ctrl = Api.Controller; // ¤hack: for some reason Api.Controller(model) dont run
-      const controller = Ctrl(model);
+      const controller = new Ctrl(model);
       api.add(controller);
       return controller;
     };

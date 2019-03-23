@@ -9,9 +9,13 @@ const plugins = {
 };
 
 module.exports = function(mongoose, express) {
+  const baucis = function(options) {
+    return baucis.empty();
+  };
+
   const _mongoose = mongoose || require('mongoose');
   const _express = express || require('express');
-  const Controller = ControllerFactory(_mongoose, _express);
+  const Controller = ControllerFactory(baucis, _mongoose, _express);
   extendMongooseModel(_mongoose);
   const Api = ApiFactory(_express, Controller);
 
@@ -19,16 +23,13 @@ module.exports = function(mongoose, express) {
   const parsers = {};
   const formatters = {};
 
-  const baucis = function(options) {
-    return baucis.empty();
-  };
-
   baucis.rest = function(model) {
     if (!instance) instance = new Api();
     return instance.rest(model);
   };
 
   baucis.empty = function() {
+    // TODO : rename
     const previous = instance;
     instance = new Api();
     return previous;

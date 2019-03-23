@@ -12,9 +12,9 @@ const {
 } = require('./utils/predicates-and-accessors');
 const {defineRoutes} = require('./utils/routing');
 
-module.exports = function(mongoose, express) {
+module.exports = function(baucis, mongoose, express) {
   const Controller = function(model) {
-    const controller = express.Router.apply(this, arguments);
+    const controller = express.Router(arguments);
     const initial = express.Router();
     const controllerForStage = {
       initial,
@@ -89,25 +89,21 @@ module.exports = function(mongoose, express) {
       }
     };
     controller._model = undefined;
-    controller.controller = function(m) {
+    controller.model = function(m) {
       if (arguments.length === 1) {
-        controller._model = typeof m === 'string' ? mongoose.controller(m) : m;
+        controller._model = typeof m === 'string' ? mongoose.model(m) : m;
         return controller;
       } else {
         return controller._model;
       }
     };
-    controller._fragment = function(value) {
-      if (value === undefined) return `/${controller.model().plural()}`;
-      if (value.indexOf('/') !== 0) return `/${value}`;
-      return value;
-    };
+    controller._fragment = undefined;
     controller.fragment = function(value) {
       if (arguments.length === 1) {
-        controller._fragment = value;
+        controller._fragment = !value.startsWith('/') ? `/${value}` : value;
         return controller;
       } else {
-        return controller._fragment;
+        return controller._fragment ||`/${controller.model().plural()}`;
       }
     };
 
@@ -131,11 +127,41 @@ module.exports = function(mongoose, express) {
       }
     };
 
-   /* protect.multiproperty('operators', undefined, false);
-    protect.multiproperty('methods', 'head get put post delete', true, function(enabled) {
-      return !!enabled;
-    });*/
+    controller._operators = {};
+    controller.operators = function(items, cargo) {
+      if (arguments.length === 0) {
+        return Object.keys(controller._operators).filter(item => controller._operators[item]);
+      } else if (arguments.length === 1) {
+        if (items.match(/\s/)) throw new Error('Can only specify one item when getting');
+        return controller._operators[items];
+      } else {
+        items
+          .split(/\s+/g)
+          .filter(id => id) // FIXME LODASH
+          .forEach(function(item) {
+            controller._operators[item] = cargo;
+          });
+        return controller;
+      }
+    };
 
+    controller._methods = {head: true, get: true, put: true, post: true, delete: true};
+    controller.methods = function(items, cargo) {
+      if (arguments.length === 0) {
+        return Object.keys(controller._methods).filter(item => controller._methods[item]);
+      } else if (arguments.length === 1) {
+        if (items.match(/\s/)) throw new Error('Can only specify one item when getting');
+        return controller._methods[items];
+      } else {
+        items
+          .split(/\s+/g)
+          .filter(id => id) // FIXME LODASH
+          .forEach(function(item) {
+            controller._methods[item] = !!cargo;
+          });
+        return controller;
+      }
+    };
 
     controller._emptyCollection = 200;
     controller.emptyCollection = function(value) {
@@ -146,10 +172,10 @@ module.exports = function(mongoose, express) {
         return controller._emptyCollection;
       }
     };
-    controller._handleError = true;
+    controller._handleErrors = true;
     /**
      * A controller property that sets whether errors should be
-    * handled if possible, or just set status code.
+     * handled if possible, or just set status code.
      */
     controller.handleErrors = function(value) {
       if (arguments.length === 1) {
@@ -188,7 +214,9 @@ module.exports = function(mongoose, express) {
     controller.use(controllerForStage.query);
     controller.use(controllerForStage.finalize);
     // Expose the original `use` function as a protected method.
-    // ////protect.use = controller.use.bind(controller);
+    // //protect.use = controller.use.bind(controller);
+    controller._use = controller.use.bind(controller);
+
     // Pass the method calls through to the "initial" stage middleware controller,
     // so that it precedes all other stages and middleware that might have been
     // already added.
@@ -204,21 +232,26 @@ module.exports = function(mongoose, express) {
     // A method used to activate middleware for a particular stage.
     function activate(definition) {
       const stage = controller.controllerForStage[definition.stage];
+     // /// console.log(definition.stage, stage.stack.length)
       const f = stage[definition.method].bind(stage);
       if (definition.endpoint === 'instance') f('/:id', definition.middleware);
       else f('/', definition.middleware);
     }
-    // __Protected Instance Members__
     controller.finalize = function(endpoint, methods, middleware) {
       defineRoutes('finalize', arguments).forEach(activate);
       return controller;
     };
-    // A method used to activate request-stage middleware.
+
+    /**
+     * A method used to activate request-stage middleware.
+     */
     controller.request = function(endpoint, methods, middleware) {
       defineRoutes('request', arguments).forEach(activate);
       return controller;
     };
-    // A method used to activate query-stage middleware.
+    /**
+     * A method used to activate query-stage middleware.
+     */
     controller.query = function(endpoint, methods, middleware) {
       defineRoutes('query', arguments).forEach(activate);
       return controller;
@@ -227,12 +260,10 @@ module.exports = function(mongoose, express) {
     // §REQUEST
     // Build the "Allow" response header
     controller.request(function(request, response, next) {
-      const active = ['head', 'get', 'post', 'put', 'delete'].filter(function(method) {
-        return controller.methods(method) !== false;
-      });
-      const allowed = active.map(function(verb) {
-        return verb.toUpperCase();
-      });
+      const active = ['head', 'get', 'post', 'put', 'delete'].filter(
+        method => controller.methods(method) !== false
+      );
+      const allowed = active.map(verb => verb.toUpperCase());
       response.set('Allow', allowed.join());
       next();
     });
@@ -280,7 +311,7 @@ module.exports = function(mongoose, express) {
 
     // // ※conditions
     // Set the conditions used for finding/updating/removing documents.
-    this.request(function(request, response, next) {
+    controller.request(function(request, response, next) {
       let conditions = request.query.conditions || {};
 
       if (typeof conditions === 'string') {
@@ -342,15 +373,13 @@ module.exports = function(mongoose, express) {
       };
     };
     // Create the pipeline interface the user interacts with.
-    this.request(function(request, response, next) {
+    controller.request(function(request, response, next) {
       request.baucis.incoming = controller.pipeline(next);
       request.baucis.outgoing = controller.pipeline(next);
       next();
     });
 
     //  §QUERY
-    const baucis = require('..')(mongoose, express); // TODO: check another way to access this
-
     // / create
     controller.query('post', function(request, response, next) {
       let url = request.originalUrl || request.url;
@@ -683,7 +712,7 @@ module.exports = function(mongoose, express) {
     }
 
     // Perform distinct query.
-    this.query(function(request, response, next) {
+    controller.query(function(request, response, next) {
       const distinct = request.query.distinct;
       if (!distinct) return next();
       if (controller.deselected(distinct)) {
@@ -698,25 +727,25 @@ module.exports = function(mongoose, express) {
       });
     });
     // Apply controller sort options to the query.
-    this.query(function(request, response, next) {
+    controller.query(function(request, response, next) {
       const sort = controller.sort();
       if (sort) request.baucis.query.sort(sort);
       next();
     });
     // Apply incoming request sort.
-    this.query(function(request, response, next) {
+    controller.query(function(request, response, next) {
       const sort = request.query.sort;
       if (sort) request.baucis.query.sort(sort);
       next();
     });
     // Apply controller select options to the query.
-    this.query(function(request, response, next) {
+    controller.query(function(request, response, next) {
       const select = controller.select();
       if (select) request.baucis.query.select(select);
       next();
     });
     // Apply incoming request select to the query.
-    this.query(function(request, response, next) {
+    controller.query(function(request, response, next) {
       const select = request.query.select;
       if (!select) return next();
 
@@ -731,7 +760,7 @@ module.exports = function(mongoose, express) {
       next();
     });
     // Apply incoming request populate.
-    this.query(function(request, response, next) {
+    controller.query(function(request, response, next) {
       let populate = request.query.populate;
       const allowPopulateSelect = request.baucis.allowPopulateSelect;
       let error = null;
@@ -767,7 +796,7 @@ module.exports = function(mongoose, express) {
       next(error);
     });
     // Apply incoming request skip.
-    this.query(function(request, response, next) {
+    controller.query(function(request, response, next) {
       const skip = request.query.skip;
       if (skip === undefined || skip === null) return next();
       if (!isNonNegativeInteger(skip)) {
@@ -777,7 +806,7 @@ module.exports = function(mongoose, express) {
       next();
     });
     // Apply incoming request limit.
-    this.query(function(request, response, next) {
+    controller.query(function(request, response, next) {
       const limit = request.query.limit;
       if (limit === undefined || limit === null) return next();
       if (!isPositiveInteger(limit)) {
@@ -787,7 +816,7 @@ module.exports = function(mongoose, express) {
       next();
     });
     // Set count flag.
-    this.query(function(request, response, next) {
+    controller.query(function(request, response, next) {
       if (!request.query.count) return next();
       if (request.query.count === 'false') return next();
       if (request.query.count !== 'true') {
@@ -809,7 +838,7 @@ module.exports = function(mongoose, express) {
       next();
     });
     // Check for query comment.
-    this.query(function(request, response, next) {
+    controller.query(function(request, response, next) {
       const comment = request.query.comment;
       if (!comment) return next();
       if (controller.comments()) request.baucis.query.comment(comment);
@@ -817,7 +846,7 @@ module.exports = function(mongoose, express) {
       next();
     });
     // Check for query hint.
-    this.query(function(request, response, next) {
+    controller.query(function(request, response, next) {
       let hint = request.query.hint;
 
       if (!hint) return next();
@@ -1172,7 +1201,7 @@ module.exports = function(mongoose, express) {
     });
 
     // If it's a Mongo bad hint error, convert to a bad request error.
-    controller.use(function(error, request, response, next) {
+    controller._use(function(error, request, response, next) {
       if (!error) return next();
       if (!error.message) return next(error);
 
@@ -1196,7 +1225,7 @@ module.exports = function(mongoose, express) {
       next(error);
     });
     // Convert Mongo duplicate key error to an unprocessible entity error
-    controller.use(function(error, request, response, next) {
+    controller._use(function(error, request, response, next) {
       if (!error) return next();
       if (!error.message) return next(error);
       if (error.message.indexOf('E11000 duplicate key error') === -1) {
@@ -1224,8 +1253,9 @@ module.exports = function(mongoose, express) {
 
       next(translatedError);
     });
+
     // Convert Mongo validation errors to unprocessable entity errors.
-    controller.use(function(error, request, response, next) {
+    controller._use(function(error, request, response, next) {
       if (!error) return next();
       if (!(error instanceof mongoose.Error.ValidationError)) return next(error);
       const newError = RestError.UnprocessableEntity();
@@ -1233,13 +1263,13 @@ module.exports = function(mongoose, express) {
       next(newError);
     });
     // Convert Mongoose version conflict error to LockConflict.
-    controller.use(function(error, request, response, next) {
+    controller._use(function(error, request, response, next) {
       if (!error) return next();
       if (!(error instanceof mongoose.Error.VersionError)) return next(error);
       next(RestError.LockConflict());
     });
     // Translate other errors to internal server errors.
-    controller.use(function(error, request, response, next) {
+    controller._use(function(error, request, response, next) {
       if (!error) return next();
       if (error instanceof RestError) return next(error);
       const error2 = RestError.InternalServerError(error.message);
@@ -1247,9 +1277,8 @@ module.exports = function(mongoose, express) {
       next(error2);
     });
     // Format the error based on the Accept header.
-    controller.use(function(error, request, response, next) {
+    controller._use(function(error, request, response, next) {
       if (!error) return next();
-
       // Always set the status code if available.
       if (error.status >= 100) {
         response.status(error.status);
@@ -1297,7 +1326,12 @@ module.exports = function(mongoose, express) {
           .pipe(response);
       });
     });
+    Controller.__extensions__.map(ext => ext(controller));
     return controller;
+  };
+  Controller.__extensions__ = [];
+  Controller.addExtension = extension => {
+    Controller.__extensions__.push(extension);
   };
   return Controller;
 };

@@ -16,7 +16,6 @@ function last(skip, names, values) {
     position--;
     if (index >= skip) r[name] = values[index];
   });
-
   return r;
 }
 
