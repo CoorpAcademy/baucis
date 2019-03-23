@@ -1,0 +1,64 @@
+{
+  "name": "baucis-swagger2",
+  "version": "0.3.15",
+  "description": "Generate customizable swagger version 2.0 definitions for your Baucis REST API.",
+  "homepage": "https://github.com/icinetic/baucis-swagger2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/icinetic/baucis-swagger2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/icinetic/baucis-swagger2/issues/new"
+  },
+  "main": "index.js",
+  "scripts": {
+    "pretest": "npm install",
+    "test": "istanbul cover node_modules/mocha/bin/_mocha -- --bail --timeout 5000 -R spec"
+  },
+  "author": {
+    "name": "Pedro J. Molina",
+    "email": "pjmolina@icinetic.com",
+    "url": "http://pjmolina.com/metalevel"
+  },
+  "contributors": [
+    {
+      "name": "William Riley-Land",
+      "email": "william@kun.io",
+      "url": "http://kun.io/wprl"
+    },
+    {
+      "name": "Robbie Trencheny",
+      "email": "me@robbiet.us",
+      "url": "http://robbie.io/"
+    }
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "deco": "~0.12.3"
+  },
+  "peerDependencies": {
+    "mongoose": ">=3 <5",
+    "baucis": "^1.0.0"
+  },
+  "devDependencies": {
+    "async": "^1.5.0",
+    "baucis": "~1.6.2",
+    "codeclimate-test-reporter": "^0.3.0",
+    "expect.js": "~0.3.1",
+    "express": "~4.13.3",
+    "istanbul": "^0.4.0",
+    "mocha": "~2.3.2",
+    "mongoose": "^4.1.6",
+    "request": "^2.64.0"
+  },
+  "keywords": [
+    "baucis",
+    "REST",
+    "RESTful",
+    "API",
+    "plugin",
+    "swagger",
+    "swagger20",
+    "documentation"
+  ]
+}
