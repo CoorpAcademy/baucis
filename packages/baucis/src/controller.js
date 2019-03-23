@@ -110,7 +110,7 @@ module.exports = function(baucis, mongoose, express) {
         controller._fragment = !value.startsWith('/') ? `/${value}` : value;
         return controller;
       } else {
-        return controller._fragment ||`/${controller.model().plural()}`;
+        return controller._fragment || `/${controller.model().plural()}`;
       }
     };
 
@@ -237,7 +237,8 @@ module.exports = function(baucis, mongoose, express) {
     //  §ACTIVATION
     /**
      * A method used to activate middleware for a particular stage.
-     */ 
+     */
+
     function activate(definition) {
       const stage = controller.controllerForStage[definition.stage];
       const f = stage[definition.method].bind(stage);

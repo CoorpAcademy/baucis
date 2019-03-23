@@ -17,6 +17,6 @@
   "author": "William Riley-Land",
   "license": "MIT",
   "dependencies": {
-    "deco": "^0.12.3"
+    "lodash": "^4.17.11"
   }
 }

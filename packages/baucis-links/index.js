@@ -1,5 +1,5 @@
 const qs = require('querystring');
-const deco = require('deco'); // FIXME remove it, just for merge
+const merge = require('lodash/fp/merge');
 
 function extendControllerWithLinks(controller) {
   controller._relations = true;
@@ -39,7 +39,7 @@ function extendControllerWithLinks(controller) {
     const originalPath = request.originalUrl.split('?')[0];
     // Used to create a link from current URL with new query string.
     const makeLink = function(query) {
-      const newQuery = deco.merge(request.query, query);
+      const newQuery = merge(request.query, query);
       return `${originalPath}?${qs.stringify(newQuery)}`;
     };
     // Response Link header links.
