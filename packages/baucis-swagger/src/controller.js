@@ -28,8 +28,7 @@ function capitalize(s) {
 }
 
 // __Module Definition__
-module.exports = function extendController () {
-  const controller = this
+module.exports = function extendController(controller) {
   // A method used to generated a Swagger property for a model
   function generatePropertyDefinition(name, path) {
     const property = {};
