@@ -1,7 +1,8 @@
-// __Dependencies__
-var baucis = require('baucis');
-var deco = require('deco');
-var decorators = deco.require(__dirname, [ 'Controller', 'Api' ]).hash;
+const extendApi = require('./src/api');
+const extendController = require('./src/controller');
 
-baucis.Controller.decorators(decorators.Controller);
-baucis.Api.decorators(decorators.Api);
+module.exports = baucis => {
+  baucis.Api.addExtension(extendApi);
+  baucis.Controller.addExtension(extendController);
+  return baucis;
+};

@@ -12,8 +12,8 @@
   },
   "main": "index.js",
   "scripts": {
-    "pretest": "npm install",
-    "test": "istanbul cover node_modules/mocha/bin/_mocha -- --bail --timeout 5000 -R spec"
+    "test": "mocha --bail --timeout 5000 -R spec",
+    "cover": "nyc npm test"
   },
   "author": {
     "name": "Pedro J. Molina",
@@ -33,22 +33,20 @@
     }
   ],
   "license": "MIT",
-  "dependencies": {
-    "deco": "~0.12.3"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "mongoose": ">=3 <5",
-    "baucis": "^1.0.0"
+    "@coorpacademy/baucis": "^1.0.0"
   },
   "devDependencies": {
+    "@coorpacademy/baucis": "^0.1.6",
     "async": "^1.5.0",
-    "baucis": "~1.6.2",
     "codeclimate-test-reporter": "^0.3.0",
     "expect.js": "~0.3.1",
     "express": "~4.13.3",
-    "istanbul": "^0.4.0",
     "mocha": "~2.3.2",
     "mongoose": "^4.1.6",
+    "nyc": "^13.3.0",
     "request": "^2.64.0"
   },
   "keywords": [
