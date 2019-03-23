@@ -13,7 +13,14 @@ const {
 const {defineRoutes} = require('./utils/routing');
 
 module.exports = function(baucis, mongoose, express) {
-  const Controller = function(model) {
+  /**
+   * Returns a Baucis Controller for the given model
+   *
+   * the controller is an express router
+   *
+   * @param {*} model Mongoose model
+   */
+  const getController = function(model) {
     const controller = express.Router(arguments);
     const initial = express.Router();
     const controllerForStage = {
@@ -213,8 +220,7 @@ module.exports = function(baucis, mongoose, express) {
     controller.use(controllerForStage.request);
     controller.use(controllerForStage.query);
     controller.use(controllerForStage.finalize);
-    // Expose the original `use` function as a protected method.
-    // //protect.use = controller.use.bind(controller);
+    // Expose the original `use` function as a 'protected method'
     controller._use = controller.use.bind(controller);
 
     // Pass the method calls through to the "initial" stage middleware controller,
@@ -229,10 +235,11 @@ module.exports = function(baucis, mongoose, express) {
     controller.delete = initial.delete.bind(initial);
 
     //  §ACTIVATION
-    // A method used to activate middleware for a particular stage.
+    /**
+     * A method used to activate middleware for a particular stage.
+     */ 
     function activate(definition) {
       const stage = controller.controllerForStage[definition.stage];
-     // /// console.log(definition.stage, stage.stack.length)
       const f = stage[definition.method].bind(stage);
       if (definition.endpoint === 'instance') f('/:id', definition.middleware);
       else f('/', definition.middleware);
@@ -259,12 +266,12 @@ module.exports = function(baucis, mongoose, express) {
 
     // §REQUEST
     // Build the "Allow" response header
-    controller.request(function(request, response, next) {
+    controller.request(function(req, res, next) {
       const active = ['head', 'get', 'post', 'put', 'delete'].filter(
         method => controller.methods(method) !== false
       );
       const allowed = active.map(verb => verb.toUpperCase());
-      response.set('Allow', allowed.join());
+      res.set('Allow', allowed.join());
       next();
     });
 
@@ -279,17 +286,17 @@ module.exports = function(baucis, mongoose, express) {
     };
 
     // Validate URL's ID parameter, if any.
-    controller.request(function(request, response, next) {
-      const id = request.params.id;
+    controller.request(function(req, res, next) {
+      const id = req.params.id;
       const instance = controller.model().schema.path(controller.findBy()).instance;
-      const invalid = controller.isInvalid(request.params.id, instance, 'url.id');
+      const invalid = controller.isInvalid(req.params.id, instance, 'url.id');
       if (!invalid) return next();
       next(RestError.BadRequest('The requested document ID "%s" is not a valid document ID', id));
     });
 
     // Check that the HTTP method has not been disabled for this controller.
-    controller.request(function(request, response, next) {
-      const method = request.method.toLowerCase();
+    controller.request(function(req, res, next) {
+      const method = req.method.toLowerCase();
       if (controller.methods(method) !== false) return next();
       next(RestError.MethodNotAllowed('The requested method has been disabled for this resource'));
     });
@@ -298,21 +305,23 @@ module.exports = function(baucis, mongoose, express) {
      *   Treat the addressed document as a collection, and push the addressed object
      * to it.  (Not implemented.)
      */
-    controller.request('instance', 'post', function(request, response, next) {
+    controller.request('instance', 'post', function(req, res, next) {
       return next(RestError.NotImplemented('Cannot POST to an instance'));
     });
 
     /**
      * Update all given docs.  (Not implemented.)
      */
-    controller.request('collection', 'put', function(request, response, next) {
+    controller.request('collection', 'put', function(req, res, next) {
       return next(RestError.NotImplemented('Cannot PUT to the collection'));
     });
 
-    // // ※conditions
-    // Set the conditions used for finding/updating/removing documents.
-    controller.request(function(request, response, next) {
-      let conditions = request.query.conditions || {};
+    // / ※conditions
+    /**
+     *  Set the conditions used for finding/updating/removing documents.
+     */
+    controller.request(function(req, res, next) {
+      let conditions = req.query.conditions || {};
 
       if (typeof conditions === 'string') {
         try {
@@ -332,11 +341,11 @@ module.exports = function(baucis, mongoose, express) {
         return next(RestError.BadRequest('Using $explain is disabled for this resource'));
       }
 
-      if (request.params.id !== undefined) {
-        conditions[controller.findBy()] = request.params.id;
+      if (req.params.id !== undefined) {
+        conditions[controller.findBy()] = req.params.id;
       }
 
-      request.baucis.conditions = conditions;
+      req.baucis.conditions = conditions;
       next();
     });
 
@@ -373,32 +382,32 @@ module.exports = function(baucis, mongoose, express) {
       };
     };
     // Create the pipeline interface the user interacts with.
-    controller.request(function(request, response, next) {
-      request.baucis.incoming = controller.pipeline(next);
-      request.baucis.outgoing = controller.pipeline(next);
+    controller.request(function(req, res, next) {
+      req.baucis.incoming = controller.pipeline(next);
+      req.baucis.outgoing = controller.pipeline(next);
       next();
     });
 
     //  §QUERY
     // / create
-    controller.query('post', function(request, response, next) {
-      let url = request.originalUrl || request.url;
+    controller.query('post', function(req, res, next) {
+      let url = req.originalUrl || req.url;
       const findBy = controller.findBy();
       const pipeline = controller.pipeline(next);
       let parser;
       // Add trailing slash to URL if needed.
       if (url.lastIndexOf('/') === url.length - 1) url = url.slice(0, url.length - 1);
       // Set the status to 201 (Created).
-      response.status(201);
+      res.status(201);
       // Check if the body was parsed by some external middleware e.g. `express.json`.
       // If so, create a stream from the POST'd document or documents.
-      if (request.body) {
-        pipeline(eventStream.readArray([].concat(request.body)));
+      if (req.body) {
+        pipeline(eventStream.readArray([].concat(req.body)));
       } else {
         // Otherwise, stream and parse the request.
-        parser = baucis.parser(request.get('content-type'));
+        parser = baucis.parser(req.get('content-type'));
         if (!parser) return next(RestError.UnsupportedMediaType());
-        pipeline(request);
+        pipeline(req);
         pipeline(parser);
       }
       // Create the stream context.
@@ -406,7 +415,7 @@ module.exports = function(baucis, mongoose, express) {
         callback(null, {incoming, doc: null});
       });
       // Process the incoming document or documents.
-      pipeline(request.baucis.incoming());
+      pipeline(req.baucis.incoming());
       // Map function to create a document from incoming JSON and update the context.
       pipeline(function(context, callback) {
         const transformed = {incoming: context.incoming};
@@ -455,7 +464,7 @@ module.exports = function(baucis, mongoose, express) {
           let location;
           // Set the conditions used to build `request.baucis.query`.
           const conditions = {$in: ids};
-          request.baucis.conditions[findBy] = conditions;
+          req.baucis.conditions[findBy] = conditions;
           // Check for at least one document.
           if (ids.length === 0) {
             next(
@@ -475,7 +484,7 @@ module.exports = function(baucis, mongoose, express) {
               findBy,
               JSON.stringify(conditions)
             );
-          response.set('Location', location);
+          res.set('Location', location);
           next();
         })
       );
@@ -503,21 +512,21 @@ module.exports = function(baucis, mongoose, express) {
     }
 
     // If there's a body, send it through any user-added streams.
-    controller.query('instance', 'put', function(request, response, next) {
+    controller.query('instance', 'put', function(req, res, next) {
       let parser;
       let count = 0;
-      const operator = request.headers['update-operator'];
+      const operator = req.headers['update-operator'];
       const versionKey = controller.model().schema.get('versionKey');
       const pipeline = controller.pipeline(next);
       // Check if the body was parsed by some external middleware e.g. `express.json`.
       // If so, create a one-document stream from the parsed body.
-      if (request.body) {
-        pipeline(eventStream.readArray([request.body]));
+      if (req.body) {
+        pipeline(eventStream.readArray([req.body]));
       } else {
         // Otherwise, stream and parse the request.
-        parser = baucis.parser(request.get('content-type'));
+        parser = baucis.parser(req.get('content-type'));
         if (!parser) return next(RestError.UnsupportedMediaType());
-        pipeline(request);
+        pipeline(req);
         pipeline(parser);
       }
       // Set up the stream context.
@@ -529,7 +538,7 @@ module.exports = function(baucis, mongoose, express) {
       // special update operator.
       if (!operator) {
         pipeline(function(context, callback) {
-          const query = controller.model().findOne(request.baucis.conditions);
+          const query = controller.model().findOne(req.baucis.conditions);
           query.exec(function(error, doc) {
             if (error) return callback(error);
             if (!doc) return callback(RestError.NotFound());
@@ -539,12 +548,12 @@ module.exports = function(baucis, mongoose, express) {
         });
       }
       // Pipe through user streams, if any.
-      pipeline(request.baucis.incoming());
+      pipeline(req.baucis.incoming());
       // If the document ID is present, ensure it matches the ID in the URL.
       pipeline(function(context, callback) {
         const bodyId = context.incoming[controller.findBy()];
         if (bodyId === undefined) return callback(null, context);
-        if (bodyId === request.params.id) return callback(null, context);
+        if (bodyId === req.params.id) return callback(null, context);
         callback(
           RestError.UnprocessableEntity({
             message: "The ID of the update document did not match the URL's document ID.",
@@ -678,10 +687,10 @@ module.exports = function(baucis, mongoose, express) {
 
           wrapper[operator] = context.incoming;
           if (controller.model().locking()) {
-            request.baucis.conditions[versionKey] = Number(context.incoming[versionKey]);
+            req.baucis.conditions[versionKey] = Number(context.incoming[versionKey]);
           }
           // Update the doc using the supplied operator and bypassing validation.
-          controller.model().updateMany(request.baucis.conditions, wrapper, callback);
+          controller.model().updateMany(req.baucis.conditions, wrapper, callback);
         });
       }
 
@@ -691,13 +700,13 @@ module.exports = function(baucis, mongoose, express) {
     });
 
     // / ※Build
-    controller.query('collection', '*', function(request, response, next) {
-      request.baucis.query = controller.model().find(request.baucis.conditions);
+    controller.query('collection', '*', function(req, res, next) {
+      req.baucis.query = controller.model().find(req.baucis.conditions);
       next();
     });
 
-    controller.query('instance', '*', function(request, response, next) {
-      request.baucis.query = controller.model().findOne(request.baucis.conditions);
+    controller.query('instance', '*', function(req, res, next) {
+      req.baucis.query = controller.model().findOne(req.baucis.conditions);
       next();
     });
 
@@ -712,41 +721,42 @@ module.exports = function(baucis, mongoose, express) {
     }
 
     // Perform distinct query.
-    controller.query(function(request, response, next) {
-      const distinct = request.query.distinct;
+    controller.query(function(req, res, next) {
+      const distinct = req.query.distinct;
       if (!distinct) return next();
       if (controller.deselected(distinct)) {
         next(RestError.Forbidden('You may not find distinct values for the requested path'));
         return;
       }
-      const query = controller.model().distinct(distinct, request.baucis.conditions);
+      const query = controller.model().distinct(distinct, req.baucis.conditions);
       query.exec(function(error, values) {
         if (error) return next(error);
-        request.baucis.documents = values;
+        req.baucis.documents = values;
         next();
       });
     });
     // Apply controller sort options to the query.
-    controller.query(function(request, response, next) {
+    controller.query(function(req, res, next) {
       const sort = controller.sort();
-      if (sort) request.baucis.query.sort(sort);
+      if (sort) req.baucis.query.sort(sort);
       next();
     });
     // Apply incoming request sort.
-    controller.query(function(request, response, next) {
-      const sort = request.query.sort;
-      if (sort) request.baucis.query.sort(sort);
+    controller.query(function(req, res, next) {
+      // §TODO: maybe name the middleware for simpler debugging
+      const sort = req.query.sort;
+      if (sort) req.baucis.query.sort(sort);
       next();
     });
     // Apply controller select options to the query.
-    controller.query(function(request, response, next) {
+    controller.query(function(req, res, next) {
       const select = controller.select();
-      if (select) request.baucis.query.select(select);
+      if (select) req.baucis.query.select(select);
       next();
     });
     // Apply incoming request select to the query.
-    controller.query(function(request, response, next) {
-      const select = request.query.select;
+    controller.query(function(req, res, next) {
+      const select = req.query.select;
       if (!select) return next();
 
       if (select.indexOf('+') !== -1) {
@@ -756,13 +766,13 @@ module.exports = function(baucis, mongoose, express) {
         return next(RestError.Forbidden('Including excluded fields is not permitted'));
       }
 
-      request.baucis.query.select(select);
+      req.baucis.query.select(select);
       next();
     });
     // Apply incoming request populate.
-    controller.query(function(request, response, next) {
-      let populate = request.query.populate;
-      const allowPopulateSelect = request.baucis.allowPopulateSelect;
+    controller.query(function(req, res, next) {
+      let populate = req.query.populate;
+      const allowPopulateSelect = req.baucis.allowPopulateSelect;
       let error = null;
 
       if (populate) {
@@ -789,65 +799,65 @@ module.exports = function(baucis, mongoose, express) {
             );
           }
 
-          request.baucis.query.populate(field);
+          req.baucis.query.populate(field);
         });
       }
 
       next(error);
     });
     // Apply incoming request skip.
-    controller.query(function(request, response, next) {
-      const skip = request.query.skip;
+    controller.query(function(req, res, next) {
+      const skip = req.query.skip;
       if (skip === undefined || skip === null) return next();
       if (!isNonNegativeInteger(skip)) {
         return next(RestError.BadRequest('Skip must be a non-negative integer if set'));
       }
-      request.baucis.query.skip(getAsInt(skip));
+      req.baucis.query.skip(getAsInt(skip));
       next();
     });
     // Apply incoming request limit.
-    controller.query(function(request, response, next) {
-      const limit = request.query.limit;
+    controller.query(function(req, res, next) {
+      const limit = req.query.limit;
       if (limit === undefined || limit === null) return next();
       if (!isPositiveInteger(limit)) {
         return next(RestError.BadRequest('Limit must be a positive integer if set'));
       }
-      request.baucis.query.limit(getAsInt(limit));
+      req.baucis.query.limit(getAsInt(limit));
       next();
     });
     // Set count flag.
-    controller.query(function(request, response, next) {
-      if (!request.query.count) return next();
-      if (request.query.count === 'false') return next();
-      if (request.query.count !== 'true') {
+    controller.query(function(req, res, next) {
+      if (!req.query.count) return next();
+      if (req.query.count === 'false') return next();
+      if (req.query.count !== 'true') {
         next(RestError.BadRequest('Count must be "true" or "false" if set'));
         return;
       }
 
-      if (request.query.hint) {
+      if (req.query.hint) {
         next(RestError.BadRequest("Hint can't be used with count"));
         return;
       }
 
-      if (request.query.comment) {
+      if (req.query.comment) {
         next(RestError.BadRequest("Comment can't be used with count"));
         return;
       }
 
-      request.baucis.count = true;
+      req.baucis.count = true;
       next();
     });
     // Check for query comment.
-    controller.query(function(request, response, next) {
-      const comment = request.query.comment;
+    controller.query(function(req, res, next) {
+      const comment = req.query.comment;
       if (!comment) return next();
-      if (controller.comments()) request.baucis.query.comment(comment);
+      if (controller.comments()) req.baucis.query.comment(comment);
       else console.warn('Query comment was ignored.');
       next();
     });
     // Check for query hint.
-    controller.query(function(request, response, next) {
-      let hint = request.query.hint;
+    controller.query(function(req, res, next) {
+      let hint = req.query.hint;
 
       if (!hint) return next();
       if (!controller.hints()) {
@@ -859,7 +869,7 @@ module.exports = function(baucis, mongoose, express) {
       Object.keys(hint).forEach(function(path) {
         hint[path] = Number(hint[path]);
       });
-      request.baucis.query.hint(hint);
+      req.baucis.query.hint(hint);
 
       next();
     });
@@ -989,27 +999,27 @@ module.exports = function(baucis, mongoose, express) {
     }
 
     // If counting get the count and send it back directly.
-    controller.finalize(function(request, response, next) {
-      if (!request.baucis.count) return next();
+    controller.finalize(function(req, res, next) {
+      if (!req.baucis.count) return next();
 
-      request.baucis.query.count(function(error, n) {
+      req.baucis.query.count(function(error, n) {
         if (error) return next(error);
-        response.removeHeader('Transfer-Encoding');
-        return response.json(n); // TODO support other content types
+        res.removeHeader('Transfer-Encoding');
+        return res.json(n); // TODO support other content types
       });
     });
 
     // If not counting, create the basic stream pipeline.
-    controller.finalize('collection', 'all', function(request, response, next) {
+    controller.finalize('collection', 'all', function(req, res, next) {
       let count = 0;
-      const documents = request.baucis.documents;
+      const documents = req.baucis.documents;
       const pipeline = controller.pipeline(next);
-      request.baucis.send = pipeline;
+      req.baucis.send = pipeline;
       // If documents were set in the baucis hash, use them.
       if (documents) pipeline(eventStream.readArray([].concat(documents)));
       else {
         // Otherwise, stream the relevant documents from Mongo, based on constructed query.
-        pipeline(request.baucis.query.cursor());
+        pipeline(req.baucis.query.cursor());
       }
 
       // Map documents to contexts.
@@ -1027,16 +1037,16 @@ module.exports = function(baucis, mongoose, express) {
             if (count > 0) return this.emit('end');
 
             const status = controller.emptyCollection();
-            response.status(status);
+            res.status(status);
 
             if (status === 204) {
-              response.removeHeader('Trailer');
+              res.removeHeader('Trailer');
               return this.emit('end');
             }
             if (status === 200) {
-              response.removeHeader('Transfer-Encoding');
-              response.removeHeader('Trailer');
-              response.json([]); // TODO other content types
+              res.removeHeader('Transfer-Encoding');
+              res.removeHeader('Trailer');
+              res.json([]); // TODO other content types
               this.emit('end');
               return;
             }
@@ -1046,27 +1056,27 @@ module.exports = function(baucis, mongoose, express) {
         )
       );
       // Apply user streams.
-      pipeline(request.baucis.outgoing());
+      pipeline(req.baucis.outgoing());
 
       // Set the document formatter based on the Accept header of the request.
-      baucis.formatters(response, function(error, formatter) {
+      baucis.formatters(res, function(error, formatter) {
         if (error) return next(error);
-        request.baucis.formatter = formatter;
+        req.baucis.formatter = formatter;
         next();
       });
     });
 
-    controller.finalize('instance', 'all', function(request, response, next) {
+    controller.finalize('instance', 'all', function(req, res, next) {
       let count = 0;
-      const documents = request.baucis.documents;
+      const documents = req.baucis.documents;
       const pipeline = controller.pipeline(next);
-      request.baucis.send = pipeline;
+      req.baucis.send = pipeline;
       // If documents were set in the baucis hash, use them.
       if (documents) {
         pipeline(eventStream.readArray([].concat(documents)));
       } else {
         // Otherwise, stream the relevant documents from Mongo, based on constructed query.
-        pipeline(request.baucis.query.cursor());
+        pipeline(req.baucis.query.cursor());
       }
 
       // Map documents to contexts.
@@ -1087,113 +1097,113 @@ module.exports = function(baucis, mongoose, express) {
         )
       );
       // Apply user streams.
-      pipeline(request.baucis.outgoing());
+      pipeline(req.baucis.outgoing());
 
       // Set the document formatter based on the Accept header of the request.
-      baucis.formatters(response, function(error, formatter) {
+      baucis.formatters(res, function(error, formatter) {
         if (error) return next(error);
-        request.baucis.formatter = formatter;
+        req.baucis.formatter = formatter;
         next();
       });
     });
 
     // OPTIONS // TODO Express' extra handling for OPTIONS conflicts with baucis
     // TODO maybe send method names in body
-    // controller.options(function (request, response, next) {
+    // controller.options(function (req, res, next) {
     //   console.log('here')
-    //   request.baucis.send(empty);
+    //   req.baucis.send(empty);
     //   next();
     // });
 
     // HEAD
-    controller.finalize('instance', 'head', function(request, response, next) {
+    controller.finalize('instance', 'head', function(req, res, next) {
       if (lastModifiedPath) {
-        request.baucis.send(lastModified(response, false));
+        req.baucis.send(lastModified(res, false));
       }
 
-      request.baucis.send(redoc);
-      request.baucis.send(etagImmediate(response));
-      request.baucis.send(request.baucis.formatter());
-      request.baucis.send(empty);
+      req.baucis.send(redoc);
+      req.baucis.send(etagImmediate(res));
+      req.baucis.send(req.baucis.formatter());
+      req.baucis.send(empty);
       next();
     });
 
-    controller.finalize('collection', 'head', function(request, response, next) {
+    controller.finalize('collection', 'head', function(req, res, next) {
       if (lastModifiedPath) {
-        request.baucis.send(lastModified(response, false));
+        req.baucis.send(lastModified(res, false));
       }
 
-      request.baucis.send(redoc);
-      request.baucis.send(request.baucis.formatter(true));
-      request.baucis.send(etag(response, false));
-      request.baucis.send(empty);
+      req.baucis.send(redoc);
+      req.baucis.send(req.baucis.formatter(true));
+      req.baucis.send(etag(res, false));
+      req.baucis.send(empty);
       next();
     });
 
     // GET
-    controller.finalize('instance', 'get', function(request, response, next) {
+    controller.finalize('instance', 'get', function(req, res, next) {
       if (lastModifiedPath) {
-        request.baucis.send(lastModified(response, false));
+        req.baucis.send(lastModified(res, false));
       }
 
-      request.baucis.send(redoc);
-      request.baucis.send(etagImmediate(response));
-      request.baucis.send(request.baucis.formatter());
+      req.baucis.send(redoc);
+      req.baucis.send(etagImmediate(res));
+      req.baucis.send(req.baucis.formatter());
       next();
     });
 
-    controller.finalize('collection', 'get', function(request, response, next) {
+    controller.finalize('collection', 'get', function(req, res, next) {
       if (lastModifiedPath) {
-        request.baucis.send(lastModified(response, true));
+        req.baucis.send(lastModified(res, true));
       }
 
-      if (request.baucis.count) {
-        request.baucis.send(count());
-        request.baucis.send(eventStream.stringify());
+      if (req.baucis.count) {
+        req.baucis.send(count());
+        req.baucis.send(eventStream.stringify());
       } else {
-        request.baucis.send(redoc);
-        request.baucis.send(request.baucis.formatter(true));
+        req.baucis.send(redoc);
+        req.baucis.send(req.baucis.formatter(true));
       }
 
-      request.baucis.send(etag(response, true));
+      req.baucis.send(etag(res, true));
       next();
     });
 
     // POST
-    controller.finalize('collection', 'post', function(request, response, next) {
-      request.baucis.send(redoc);
-      request.baucis.send(request.baucis.formatter());
+    controller.finalize('collection', 'post', function(req, res, next) {
+      req.baucis.send(redoc);
+      req.baucis.send(req.baucis.formatter());
       next();
     });
 
     // PUT
-    controller.finalize('put', function(request, response, next) {
-      request.baucis.send(redoc);
-      request.baucis.send(request.baucis.formatter());
+    controller.finalize('put', function(req, res, next) {
+      req.baucis.send(redoc);
+      req.baucis.send(req.baucis.formatter());
       next();
     });
 
     // DELETE
-    controller.finalize('delete', function(request, response, next) {
+    controller.finalize('delete', function(req, res, next) {
       // Remove each document from the database.
-      request.baucis.send(function(context, callback) {
+      req.baucis.send(function(context, callback) {
         context.doc.remove(callback);
       });
       // Respond with the count of deleted documents.
-      request.baucis.send(count());
-      request.baucis.send(eventStream.stringify());
+      req.baucis.send(count());
+      req.baucis.send(eventStream.stringify());
       next();
     });
 
-    controller.finalize(function(request, response, next) {
-      request.baucis.send().pipe(
+    controller.finalize(function(req, res, next) {
+      req.baucis.send().pipe(
         eventStream.through(
           function(chunk) {
-            response.write(chunk);
+            res.write(chunk);
           },
           function() {
-            response.addTrailers(trailers);
-            response.end();
+            res.addTrailers(trailers);
+            res.end();
             this.emit('end');
           }
         )
@@ -1201,7 +1211,7 @@ module.exports = function(baucis, mongoose, express) {
     });
 
     // If it's a Mongo bad hint error, convert to a bad request error.
-    controller._use(function(error, request, response, next) {
+    controller._use(function(error, req, res, next) {
       if (!error) return next();
       if (!error.message) return next(error);
 
@@ -1225,7 +1235,7 @@ module.exports = function(baucis, mongoose, express) {
       next(error);
     });
     // Convert Mongo duplicate key error to an unprocessible entity error
-    controller._use(function(error, request, response, next) {
+    controller._use(function(error, req, res, next) {
       if (!error) return next();
       if (!error.message) return next(error);
       if (error.message.indexOf('E11000 duplicate key error') === -1) {
@@ -1255,7 +1265,7 @@ module.exports = function(baucis, mongoose, express) {
     });
 
     // Convert Mongo validation errors to unprocessable entity errors.
-    controller._use(function(error, request, response, next) {
+    controller._use(function(error, req, res, next) {
       if (!error) return next();
       if (!(error instanceof mongoose.Error.ValidationError)) return next(error);
       const newError = RestError.UnprocessableEntity();
@@ -1263,7 +1273,7 @@ module.exports = function(baucis, mongoose, express) {
       next(newError);
     });
     // Convert Mongoose version conflict error to LockConflict.
-    controller._use(function(error, request, response, next) {
+    controller._use(function(error, req, res, next) {
       if (!error) return next();
       if (!(error instanceof mongoose.Error.VersionError)) return next(error);
       next(RestError.LockConflict());
@@ -1277,16 +1287,16 @@ module.exports = function(baucis, mongoose, express) {
       next(error2);
     });
     // Format the error based on the Accept header.
-    controller._use(function(error, request, response, next) {
+    controller._use(function(error, req, res, next) {
       if (!error) return next();
       // Always set the status code if available.
       if (error.status >= 100) {
-        response.status(error.status);
+        res.status(error.status);
       }
 
       if (!controller.handleErrors()) return next(error);
 
-      baucis.formatters(response, function(error2, formatter) {
+      baucis.formatters(res, function(error2, formatter) {
         if (error2) return next(error2);
 
         let errors;
@@ -1323,15 +1333,15 @@ module.exports = function(baucis, mongoose, express) {
         eventStream
           .readArray(errors)
           .pipe(f)
-          .pipe(response);
+          .pipe(res);
       });
     });
-    Controller.__extensions__.map(ext => ext(controller));
+    getController.__extensions__.map(ext => ext(controller));
     return controller;
   };
-  Controller.__extensions__ = [];
-  Controller.addExtension = extension => {
-    Controller.__extensions__.push(extension);
+  getController.__extensions__ = [];
+  getController.addExtension = extension => {
+    getController.__extensions__.push(extension);
   };
-  return Controller;
+  return getController;
 };

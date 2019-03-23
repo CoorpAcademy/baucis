@@ -2,21 +2,29 @@ const semver = require('semver');
 const RestError = require('rest-error');
 
 module.exports = (express, Controller) => {
-  function Api() {
-    const api = express.Router(arguments); //§FIXME tocheck
+  /**
+   * Returns a Baucis API
+   *
+   * the api is an express router
+   */
+  function getApi() {
+    const api = express.Router(arguments);
+    // ¤Note: express middleware cannot be extend by another class
+    // Hence the methods attach to hit
+    // This is not a constructor
 
-    api.use(function(request, response, next) {
-      if (request.baucis)
+    api.use(function(res, req, next) {
+      if (res.baucis)
         return next(RestError.Misconfigured('Baucis request property already created'));
 
-      request.baucis = {};
-      response.removeHeader('x-powered-by');
+      res.baucis = {};
+      req.removeHeader('x-powered-by');
       // Any caching proxies should be aware of API version.
-      response.vary('API-Version');
+      req.vary('API-Version');
       // TODO move this
       // Requested range is used to select highest possible release number.
       // Then later controllers are checked for matching the release number.
-      const version = request.headers['api-version'] || '*';
+      const version = res.headers['api-version'] || '*';
       // Check the requested API version is valid.
       if (!semver.validRange(version)) {
         next(
@@ -28,9 +36,9 @@ module.exports = (express, Controller) => {
         return;
       }
 
-      request.baucis.release = semver.maxSatisfying(api.releases(), version);
+      res.baucis.release = semver.maxSatisfying(api.releases(), version);
       // Check for API version unsatisfied and give a 400 if no versions match.
-      if (!request.baucis.release) {
+      if (!res.baucis.release) {
         next(
           RestError.BadRequest(
             'The requested API version range "%s" could not be satisfied',
@@ -40,7 +48,7 @@ module.exports = (express, Controller) => {
         return;
       }
 
-      response.set('API-Version', request.baucis.release);
+      req.set('API-Version', res.baucis.release);
       next();
     });
 
@@ -60,7 +68,7 @@ module.exports = (express, Controller) => {
     };
 
     api.rest = model => {
-      const Ctrl = Api.Controller; // ¤hack: for some reason Api.Controller(model) dont run
+      const Ctrl = getApi.Controller; // ¤hack: for some reason Api.Controller(model) dont run
       const controller = new Ctrl(model);
       api.add(controller);
       return controller;
@@ -98,23 +106,23 @@ module.exports = (express, Controller) => {
     /**
      * Find the correct controller to handle the request.
      */
-    api.use('/:path', (request, response, next) => {
-      const fragment = `/${request.params.path}`;
-      const controllers = api.controllers(request.baucis.release, fragment);
+    api.use('/:path', (req, res, next) => {
+      const fragment = `/${req.params.path}`;
+      const controllers = api.controllers(req.baucis.release, fragment);
       // If not found, bail.
       if (controllers.length === 0) return next();
 
-      request.baucis.controller = controllers[0];
-      request.baucis.controller(request, response, next);
+      req.baucis.controller = controllers[0];
+      req.baucis.controller(req, res, next);
     });
 
-    Api.__extensions__.map(ext => ext(api));
+    getApi.__extensions__.map(ext => ext(api));
     return api;
   }
-  Api.Controller = Controller;
-  Api.__extensions__ = [];
-  Api.addExtension = extension => {
-    Api.__extensions__.push(extension);
+  getApi.Controller = Controller;
+  getApi.__extensions__ = [];
+  getApi.addExtension = extension => {
+    getApi.__extensions__.push(extension);
   };
-  return Api;
+  return getApi;
 };
