@@ -7,6 +7,9 @@ node_js:
 matrix:
   allow_failures:
     - node_js: 10
+env:
+- PACKAGE=baucis
+- PACKAGE=baucis-swagger
 
 services:
 - docker
@@ -19,8 +22,7 @@ before_script:
 
 script:
   - npm run lint
-  - (cd packages/baucis && npm run cover)
-  - (cd packages/baucis-swagger && npm run cover)
+  - (cd packages/$PACKAGE && npm run cover)
 
 after_script:
   - npm run publish-coverage
