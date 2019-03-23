@@ -89,8 +89,8 @@ module.exports = function(mongoose, express) {
     return baucis;
   };
 
-  baucis.addPlugin = plugin => {
-    plugin(baucis);
+  baucis.addPlugin = (...plugins) => {
+    plugins.map(plugin => plugin(baucis));
     return baucis;
   };
 
