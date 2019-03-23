@@ -2,8 +2,9 @@ const RestError = require('rest-error');
 const {last} = require('./predicates-and-accessors');
 
 // Returns `true` if the given stirng is a recognized HTTP method.
+const httpMethods = ['all', 'get', 'post', 'put', 'delete', 'head'];
 function isRecognizedMethod(s) {
-  return !!/^all|head|get|put|post|delete$/.exec(s);
+  return httpMethods.includes(s);
 }
 // Parse middleware into an array of middleware definitions for each endpoint and method
 function factor(options) {

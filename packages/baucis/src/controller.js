@@ -4,6 +4,7 @@ const domain = require('domain');
 const RestError = require('rest-error');
 const eventStream = require('event-stream');
 const semver = require('semver');
+const _ = require('lodash/fp');
 
 const {
   isPositiveInteger,
@@ -144,7 +145,7 @@ module.exports = function(baucis, mongoose, express) {
       } else {
         items
           .split(/\s+/g)
-          .filter(id => id) // FIXME LODASH
+          .filter(_.identity)
           .forEach(function(item) {
             controller._operators[item] = cargo;
           });
@@ -162,7 +163,7 @@ module.exports = function(baucis, mongoose, express) {
       } else {
         items
           .split(/\s+/g)
-          .filter(id => id) // FIXME LODASH
+          .filter(_.identity)
           .forEach(function(item) {
             controller._methods[item] = !!cargo;
           });
@@ -497,19 +498,11 @@ module.exports = function(baucis, mongoose, express) {
     // §todo: maybe make it configurable
 
     function checkBadUpdateOperatorPaths(operator, paths) {
-      let bad = false;
       const whitelisted = controller.operators(operator);
 
       if (!whitelisted) return true;
-
       const parts = whitelisted.split(/\s+/);
-
-      paths.forEach(function(path) {
-        if (parts.indexOf(path) !== -1) return;
-        bad = true;
-      });
-
-      return bad;
+      return _.any(path => parts.indexOf(path) === -1, paths);
     }
 
     // If there's a body, send it through any user-added streams.
@@ -713,12 +706,7 @@ module.exports = function(baucis, mongoose, express) {
 
     // / ※Options
     function checkBadSelection(select) {
-      let bad = false;
-      controller.deselected().forEach(function(path) {
-        const badPath = new RegExp(`[+]?${path}\\b`, 'i');
-        if (badPath.exec(select)) bad = true;
-      });
-      return bad;
+      return _.any(path => new RegExp(`[+]?${path}\\b`, 'i').exec(select), controller.deselected());
     }
 
     // Perform distinct query.
@@ -867,10 +855,7 @@ module.exports = function(baucis, mongoose, express) {
 
       if (typeof hint === 'string') hint = JSON.parse(hint);
       // Convert the value for each path from string to number.
-      Object.keys(hint).forEach(function(path) {
-        hint[path] = Number(hint[path]);
-      });
-      req.baucis.query.hint(hint);
+      req.baucis.query.hint(_.mapValues(_.toNumber, hint));
 
       next();
     });
