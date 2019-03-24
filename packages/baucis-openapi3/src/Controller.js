@@ -1,9 +1,9 @@
-// This is a Controller mixin to add methods for generating OpenAPI data.
-
-const mongoose = require('mongoose'); // §FIXME : to kill
 const utils = require('./utils');
 const params = require('./parameters');
 
+/**
+ * extends Controller to add methods for generating OpenAPI data.
+ */
 module.exports = function extendController(controller) {
   function buildTags(resourceName) {
     return [resourceName];
@@ -221,19 +221,19 @@ module.exports = function extendController(controller) {
     if (
       type === String ||
       type === Date ||
-      type === mongoose.Schema.Types.ObjectId ||
-      type === mongoose.Schema.Types.Oid
+      type.name === 'ObjectId' ||
+      type.name === 'Oid'
     ) {
       return 'string';
     }
-    if (type === mongoose.Schema.Types.Array || Array.isArray(type) || type.name === 'Array') {
+    if (Array.isArray(type) || type.name === 'Array') {
       return 'array';
     }
     if (
       type === Object ||
       type instanceof Object ||
-      type === mongoose.Schema.Types.Mixed ||
-      type === mongoose.Schema.Types.Buffer
+      type.name === 'Mixed' ||
+      type.name === 'Buffer'
     ) {
       return null;
     }
@@ -296,7 +296,7 @@ module.exports = function extendController(controller) {
       return;
     }
     // Configure the property
-    if (path.options.type === mongoose.Schema.Types.ObjectId) {
+    if (path.options.type && path.options.type.name === 'ObjectId') {
       if (name === '_id') {
         property.type = 'string';
       } else if (path.options.ref) {

@@ -93,11 +93,9 @@ mongoose.model('goose', Goose).plural('geese');
 mongoose.model('chargeCluster', ChargeCluster);
 mongoose.model('chargeArea', ChargeArea);
 
-const fixture =  {
+const fixture = {
   init(done) {
-    mongoose.connect(config.mongo.url, {
-      useMongoClient: true
-    });
+    mongoose.connect(config.mongo.url);
 
     const serverVars = plugin
       .buildServerVariables()
