@@ -1,13 +1,18 @@
 {
   "name": "@coorpacademy/baucis-json",
-  "version": "0.1.0",
+  "version": "0.2.0-alpha.0",
   "description": "Baucis uses this to parse and format streams of JSON.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "baucis", "stream", "json", "parse", "parser", "format"
+    "baucis",
+    "stream",
+    "json",
+    "parse",
+    "parser",
+    "format"
   ],
   "author": "William Riley-Land <william@kun.io>",
   "license": "MIT",
