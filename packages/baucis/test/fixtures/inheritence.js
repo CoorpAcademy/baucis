@@ -1,24 +1,23 @@
-// __Dependencies__
 const mongoose = require('mongoose');
 const express = require('express');
-const deco = require('deco');
 const async = require('async');
 const baucis = require('../..')(mongoose, express);
 const config = require('./config');
 
-// __Private Module Members__
 let app;
 let server;
 
-const BaseSchema = deco(function() {
-  this.add({name: String});
-});
+// eslint-disable-next-line fp/no-class
+class BaseSchema extends mongoose.Schema {
+  constructor() {
+    super(arguments);
+    this.add({name: String});
+  }
+}
 
-BaseSchema.inherit(mongoose.Schema);
-
-const LiqueurSchema = BaseSchema();
-const AmaroSchema = BaseSchema({bitterness: Number});
-const CordialSchema = BaseSchema({sweetness: Number});
+const LiqueurSchema = new BaseSchema();
+const AmaroSchema = new BaseSchema({bitterness: Number});
+const CordialSchema = new BaseSchema({sweetness: Number});
 
 const Liqueur = mongoose.model('liqueur', LiqueurSchema);
 const Amaro = Liqueur.discriminator('amaro', AmaroSchema).plural('amari');
