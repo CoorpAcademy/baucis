@@ -28,12 +28,13 @@ module.exports = function(mongoose, express) {
     return instance.rest(model);
   };
 
-  baucis.empty = function() {
-    // TODO : rename
-    const previous = instance;
-    instance = new Api();
-    return previous;
+  baucis.empty = function(options = {finalize: true}) {
+    const current = instance;
+    if (options.finalize) instance = new Api();
+    return current;
   };
+  // alias for empty, which might at some point superseed it
+  baucis.get = baucis.empty;
 
   baucis.formatters = function(response, callback) {
     // if (response._headerSent) {
