@@ -10,6 +10,8 @@ matrix:
 env:
 - PACKAGE=baucis
 - PACKAGE=baucis-swagger
+- PACKAGE=baucis-swagger2
+- PACKAGE=baucis-openapi3
 
 services:
 - docker
