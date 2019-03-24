@@ -5,6 +5,24 @@ const params = require('./parameters');
 // https://www.openapis.org/blog/2017/03/01/openapi-spec-3-implementers-draft-released#
 // https://github.com/OAI/OpenAPI-Specification/blob/3.0.0-rc0/versions/3.0.md
 
+function clone(obj) {
+  if (!obj) {
+    return {};
+  }
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function mergeIn(container, items) {
+  if (!items) {
+    return;
+  }
+  for (const key in items) {
+    if (items.hasOwnProperty(key)) {
+      container[key] = items[key];
+    }
+  }
+}
+
 // Figure out the basePath for OpenAPI definition
 function getBase(request, extra) {
   const parts = request.originalUrl.split('/');
@@ -92,37 +110,12 @@ function buildDefaultServers() {
     }
   ];
 }
-// A method for generating OpenAPI resource listing
-function generateResourceListing(options) {
-  const controllers = options.controllers;
-  const opts = options.options || {};
-
-  const listing = {
-    openapi: '3.0.0',
-    info: buildInfo(opts),
-    servers: opts.servers || buildDefaultServers(),
-    tags: buildTags(opts, controllers),
-    paths: buildPaths(opts, controllers),
-    components: buildComponents(opts, controllers)
-  };
-
-  mergeIn(listing.paths, opts.paths);
-
-  if (opts.security) {
-    listing.security = opts.security;
-  }
-  if (opts.externalDocs) {
-    listing.externalDocs = opts.externalDocs;
-  }
-
-  return listing;
-}
 
 function defaultIfMissing(obj, prop, defaultValue) {
   if (!obj) {
     return;
   }
-  if (!obj.hasOwnProperty(prop) || obj[prop] == null) {
+  if (!obj.hasOwnProperty(prop) || obj[prop] === null) {
     if (defaultValue) {
       obj[prop] = defaultValue;
     } else {
@@ -151,31 +144,6 @@ function buildInfo(options) {
   // });
 
   return info;
-}
-function buildComponents(options, controllers) {
-  const components = clone(options.components);
-
-  defaultIfMissing(components, 'schemas', {});
-  defaultIfMissing(components, 'responses', {});
-  defaultIfMissing(components, 'parameters', {});
-  defaultIfMissing(components, 'examples', {});
-  defaultIfMissing(components, 'requestBodies', {});
-  defaultIfMissing(components, 'headers', {});
-  defaultIfMissing(components, 'securitySchemes', {});
-  defaultIfMissing(components, 'links', {});
-  defaultIfMissing(components, 'callbacks', {});
-
-  mergeIn(components.schemas, buildSchemas(controllers));
-  mergeIn(components.responses, buildResponses(controllers));
-  mergeIn(components.parameters, buildParameters(controllers));
-  mergeIn(components.examples, buildExamples(controllers));
-  mergeIn(components.requestBodies, buildRequestBodies(controllers));
-  mergeIn(components.headers, buildHeaders(controllers));
-  mergeIn(components.securitySchemes, buildSecuritySchemes(options, controllers));
-  mergeIn(components.links, buildLinks(controllers));
-  mergeIn(components.callbacks, buildCallbacks(controllers));
-
-  return components;
 }
 
 function buildSchemas(controllers) {
@@ -234,11 +202,56 @@ function buildCallbacks(controllers) {
   return {};
 }
 
-function clone(obj) {
-  if (!obj) {
-    return {};
+function buildComponents(options, controllers) {
+  const components = clone(options.components);
+
+  defaultIfMissing(components, 'schemas', {});
+  defaultIfMissing(components, 'responses', {});
+  defaultIfMissing(components, 'parameters', {});
+  defaultIfMissing(components, 'examples', {});
+  defaultIfMissing(components, 'requestBodies', {});
+  defaultIfMissing(components, 'headers', {});
+  defaultIfMissing(components, 'securitySchemes', {});
+  defaultIfMissing(components, 'links', {});
+  defaultIfMissing(components, 'callbacks', {});
+
+  mergeIn(components.schemas, buildSchemas(controllers));
+  mergeIn(components.responses, buildResponses(controllers));
+  mergeIn(components.parameters, buildParameters(controllers));
+  mergeIn(components.examples, buildExamples(controllers));
+  mergeIn(components.requestBodies, buildRequestBodies(controllers));
+  mergeIn(components.headers, buildHeaders(controllers));
+  mergeIn(components.securitySchemes, buildSecuritySchemes(options, controllers));
+  mergeIn(components.links, buildLinks(controllers));
+  mergeIn(components.callbacks, buildCallbacks(controllers));
+
+  return components;
+}
+
+// A method for generating OpenAPI resource listing
+function generateResourceListing(options) {
+  const controllers = options.controllers;
+  const opts = options.options || {};
+
+  const listing = {
+    openapi: '3.0.0',
+    info: buildInfo(opts),
+    servers: opts.servers || buildDefaultServers(),
+    tags: buildTags(opts, controllers),
+    paths: buildPaths(opts, controllers),
+    components: buildComponents(opts, controllers)
+  };
+
+  mergeIn(listing.paths, opts.paths);
+
+  if (opts.security) {
+    listing.security = opts.security;
   }
-  return JSON.parse(JSON.stringify(obj));
+  if (opts.externalDocs) {
+    listing.externalDocs = opts.externalDocs;
+  }
+
+  return listing;
 }
 
 // build an specific spec based on options and filtered controllers
@@ -256,17 +269,6 @@ function generateResourceListingForVersion(options) {
   mergeIn(clone.components.schemas, compo2.schemas);
 
   return clone;
-}
-
-function mergeIn(container, items) {
-  if (!items) {
-    return;
-  }
-  for (const key in items) {
-    if (items.hasOwnProperty(key)) {
-      container[key] = items[key];
-    }
-  }
 }
 
 module.exports = function extendApi(api) {

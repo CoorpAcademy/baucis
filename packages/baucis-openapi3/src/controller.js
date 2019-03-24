@@ -120,56 +120,27 @@ module.exports = function extendController(controller) {
     return res;
   }
 
-  function buildBaseOperation(mode, verb, controller) {
-    const resourceName = controller.model().singular();
-    const pluralName = controller.model().plural();
-    const isInstance = mode === 'instance';
-    const resourceKey = utils.capitalize(resourceName);
-    const res = {
-      parameters: params.generateOperationParameters(isInstance, verb),
-      responses: buildResponsesFor(isInstance, verb, resourceName, pluralName)
-    };
-    const rBody = buildRequestBodyFor(isInstance, verb, resourceName);
-    if (rBody) {
-      res.requestBody = rBody;
-    }
-    if (res.parameters.length === 0) {
-      delete res.parameters;
-    }
-    const sec = buildSecurityFor();
-    if (sec) {
-      res.security = sec;
-    }
-
-    if (isInstance) {
-      return buildBaseOperationInstance(verb, res, resourceKey, resourceName);
-    } else {
-      // collection
-      return buildBaseOperationCollection(verb, res, resourceKey, pluralName);
-    }
-  }
-
   function buildBaseOperationInstance(verb, res, resourceKey, resourceName) {
     if (verb === 'get') {
       return buildOperationInfo(
         res,
         `get${resourceKey}ById`,
         `Get a ${resourceName} by its unique ID`,
-        `Retrieve a ${resourceName} by its ID` + `.`
+        `Retrieve a ${resourceName} by its ID.`
       );
     } else if (verb === 'put') {
       return buildOperationInfo(
         res,
         `update${resourceKey}`,
         `Modify a ${resourceName} by its unique ID`,
-        `Update an existing ${resourceName} by its ID` + `.`
+        `Update an existing ${resourceName} by its ID.`
       );
     } else if (verb === 'delete') {
       return buildOperationInfo(
         res,
         `delete${resourceKey}ById`,
         `Delete a ${resourceName} by its unique ID`,
-        `Deletes an existing ${resourceName} by its ID` + `.`
+        `Deletes an existing ${resourceName} by its ID.`
       );
     }
   }
@@ -199,6 +170,35 @@ module.exports = function extendController(controller) {
     }
   }
 
+  function buildBaseOperation(mode, verb, controller) {
+    const resourceName = controller.model().singular();
+    const pluralName = controller.model().plural();
+    const isInstance = mode === 'instance';
+    const resourceKey = utils.capitalize(resourceName);
+    const res = {
+      parameters: params.generateOperationParameters(isInstance, verb),
+      responses: buildResponsesFor(isInstance, verb, resourceName, pluralName)
+    };
+    const rBody = buildRequestBodyFor(isInstance, verb, resourceName);
+    if (rBody) {
+      res.requestBody = rBody;
+    }
+    if (res.parameters.length === 0) {
+      delete res.parameters;
+    }
+    const sec = buildSecurityFor();
+    if (sec) {
+      res.security = sec;
+    }
+
+    if (isInstance) {
+      return buildBaseOperationInstance(verb, res, resourceKey, resourceName);
+    } else {
+      // collection
+      return buildBaseOperationCollection(verb, res, resourceKey, pluralName);
+    }
+  }
+
   function buildOperation(containerPath, mode, verb) {
     const resourceName = controller.model().singular();
     const operation = buildBaseOperation(mode, verb, controller);
@@ -218,12 +218,7 @@ module.exports = function extendController(controller) {
     if (type === Boolean) {
       return 'boolean';
     }
-    if (
-      type === String ||
-      type === Date ||
-      type.name === 'ObjectId' ||
-      type.name === 'Oid'
-    ) {
+    if (type === String || type === Date || type.name === 'ObjectId' || type.name === 'Oid') {
       return 'string';
     }
     if (Array.isArray(type) || type.name === 'Array') {
@@ -287,6 +282,47 @@ module.exports = function extendController(controller) {
     }
     return false;
   }
+
+  function referenceForType(type) {
+    if (type && type.length > 0 && type[0]) {
+      const sw2Type = openApi30TypeFor(type[0]);
+      if (sw2Type) {
+        return {
+          isPrimitive: true,
+          type: sw2Type // primitive type
+        };
+      } else {
+        return {
+          isPrimitive: false,
+          type: `#/components/schemas/${type[0].name}` // not primitive: asume complex type def and reference schema
+        };
+      }
+    }
+    return {
+      isPrimitive: true,
+      type: 'string'
+    }; // No info provided
+  }
+
+  function isArrayOfRefs(type) {
+    return (
+      type &&
+      type.length > 0 &&
+      type[0] &&
+      type[0].ref &&
+      type[0].type &&
+      type[0].type.name === 'ObjectId'
+    );
+  }
+
+  function warnInvalidType(name, path) {
+    console.log(
+      'Warning: That field type is not yet supported in baucis OpenAPI definitions, using "string."'
+    );
+    console.log('Path name: %s.%s', utils.capitalize(controller.model().singular()), name);
+    console.log('Mongoose type: %s', path.options.type);
+  }
+
   // A method used to generated an OpenAPI property for a model
   function generatePropertyDefinition(name, path, definitionName) {
     const property = {};
@@ -339,66 +375,26 @@ module.exports = function extendController(controller) {
     }
 
     /*
-    // Set enum values if applicable
-    if (path.enumValues && path.enumValues.length > 0) {
-      // Pending:  property.allowableValues = { valueType: 'LIST', values: path.enumValues };
-    }
-    // Set allowable values range if min or max is present
-    if (!isNaN(path.options.min) || !isNaN(path.options.max)) {
-      // Pending: property.allowableValues = { valueType: 'RANGE' };
-    }
-    if (!isNaN(path.options.min)) {
-      // Pending: property.allowableValues.min = path.options.min;
-    }
-    if (!isNaN(path.options.max)) {
-      // Pending: property.allowableValues.max = path.options.max;
-    }
-	*/
+  // Set enum values if applicable
+  if (path.enumValues && path.enumValues.length > 0) {
+    // Pending:  property.allowableValues = { valueType: 'LIST', values: path.enumValues };
+  }
+  // Set allowable values range if min or max is present
+  if (!isNaN(path.options.min) || !isNaN(path.options.max)) {
+    // Pending: property.allowableValues = { valueType: 'RANGE' };
+  }
+  if (!isNaN(path.options.min)) {
+    // Pending: property.allowableValues.min = path.options.min;
+  }
+  if (!isNaN(path.options.max)) {
+    // Pending: property.allowableValues.max = path.options.max;
+  }
+*/
     if (!property.type && !property.$ref) {
       warnInvalidType(name, path);
       property.type = 'string';
     }
     return property;
-  }
-
-  function referenceForType(type) {
-    if (type && type.length > 0 && type[0]) {
-      const sw2Type = openApi30TypeFor(type[0]);
-      if (sw2Type) {
-        return {
-          isPrimitive: true,
-          type: sw2Type // primitive type
-        };
-      } else {
-        return {
-          isPrimitive: false,
-          type: `#/components/schemas/${type[0].name}` // not primitive: asume complex type def and reference schema
-        };
-      }
-    }
-    return {
-      isPrimitive: true,
-      type: 'string'
-    }; // No info provided
-  }
-
-  function isArrayOfRefs(type) {
-    return (
-      type &&
-      type.length > 0 &&
-      type[0] &&
-      type[0].ref &&
-      type[0].type &&
-      type[0].type.name === 'ObjectId'
-    );
-  }
-
-  function warnInvalidType(name, path) {
-    console.log(
-      'Warning: That field type is not yet supported in baucis OpenAPI definitions, using "string."'
-    );
-    console.log('Path name: %s.%s', utils.capitalize(controller.model().singular()), name);
-    console.log('Mongoose type: %s', path.options.type);
   }
 
   function mergePaths(oaSchema, pathsCollection, definitionName) {
@@ -448,6 +444,15 @@ module.exports = function extendController(controller) {
     mergePathsForInnerSchemaDef(schemaDefs, schema.virtuals, definitionName);
   }
 
+  function buildPathParams(pathContainer, path, isInstance) {
+    const pathParams = params.generatePathParameters(isInstance);
+    if (pathParams.length > 0) {
+      pathContainer[path] = {
+        parameters: pathParams
+      };
+    }
+  }
+
   controller.generateOpenApi3 = function() {
     if (controller.openApi3) {
       return controller;
@@ -490,15 +495,6 @@ module.exports = function extendController(controller) {
 
     return controller;
   };
-
-  function buildPathParams(pathContainer, path, isInstance) {
-    const pathParams = params.generatePathParameters(isInstance);
-    if (pathParams.length > 0) {
-      pathContainer[path] = {
-        parameters: pathParams
-      };
-    }
-  }
 
   return controller;
 };

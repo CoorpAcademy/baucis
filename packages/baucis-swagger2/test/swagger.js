@@ -1,6 +1,5 @@
 const expect = require('expect.js');
 const request = require('request');
-const baucis = require('@coorpacademy/baucis');
 
 const fixtures = require('./fixtures/vegetable');
 

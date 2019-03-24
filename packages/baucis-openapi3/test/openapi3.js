@@ -458,10 +458,10 @@ describe('OpenAPI 3.0 Resources', function() {
         }
         expect(response).to.have.property('statusCode', 200);
 
-        //forbidden extension
+        // forbidden extension
         expect(body).to.not.have.property('lambic');
 
-        //allowed extensions
+        // allowed extensions
         expect(body.paths['/starkTrek']).to.be.an(Object);
         expect(body.paths['/starkTrek'].get.operationId).to.be('enterprise');
         expect(body.components.schemas.Spook).to.be.an(Object);
@@ -745,7 +745,7 @@ describe('OpenAPI 3.0 Resources', function() {
           'description',
           'How many documents to skip. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#skip)'
         );
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'integer');
         expect(param.schema).to.have.property('format', 'int32');
@@ -772,7 +772,7 @@ describe('OpenAPI 3.0 Resources', function() {
           'description',
           'The maximum number of documents to send. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#limit)'
         );
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'integer');
         expect(param.schema).to.have.property('format', 'int32');
@@ -798,7 +798,7 @@ describe('OpenAPI 3.0 Resources', function() {
           'description',
           'Set to true to return count instead of documents. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#count)'
         );
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'boolean');
         expect(param).to.have.property('required', false);
@@ -823,7 +823,7 @@ describe('OpenAPI 3.0 Resources', function() {
           'description',
           'Set the conditions used to find or remove the document(s). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#conditions)'
         );
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -850,7 +850,7 @@ describe('OpenAPI 3.0 Resources', function() {
           'description',
           'Set the fields by which to sort. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#sort)'
         );
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -877,7 +877,7 @@ describe('OpenAPI 3.0 Resources', function() {
           'description',
           'Select which paths will be returned by the query. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#select)'
         );
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -904,7 +904,7 @@ describe('OpenAPI 3.0 Resources', function() {
           'description',
           'Specify which paths to populate. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#populate)'
         );
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -930,7 +930,7 @@ describe('OpenAPI 3.0 Resources', function() {
           'description',
           'Set to a path name to retrieve an array of distinct values. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#distinct)'
         );
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -957,7 +957,7 @@ describe('OpenAPI 3.0 Resources', function() {
           'description',
           'Add an index hint to the query (must be enabled per controller). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#hint)'
         );
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -984,7 +984,7 @@ describe('OpenAPI 3.0 Resources', function() {
           'description',
           'Add a comment to a query (must be enabled per controller). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#comment)'
         );
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -1008,7 +1008,7 @@ describe('OpenAPI 3.0 Resources', function() {
         expect(param).to.have.property('name', 'id');
         expect(param).to.have.property('in', 'path');
         expect(param).to.have.property('description', 'The identifier of the resource.');
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'string');
         expect(param).to.have.property('required', true);
@@ -1034,7 +1034,7 @@ describe('OpenAPI 3.0 Resources', function() {
           'description',
           '**BYPASSES VALIDATION** May be used with PUT to update the document using $push, $pull, or $set. [doc](https://github.com/wprl/baucis/wiki/HTTP-Headers)'
         );
-        expect(param).to.not.have.property('type'); //v2
+        expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
         expect(param.schema).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -1307,7 +1307,7 @@ describe('OpenAPI 3.0 Resources', function() {
         expect(response).to.have.property('statusCode', 200);
 
         expect(body.paths['/vegetables'].get.tags).to.be.an(Array);
-        expect(body.paths['/vegetables'].get.tags[0]).to.be('vegetable'); //resource
+        expect(body.paths['/vegetables'].get.tags[0]).to.be('vegetable'); // resource
 
         done();
       });
@@ -1388,7 +1388,7 @@ describe('OpenAPI 3.0 Resources', function() {
           return done(err);
         }
 
-        //credits to https://github.com/mdhooge for providing the repro-sample
+        // credits to https://github.com/mdhooge for providing the repro-sample
         expect(body.components.schemas).to.have.property('ChargeArea');
         expect(body.components.schemas).to.have.property('ChargeCluster');
 
@@ -1398,7 +1398,7 @@ describe('OpenAPI 3.0 Resources', function() {
         expect(body.components.schemas.ChargeArea.properties.clusters.items).to.have.property(
           'type'
         );
-        expect(body.components.schemas.ChargeArea.properties.clusters.items.type).to.be('string'); //ids refs -> string
+        expect(body.components.schemas.ChargeArea.properties.clusters.items.type).to.be('string'); // ids refs -> string
 
         done();
       });

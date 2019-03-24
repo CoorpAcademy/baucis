@@ -24,7 +24,9 @@
     "promise/no-native": "off",
     "no-shadow": "warn",
     "no-param-reassign": "warn",
+    "fp/no-loops": "warn",
     "fp/no-arguments": "warn",
+    "lodash-fp/prefer-constant": "warn",
     "prefer-rest-params": "warn"
   },
   "overrides": [

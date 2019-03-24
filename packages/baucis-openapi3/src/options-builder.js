@@ -1,3 +1,27 @@
+function ensureHasInfo(opt) {
+  if (!opt.info) {
+    opt.info = {
+      title: 'app',
+      version: '0.0.1'
+    };
+  }
+}
+function ensureHasServers(opt) {
+  if (!opt.servers) {
+    opt.servers = [];
+  }
+}
+function ensureHasComponents(opt) {
+  if (!opt.components) {
+    opt.components = {
+      schemas: {},
+      parameters: {},
+      responses: {},
+      securitySchemes: {}
+    };
+  }
+}
+
 // OpenApi3Options class
 function OpenApi3Options() {
   ensureHasInfo(this);
@@ -120,36 +144,11 @@ OpenApi3Options.prototype.addSecuritySchemeOAuth2AuthCode = function(
   this.components.securitySchemes[name] = data;
   return this;
 };
-function ensureHasInfo(opt) {
-  if (!opt.info) {
-    opt.info = {
-      title: 'app',
-      version: '0.0.1'
-    };
-  }
-}
-function ensureHasServers(opt) {
-  if (!opt.servers) {
-    opt.servers = [];
-  }
-}
-function ensureHasComponents(opt) {
-  if (!opt.components) {
-    opt.components = {
-      schemas: {},
-      parameters: {},
-      responses: {},
-      securitySchemes: {}
-    };
-  }
-}
-
 // Server variables -----
+function ServerVariables() {}
 function buildServerVariables() {
   return new ServerVariables();
 }
-
-function ServerVariables() {}
 
 ServerVariables.prototype.addServerVar = function(name, enumerations, defaultValue, description) {
   const vData = {

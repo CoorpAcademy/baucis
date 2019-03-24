@@ -61,37 +61,12 @@ module.exports = function extendController(controller) {
   function buildSecurityFor() {
     return null; // no security defined
   }
+
   function buildOperationInfo(res, operationId, summary, description) {
     res.operationId = operationId;
     res.summary = summary;
     res.description = description;
     return res;
-  }
-  function buildBaseOperation(mode, verb, controller) {
-    const resourceName = controller.model().singular();
-    const pluralName = controller.model().plural();
-    const isInstance = mode === 'instance';
-    const resourceKey = utils.capitalize(resourceName);
-    const res = {
-      // consumes: ['application/json'], //if used overrides global definition
-      // produces: ['application/json'], //if used overrides global definition
-      parameters: params.generateOperationParameters(isInstance, verb, controller),
-      responses: buildResponsesFor(isInstance, verb, resourceName, pluralName)
-    };
-    if (res.parameters.length === 0) {
-      delete res.parameters;
-    }
-    const sec = buildSecurityFor();
-    if (sec) {
-      res.security = sec;
-    }
-
-    if (isInstance) {
-      return buildBaseOperationInstance(verb, res, resourceKey, resourceName);
-    } else {
-      // collection
-      return buildBaseOperationCollection(verb, res, resourceKey, pluralName);
-    }
   }
 
   function buildBaseOperationInstance(verb, res, resourceKey, resourceName) {
@@ -143,6 +118,33 @@ module.exports = function extendController(controller) {
     }
   }
 
+  function buildBaseOperation(mode, verb, controller) {
+    const resourceName = controller.model().singular();
+    const pluralName = controller.model().plural();
+    const isInstance = mode === 'instance';
+    const resourceKey = utils.capitalize(resourceName);
+    const res = {
+      // consumes: ['application/json'], //if used overrides global definition
+      // produces: ['application/json'], //if used overrides global definition
+      parameters: params.generateOperationParameters(isInstance, verb, controller),
+      responses: buildResponsesFor(isInstance, verb, resourceName, pluralName)
+    };
+    if (res.parameters.length === 0) {
+      delete res.parameters;
+    }
+    const sec = buildSecurityFor();
+    if (sec) {
+      res.security = sec;
+    }
+
+    if (isInstance) {
+      return buildBaseOperationInstance(verb, res, resourceKey, resourceName);
+    } else {
+      // collection
+      return buildBaseOperationCollection(verb, res, resourceKey, pluralName);
+    }
+  }
+
   function buildOperation(containerPath, mode, verb) {
     const resourceName = controller.model().singular();
     const operation = buildBaseOperation(mode, verb, controller);
@@ -162,23 +164,13 @@ module.exports = function extendController(controller) {
     if (type === Boolean) {
       return 'boolean';
     }
-    if (
-      type === String ||
-      type === Date ||
-      type.name === 'ObjectId' ||
-      type.name === 'Oid'
-    ) {
+    if (type === String || type === Date || type.name === 'ObjectId' || type.name === 'Oid') {
       return 'string';
     }
-    if ( Array.isArray(type) || type.name === 'Array') {
+    if (Array.isArray(type) || type.name === 'Array') {
       return 'array';
     }
-    if (
-      type === Object ||
-      type instanceof Object ||
-      type === 'Mixed' ||
-      type === 'Buffer'
-    ) {
+    if (type === Object || type instanceof Object || type === 'Mixed' || type === 'Buffer') {
       return null;
     }
     throw new Error(`Unrecognized type: ${type}`);
@@ -216,6 +208,41 @@ module.exports = function extendController(controller) {
     }
     return false;
   }
+
+  function isArrayOfRefs(type) {
+    return (
+      type && type.length > 0 && type[0].ref && type[0].type && type[0].type.name === 'ObjectId'
+    );
+  }
+  function warnInvalidType(name, path) {
+    console.log(
+      'Warning: That field type is not yet supported in baucis Swagger definitions, using "string."'
+    );
+    console.log('Path name: %s.%s', utils.capitalize(controller.model().singular()), name);
+    console.log('Mongoose type: %s', path.options.type);
+  }
+
+  function referenceForType(type) {
+    if (type && type.length > 0 && type[0]) {
+      const sw2Type = swagger20TypeFor(type[0]);
+      if (sw2Type) {
+        return {
+          isPrimitive: true,
+          type: sw2Type // primitive type
+        };
+      } else {
+        return {
+          isPrimitive: false,
+          type: `#/definitions/${type[0].name}` // not primitive: asume complex type def and reference
+        };
+      }
+    }
+    return {
+      isPrimitive: true,
+      type: 'string'
+    }; // No info provided
+  }
+
   // A method used to generated a Swagger property for a model
   function generatePropertyDefinition(name, path, definitionName) {
     const property = {};
@@ -289,39 +316,6 @@ module.exports = function extendController(controller) {
     }
     return property;
   }
-  function referenceForType(type) {
-    if (type && type.length > 0 && type[0]) {
-      const sw2Type = swagger20TypeFor(type[0]);
-      if (sw2Type) {
-        return {
-          isPrimitive: true,
-          type: sw2Type // primitive type
-        };
-      } else {
-        return {
-          isPrimitive: false,
-          type: `#/definitions/${type[0].name}` // not primitive: asume complex type def and reference
-        };
-      }
-    }
-    return {
-      isPrimitive: true,
-      type: 'string'
-    }; // No info provided
-  }
-
-  function isArrayOfRefs(type) {
-    return (
-      type && type.length > 0 && type[0].ref && type[0].type && type[0].type.name === 'ObjectId'
-    );
-  }
-  function warnInvalidType(name, path) {
-    console.log(
-      'Warning: That field type is not yet supported in baucis Swagger definitions, using "string."'
-    );
-    console.log('Path name: %s.%s', utils.capitalize(controller.model().singular()), name);
-    console.log('Mongoose type: %s', path.options.type);
-  }
 
   function mergePaths(definition, pathsCollection, definitionName) {
     Object.keys(pathsCollection).forEach(function(name) {
@@ -362,6 +356,15 @@ module.exports = function extendController(controller) {
         defs[newdefinitionName] = def;
       }
     });
+  }
+
+  function buildPathParams(pathContainer, path, isInstance) {
+    const pathParams = params.generatePathParameters(isInstance);
+    if (pathParams.length > 0) {
+      pathContainer[path] = {
+        parameters: pathParams
+      };
+    }
   }
 
   function addInnerModelDefinitions(defs, definitionName) {
@@ -409,15 +412,6 @@ module.exports = function extendController(controller) {
 
     return controller;
   };
-
-  function buildPathParams(pathContainer, path, isInstance) {
-    const pathParams = params.generatePathParameters(isInstance);
-    if (pathParams.length > 0) {
-      pathContainer[path] = {
-        parameters: pathParams
-      };
-    }
-  }
 
   return controller;
 };

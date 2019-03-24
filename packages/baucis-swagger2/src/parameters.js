@@ -139,25 +139,10 @@ function getParamDocument(isPost, controller) {
     schema: {
       // Pending: post body in baucis can be single or array: Polymorphic: not able to express this overload in Swagger 2.0
       // Document as single
-      $ref: `#/definitions/${  utils.capitalize(controller.model().singular())}`
+      $ref: `#/definitions/${utils.capitalize(controller.model().singular())}`
     },
     required: true
   };
-}
-
-// Generate parameter list for operations
-function generateOperationParameters(isInstance, verb, controller) {
-  const parameters = [];
-
-  if (isInstance) {
-    addOperationSingularParameters(verb, parameters);
-  } else {
-    addOperationCollectionParameters(verb, parameters);
-  }
-  addPostParameters(verb, controller, parameters);
-  addPutParameters(verb, controller, parameters);
-
-  return parameters;
 }
 
 function addOperationSingularParameters(verb, parameters) {
@@ -191,9 +176,33 @@ function addPutParameters(verb, controller, parameters) {
   }
 }
 
+// Generate parameter list for operations
+function generateOperationParameters(isInstance, verb, controller) {
+  const parameters = [];
+
+  if (isInstance) {
+    addOperationSingularParameters(verb, parameters);
+  } else {
+    addOperationCollectionParameters(verb, parameters);
+  }
+  addPostParameters(verb, controller, parameters);
+  addPutParameters(verb, controller, parameters);
+
+  return parameters;
+}
+
+function addPathSingularParameters(parameters) {
+  // Parameters available for singular routes
+  parameters.push(getParamRef('id'));
+}
+function addPathCollectionParameters(parameters) {
+  // Common Parameters available for plural routes
+  parameters.push(getParamRef('sort'));
+}
+
 // Generate parameter list for path: common for several operations
 function generatePathParameters(isInstance) {
-  let parameters = [];
+  const parameters = [];
 
   // Parameters available for singular and plural routes
   parameters.push(getParamRef('select'), getParamRef('populate'));
@@ -207,14 +216,6 @@ function generatePathParameters(isInstance) {
   return parameters;
 }
 
-function addPathSingularParameters(parameters) {
-  // Parameters available for singular routes
-  parameters.push(getParamRef('id'));
-}
-function addPathCollectionParameters(parameters) {
-  // Common Parameters available for plural routes
-  parameters.push(getParamRef('sort'));
-}
 function generateCommonParams() {
   const parameters = {};
   parameters.id = getParamId();

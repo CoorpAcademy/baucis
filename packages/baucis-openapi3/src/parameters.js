@@ -163,17 +163,6 @@ function getParamRef(name) {
   };
 }
 
-// Generate parameter list for operations
-function generateOperationParameters(isInstance, verb) {
-  const parameters = [];
-  if (isInstance) {
-    addOperationSingularParameters(verb, parameters);
-  } else {
-    addOperationCollectionParameters(verb, parameters);
-  }
-  return parameters;
-}
-
 function addOperationSingularParameters(verb, parameters) {
   if (verb === 'put') {
     parameters.push(getParamRef('X-Baucis-Update-Operator'));
@@ -196,6 +185,27 @@ function addOperationCollectionParameters(verb, parameters) {
   }
 }
 
+// Generate parameter list for operations
+function generateOperationParameters(isInstance, verb) {
+  const parameters = [];
+  if (isInstance) {
+    addOperationSingularParameters(verb, parameters);
+  } else {
+    addOperationCollectionParameters(verb, parameters);
+  }
+  return parameters;
+}
+
+function addPathSingularParameters(parameters) {
+  // Parameters available for singular routes
+  parameters.push(getParamRef('id'));
+}
+
+function addPathCollectionParameters(parameters) {
+  // Common Parameters available for plural routes
+  parameters.push(getParamRef('sort'));
+}
+
 // Generate parameter list for path: common for several operations
 function generatePathParameters(isInstance) {
   const parameters = [];
@@ -210,16 +220,6 @@ function generatePathParameters(isInstance) {
     addPathCollectionParameters(parameters);
   }
   return parameters;
-}
-
-function addPathSingularParameters(parameters) {
-  // Parameters available for singular routes
-  parameters.push(getParamRef('id'));
-}
-
-function addPathCollectionParameters(parameters) {
-  // Common Parameters available for plural routes
-  parameters.push(getParamRef('sort'));
 }
 
 function generateCommonParams() {
