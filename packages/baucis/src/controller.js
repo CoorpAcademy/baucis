@@ -1045,7 +1045,7 @@ module.exports = function(baucis, mongoose, express) {
       pipeline(req.baucis.outgoing());
 
       // Set the document formatter based on the Accept header of the request.
-      baucis.formatters(res, function(error, formatter) {
+      baucis._formatters(res, function(error, formatter) {
         if (error) return next(error);
         req.baucis.formatter = formatter;
         next();
@@ -1086,7 +1086,7 @@ module.exports = function(baucis, mongoose, express) {
       pipeline(req.baucis.outgoing());
 
       // Set the document formatter based on the Accept header of the request.
-      baucis.formatters(res, function(error, formatter) {
+      baucis._formatters(res, function(error, formatter) {
         if (error) return next(error);
         req.baucis.formatter = formatter;
         next();
@@ -1282,7 +1282,7 @@ module.exports = function(baucis, mongoose, express) {
 
       if (!controller.handleErrors()) return next(error);
 
-      baucis.formatters(res, function(error2, formatter) {
+      baucis._formatters(res, function(error2, formatter) {
         if (error2) return next(error2);
 
         let errors;

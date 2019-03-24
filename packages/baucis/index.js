@@ -36,7 +36,7 @@ module.exports = function(mongoose, express) {
   // alias for empty, which might at some point superseed it
   baucis.get = baucis.empty;
 
-  baucis.formatters = function(response, callback) {
+  baucis._formatters = function(response, callback) {
     // if (response._headerSent) {
     //   callback(null, function () {
     //     return eventStream.through(function (data) { console.log(data) }, function () {
