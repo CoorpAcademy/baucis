@@ -1,4 +1,4 @@
-## Query string parameters
+## Query string parameters :wrench:
 
 Use query options from the client to make dynamic requests.  Query options can be mixed as you see fit.
 

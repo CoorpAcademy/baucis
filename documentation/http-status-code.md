@@ -1,4 +1,5 @@
-## HTTP Status Codes
+## HTTP Status Codes :traffic_light:
+
 Baucis supports a rich array of error responses and status codes. For more information on status codes see [RFC2616](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) the HTTP sepcification.
 
 ### 4xx

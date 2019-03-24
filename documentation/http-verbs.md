@@ -1,4 +1,4 @@
-## HTTP Verbs
+## HTTP Verbs :speech_balloon:
 
 | HTTP Verb     | /vegetables   | /vegetables/:id |
 | ------------- | ------------- | --------------- |

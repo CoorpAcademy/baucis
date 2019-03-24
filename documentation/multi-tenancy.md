@@ -1,4 +1,4 @@
-## Multi tenancy
+## Multi tenancy :flags:
 It’s possible to do something like this (off the top of my head, untested):
 
 ```javascript

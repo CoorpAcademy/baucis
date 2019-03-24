@@ -1,4 +1,4 @@
-## Swagger
+## Swagger :world_map:
 
 Here's how to use swagger.  First, install the plugin:
 

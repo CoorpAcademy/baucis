@@ -1,4 +1,4 @@
-## Extending Baucis
+## Extending Baucis :hammer_and_wrench:
 
 Baucis can be augmented via Express middleware, incoming and outgoing streams, as well as with decorators.
 

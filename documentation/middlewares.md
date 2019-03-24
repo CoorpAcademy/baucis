@@ -1,4 +1,4 @@
-## Middlewares
+## Middlewares :inbox_tray:
 Baucis adds middleware registration functions for two stages of the request cycle:
 
 ### request

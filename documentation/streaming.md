@@ -1,4 +1,4 @@
-## Streaming
+## Streaming :ocean:
 
 Baucis takes full advantage of Node streams internally to offer even more performance, especially when dealing with large datasets.  Both outgoing and incoming documents are streamed!
 

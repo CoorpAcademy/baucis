@@ -1,4 +1,16 @@
-## Plugins
+## Plugins :zap:
+
+- [Maintained plugins](#maintained-plugins)
+- [Original plugins](#original-plugins)
+
+----------
+
+### Maintained plugins
+These plugin have been ported into the new baucis plugin format,
+and are host under this fork baucis repository
+- [`@cooorpacademy/baucis-swagger`](https://www.npmjs.org/package/baucis-swagger) : [![Npm version](https://img.shields.io/npm/v/@coorpacademy/baucis-swagger.svg)](https://www.npmjs.com/package/@coorpacademy/baucis-swagger) automatically generate interactive API documentation (initialy created by wprl)
+- [`@cooorpacademy/baucis-swagger2`](https://www.npmjs.org/package/baucis-swagger2): [![Npm version](https://img.shields.io/npm/v/@coorpacademy/baucis-swagger2.svg)](https://www.npmjs.com/package/@coorpacademy/baucis-swagger2) Swagger 2.0 package (initialy created by @icinetic)
+- [`@cooorpacademy/baucis-openapi3`](https://www.npmjs.org/package/baucis-openapi3): [![Npm version](https://img.shields.io/npm/v/@coorpacademy/baucis-openapi3.svg)](https://www.npmjs.com/package/@coorpacademy/baucis-openapi3) OpenAPI 3.0 package (initialy created by [Metadev](https://github.com/metadevpro))
 
 ### Original plugins
 |Module Name  |  |

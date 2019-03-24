@@ -1,4 +1,4 @@
-## Examples
+## Examples :man_teacher:
 
  * [Example REST API server built with Node and Baucis](//github.com/wprl/baucis-example)
  * [Examples with Backbone.js](examples/Backbone.js)

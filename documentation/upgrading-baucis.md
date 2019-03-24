@@ -1,4 +1,4 @@
-## Upgrading Baucis
+## Upgrading Baucis :arrow_up:
 
 ### To migrate from original baucis to @coorpacademy/baucis
 §TODO

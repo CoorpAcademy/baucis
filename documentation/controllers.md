@@ -1,4 +1,4 @@
-## Controllers
+## Controllers :man_technologist:
 
 ### `controller.mode()`
 

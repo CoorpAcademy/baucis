@@ -1,6 +1,6 @@
-## Models
+## Models :man_artist:
 
-Baucis decorates Mongoose models with a few additional methods to add richer textual and other semantics.  The Model API is unstable.  It will be stablized for v1.0.0.
+Baucis decorates Mongoose models with a few additional methods to add richer textual and other semantics.  The Model API is *unstable*.  It will be stablized for v1.0.0 (in original baucis). (*not sure this happened*)
 
 Typically, these methods would be called when the schema is registered with Mongoose:
 ``` javascript
@@ -36,6 +36,7 @@ model.lastModified('modified.date');
 ### `model.locking()`
 
 Enable optimistic locking.  (Disabled by default.)  Requires that all PUTs must send the document version (`__v` by default) and will send a 409 response if there would be a version conflict, instead of performing the update.
+
 ``` javascript
 model.locking(true);
 ```
