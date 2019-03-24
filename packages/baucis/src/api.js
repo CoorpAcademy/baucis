@@ -29,8 +29,7 @@ module.exports = (express, Controller) => {
       if (!semver.validRange(version)) {
         next(
           RestError.BadRequest(
-            'The requested API version range "%s" was not a valid semver range',
-            version
+            `The requested API version range "${version}" was not a valid semver range`
           )
         );
         return;
@@ -41,8 +40,7 @@ module.exports = (express, Controller) => {
       if (!res.baucis.release) {
         next(
           RestError.BadRequest(
-            'The requested API version range "%s" could not be satisfied',
-            version
+            `The requested API version range "${version}" could not be satisfied`
           )
         );
         return;
@@ -99,9 +97,7 @@ module.exports = (express, Controller) => {
       }
 
       // Find the matching controller among controllers that match the requested release.
-      return satisfies.filter(function(controller) {
-        return fragment === controller.fragment();
-      });
+      return satisfies.filter(controller => fragment === controller.fragment());
     };
     /**
      * Find the correct controller to handle the request.

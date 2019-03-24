@@ -944,17 +944,14 @@ module.exports = function(baucis, mongoose, express) {
           if (!context.doc.get) return this.emit('data', context);
 
           const current = context.doc.get(lastModifiedPath);
-          if (latest === null) latest = current;
-          else latest = new Date(Math.max(latest, current));
+          latest = latest === null ? current : new Date(Math.max(latest, current));
           if (!useTrailer) {
             response.set('Last-Modified', latest.toUTCString());
           }
           this.emit('data', context);
         },
         function() {
-          if (useTrailer) {
-            if (latest) trailers['Last-Modified'] = latest.toUTCString();
-          }
+          if (useTrailer && latest) trailers['Last-Modified'] = latest.toUTCString();
 
           this.emit('end');
         }

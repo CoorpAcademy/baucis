@@ -3,13 +3,13 @@ const ApiFactory = require('./src/api');
 const ControllerFactory = require('./src/controller');
 const extendMongooseModel = require('./src/model');
 
-const plugins = {
+const builtInPlugins = {
   json: require('@coorpacademy/baucis-json'),
   links: require('@coorpacademy/baucis-links')
 };
 
 module.exports = function(mongoose, express) {
-  const baucis = function(options) {
+  const baucis = function() {
     return baucis.get();
   };
 
@@ -62,31 +62,26 @@ module.exports = function(mongoose, express) {
   /**
    * Adds a formatter for the given mime type.  Needs a function that returns a stream.
    */
-  baucis.setFormatter = function(mime, f) {
-    formatters[mime] = function(callback) {
-      return function() {
-        callback(null, f);
-      };
-    };
+  baucis.setFormatter = function(mime, formatter) {
+    formatters[mime] = callback => () => callback(null, formatter);
     return baucis;
   };
 
   /**
    * Baucis parser that Default to JSON when no MIME type is provided
    */
-  baucis.parser = function(mime, handler) {
-    mime = mime || 'application/json';
+  baucis.parser = function(mime) {
+    const mimeType = mime ? mime.split(';')[0].trim() : 'application/json';
     // Not interested in any additional parameters at this point.
-    mime = mime.split(';')[0].trim();
-    handler = parsers[mime];
-    return handler ? handler() : undefined;
+    const handler = parsers[mimeType];
+    return handler && handler();
   };
 
   /**
    * Adds a parser for the given mime type.  Needs a function that returns a stream.
    */
-  baucis.setParser = function(mime, f) {
-    parsers[mime] = f;
+  baucis.setParser = function(mime, parser) {
+    parsers[mime] = parser;
     return baucis;
   };
 
@@ -100,8 +95,8 @@ module.exports = function(mongoose, express) {
   baucis.Error = RestError;
   baucis.Api.Controller = Controller;
 
-  baucis.addPlugin(plugins.links);
-  baucis.addPlugin(plugins.json);
+  baucis.addPlugin(builtInPlugins.links);
+  baucis.addPlugin(builtInPlugins.json);
 
   return baucis;
 };
