@@ -1,4 +1,3 @@
-const mongoose = require('mongoose'); // FIXME: to kill
 const utils = require('./utils');
 const params = require('./parameters');
 
@@ -166,19 +165,19 @@ module.exports = function extendController(controller) {
     if (
       type === String ||
       type === Date ||
-      type === mongoose.Schema.Types.ObjectId ||
-      type === mongoose.Schema.Types.Oid
+      type.name === 'ObjectId' ||
+      type.name === 'Oid'
     ) {
       return 'string';
     }
-    if (type === mongoose.Schema.Types.Array || Array.isArray(type) || type.name === 'Array') {
+    if ( Array.isArray(type) || type.name === 'Array') {
       return 'array';
     }
     if (
       type === Object ||
       type instanceof Object ||
-      type === mongoose.Schema.Types.Mixed ||
-      type === mongoose.Schema.Types.Buffer
+      type === 'Mixed' ||
+      type === 'Buffer'
     ) {
       return null;
     }
@@ -194,19 +193,6 @@ module.exports = function extendController(controller) {
     if (type === Date) {
       return 'date-time';
     }
-
-    /*
-    if (type === String) { return null; }
-    if (type === Boolean) { return null; }
-    if (type === mongoose.Schema.Types.ObjectId) { return null; }
-    if (type === mongoose.Schema.Types.Oid) { return null; }
-    if (type === mongoose.Schema.Types.Array) { return null; }
-    if (Array.isArray(type) || type.name === "Array") { return null; }
-    if (type === Object) { return null; }
-    if (type instanceof Object) { return null; }
-    if (type === mongoose.Schema.Types.Mixed) { return null; }
-    if (type === mongoose.Schema.Types.Buffer) { return null; }
-	*/
     return null;
   }
   function skipProperty(name, path, controller) {
@@ -239,7 +225,7 @@ module.exports = function extendController(controller) {
       return;
     }
     // Configure the property
-    if (path.options.type === mongoose.Schema.Types.ObjectId) {
+    if (path.options.type && path.options.type.name === 'ObjectId') {
       if (name === '_id') {
         property.type = 'string';
       } else if (path.options.ref) {
