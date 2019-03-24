@@ -1,3 +1,4 @@
+const path = require('path');
 const mongoose = require('mongoose');
 const express = require('express');
 const swagger = require('../packages/baucis-swagger');
@@ -51,12 +52,13 @@ baucis.rest('goose');
 const app = express();
 app.use('/api', baucis());
 
+app.use('/explorer', express.static(path.join(__dirname, 'explorer')));
 app.use(function(error, request, response, next) {
   if (error) return response.send(500, error.toString());
   next();
 });
 
-app.listen(4312, () => console.log(`go to http://localhost:4312/api/documentation`));
+app.listen(4312, () => console.log(`go to http://localhost:4312/explorer`));
 
 const vegetableNames = [
   'Turnip',
