@@ -10,7 +10,7 @@ const plugins = {
 
 module.exports = function(mongoose, express) {
   const baucis = function(options) {
-    return baucis.empty();
+    return baucis.get();
   };
 
   const _mongoose = mongoose || require('mongoose');
@@ -28,13 +28,13 @@ module.exports = function(mongoose, express) {
     return instance.rest(model);
   };
 
-  baucis.empty = function(options = {finalize: true}) {
+  baucis.get = function(options = {finalize: true}) {
     const current = instance;
-    if (options.finalize) instance = new Api();
+    if (options === true || options.finalize) instance = new Api();
     return current;
   };
-  // alias for empty, which might at some point superseed it
-  baucis.get = baucis.empty;
+  // alias for empty, which might at some point superseed it, and empty deprecated
+  baucis.empty = () => baucis.get();
 
   baucis._formatters = function(response, callback) {
     // if (response._headerSent) {
