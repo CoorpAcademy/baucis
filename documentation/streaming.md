@@ -47,7 +47,7 @@ controller.request(function (request, response, next) {
 });
 ```
 
-If `request.baucis.incoming` or `request.baucis.outgoing` is called multiple times, the multiple through streams will be piped together.
+If `request.baucis.incoming()` or `request.baucis.outgoing()` is called multiple times, the multiple through streams will be piped together.
 
 Here's an example of how a stream that interacts with outgoing documents may be added:
 

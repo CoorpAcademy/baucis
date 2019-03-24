@@ -8,46 +8,46 @@ An example of creating a REST API from a couple Mongoose schemata.
 
 ``` javascript
 // Create a mongoose schema.
-var Vegetable = new mongoose.Schema({ name: String });
+const Vegetable = new mongoose.Schema({ name: String });
 // Register new models with mongoose.
 mongoose.model('vegetable', Vegetable);
 // Create a simple controller.  By default these HTTP methods
 // are activated: HEAD, GET, POST, PUT, DELETE
 baucis.rest('vegetable');
 // Create the app and listen for API requests
-var app = express();
+const app = express();
 app.use('/api', baucis());
 app.listen(80);
 ```
-### baucis.rest
+### `baucis.rest()`
 
 
-`baucis.rest` creates a new controller associated with a given model.
+`baucis.rest()` creates a new controller associated with a given model.
 
 You can pass in a mongoose model name:
 
 ``` javascript
-var controller = baucis.rest('robot');
+const controller = baucis.rest('robot');
 ```
 
 Or, pass in a Mongoose model:
 
 ``` javascript
-var controller = baucis.rest(mongoose.model('robot'));
+const controller = baucis.rest(mongoose.model('robot'));
 ```
 
-Calling `baucis.rest` also adds the newly created controller to the current API.  When `baucis()` is called, the API is finalized and any subsequent controllers will be added to another API instance.
+Calling `baucis.rest()` also adds the newly created controller to the current API.  When `baucis()` is called, the API is finalized and any subsequent controllers will be added to another API instance.
 
 ```javascript
 // Creating the first API.
 baucis.rest('legume');
-var api = baucis();
+const api = baucis();
 // Creating another API.
 baucis.rest('tuber');
-var api2 = baucis();
+const api2 = baucis();
 ```
 
-Controllers also have the usual Express features.  Controllers are Express 4 `Routes`.
+Controllers also have the usual Express features.  Controllers are Express 4 `Router`.
 
 ``` javascript
 // Add middleware before API routes
@@ -68,7 +68,7 @@ controller.listen(3000);
 
 Customize them with Express middleware, including pre-existing modules like `passport`.
 
-Baucis also adds controller the `request` and `query` methods to interact with the baucis interal Mongoose query.  **(See the [middleware section](https://github.com/wprl/baucis/wiki/Middleware).)**
+Baucis also adds controller the `request` and `query` methods to interact with the baucis interal Mongoose query.  **(See the [middleware section](./middlewares.md).)**
 
 ``` javascript
 controller.request(function (request, response, next) {

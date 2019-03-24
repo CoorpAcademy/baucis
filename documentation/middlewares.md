@@ -7,7 +7,7 @@ This stage of middleware will be called after baucis applies defaults based on t
 
 ### query
 
-This stage of middleware will be called after baucis applies defaults to the Mongoose query object, but before the documents are streamed out through the response.  The Mongoose query can be accessed and changed in your custom middleware via `request.baucis.query`.  Query middleware cannot be added explicitly for POST and will be ignored when added for POST implicitly.
+This stage of middleware will be called after baucis applies defaults to the Mongoose query object, but before the documents are streamed out through the response.  The Mongoose query can be accessed and changed in your custom middleware via `request.baucis.query()`.  Query middleware cannot be added explicitly for POST and will be ignored when added for POST implicitly.
 
 ### How to use baucis middleware
 

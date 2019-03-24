@@ -104,7 +104,7 @@ baucis.rest('cat').versions('0.0.1');
 baucis.rest('cat').versions('>0.0.1 <1.0.0');
 baucis.rest('cat').versions('~1');
 baucis.rest('cat').versions('>2.0.0');
-var api = baucis();
+const api = baucis();
 baucis().release('0.0.2').release('1.0.0').release('1.1.0').release('2.0.0')
 app.use('/api', api);
 ```
