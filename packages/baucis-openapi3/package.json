@@ -12,10 +12,10 @@
   },
   "main": "index.js",
   "scripts": {
-    "lint": "node_modules/.bin/eslint *.js src/**/*.js test/**/*.js",
-    "pretest": "npm run lint",
-    "test": "nyc --reporter=lcov ./node_modules/.bin/mocha --recursive --timeout 5000 -R spec ",
-    "test:tdd": "./node_modules/.bin/mocha --recursive --timeout 5000 -R min --watch"
+    "lint": "eslint *.js src/**/*.js test/**/*.js",
+    "test": "mocha --recursive --timeout 5000 -R spec --exit",
+    "cover:": "nyc npm test",
+    "test:tdd": "mocha --recursive --timeout 5000 -R min --watch"
   },
   "author": {
     "name": "Dr. Pedro J. Molina",
@@ -31,6 +31,7 @@
     "baucis": "^1.0.0"
   },
   "devDependencies": {
+    "@coorpacademy/baucis": "^0.1.6",
     "async": "^2.6.1",
     "baucis": "~1.6.8",
     "codeclimate-test-reporter": "^0.5.0",

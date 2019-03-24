@@ -1,29 +1,25 @@
-// __Dependencies__
-var utils = require('./utils');
-var params = require('./parameters');
-
-// __Private Module Members__
+const utils = require('./utils');
+const params = require('./parameters');
 
 // Implements OpenAPI 3.0.0-RC (implementers draft) as described in:
 // https://www.openapis.org/blog/2017/03/01/openapi-spec-3-implementers-draft-released#
 // https://github.com/OAI/OpenAPI-Specification/blob/3.0.0-rc0/versions/3.0.md
 
-
 // Figure out the basePath for OpenAPI definition
 function getBase(request, extra) {
-  var parts = request.originalUrl.split('/');
+  const parts = request.originalUrl.split('/');
   // Remove extra path parts.
   parts.splice(-extra, extra);
-  var base = parts.join('/');
+  const base = parts.join('/');
   return base;
 }
 
 function generateValidationErrorSchema() {
-  var def = {
+  const def = {
     required: ['message', 'name', 'kind', 'path'],
     properties: {
       properties: {
-        '$ref': '#/components/schemas/ValidationErrorProperties'
+        $ref: '#/components/schemas/ValidationErrorProperties'
       },
       message: {
         type: 'string'
@@ -43,7 +39,7 @@ function generateValidationErrorSchema() {
 }
 
 function generateValidationErrorPropertiesSchema() {
-  var def = {
+  const def = {
     required: ['type', 'message', 'path'],
     properties: {
       type: {
@@ -61,13 +57,13 @@ function generateValidationErrorPropertiesSchema() {
 }
 
 function buildTags(opts, controllers) {
-  var tags = [];
+  const tags = [];
   if (controllers) {
-    controllers.forEach(function (controller) {
+    controllers.forEach(function(controller) {
       tags.push({
         name: controller.model().singular(),
-        description: utils.capitalize(controller.model().singular()) + ' resource.',
-        'x-resource': true //custom extension to state this tag represent a resource
+        description: `${utils.capitalize(controller.model().singular())} resource.`,
+        'x-resource': true // custom extension to state this tag represent a resource
       });
     });
   }
@@ -75,12 +71,12 @@ function buildTags(opts, controllers) {
 }
 
 function buildPaths(opts, controllers) {
-  var paths = {};
+  const paths = {};
   if (controllers) {
-    controllers.forEach(function (controller) {
+    controllers.forEach(function(controller) {
       controller.generateOpenApi3();
-      var collection = controller.openApi3.paths;
-      for (var path in collection) {
+      const collection = controller.openApi3.paths;
+      for (const path in collection) {
         if (collection.hasOwnProperty(path)) {
           paths[path] = collection[path];
         }
@@ -90,16 +86,18 @@ function buildPaths(opts, controllers) {
   return paths;
 }
 function buildDefaultServers() {
-  return [{
-      url: "/api"
-    }];
+  return [
+    {
+      url: '/api'
+    }
+  ];
 }
 // A method for generating OpenAPI resource listing
 function generateResourceListing(options) {
-  var controllers = options.controllers;
-  var opts = options.options || {};
+  const controllers = options.controllers;
+  const opts = options.options || {};
 
-  var listing = {
+  const listing = {
     openapi: '3.0.0',
     info: buildInfo(opts),
     servers: opts.servers || buildDefaultServers(),
@@ -134,7 +132,7 @@ function defaultIfMissing(obj, prop, defaultValue) {
 }
 
 function buildInfo(options) {
-  var info = options.info || {};
+  const info = options.info || {};
   defaultIfMissing(info, 'title', 'api');
   defaultIfMissing(info, 'description', 'Baucis generated OpenAPI v.3 documentation.');
   defaultIfMissing(info, 'version', null);
@@ -154,20 +152,18 @@ function buildInfo(options) {
 
   return info;
 }
-
-
 function buildComponents(options, controllers) {
-  var components = clone(options.components);
+  const components = clone(options.components);
 
-  defaultIfMissing(components, "schemas", {});
-  defaultIfMissing(components, "responses", {});
-  defaultIfMissing(components, "parameters", {});
-  defaultIfMissing(components, "examples", {});
-  defaultIfMissing(components, "requestBodies", {});
-  defaultIfMissing(components, "headers", {});
-  defaultIfMissing(components, "securitySchemes", {});
-  defaultIfMissing(components, "links", {});
-  defaultIfMissing(components, "callbacks", {});
+  defaultIfMissing(components, 'schemas', {});
+  defaultIfMissing(components, 'responses', {});
+  defaultIfMissing(components, 'parameters', {});
+  defaultIfMissing(components, 'examples', {});
+  defaultIfMissing(components, 'requestBodies', {});
+  defaultIfMissing(components, 'headers', {});
+  defaultIfMissing(components, 'securitySchemes', {});
+  defaultIfMissing(components, 'links', {});
+  defaultIfMissing(components, 'callbacks', {});
 
   mergeIn(components.schemas, buildSchemas(controllers));
   mergeIn(components.responses, buildResponses(controllers));
@@ -183,11 +179,11 @@ function buildComponents(options, controllers) {
 }
 
 function buildSchemas(controllers) {
-  var schemas = {};
-  controllers.forEach(function (controller) {
+  const schemas = {};
+  controllers.forEach(function(controller) {
     controller.generateOpenApi3();
-    var collection = controller.openApi3.components.schemas;
-    for (var def in collection) {
+    const collection = controller.openApi3.components.schemas;
+    for (const def in collection) {
       if (collection.hasOwnProperty(def)) {
         schemas[def] = collection[def];
       }
@@ -199,42 +195,42 @@ function buildSchemas(controllers) {
 }
 
 function buildParameters(controllers) {
-  controllers.forEach(function () {});
+  controllers.forEach(function() {});
   return params.generateCommonParams();
 }
 
 function buildResponses(controllers) {
-  controllers.forEach(function () {});
+  controllers.forEach(function() {});
   return {};
 }
 
 function buildSecuritySchemes(options, controllers) {
-  controllers.forEach(function () {});
+  controllers.forEach(function() {});
   return {};
 }
 
 function buildExamples(controllers) {
-  controllers.forEach(function () {});
+  controllers.forEach(function() {});
   return {};
 }
 
 function buildRequestBodies(controllers) {
-  controllers.forEach(function () {});
+  controllers.forEach(function() {});
   return {};
 }
 
 function buildHeaders(controllers) {
-  controllers.forEach(function () {});
+  controllers.forEach(function() {});
   return {};
 }
 
 function buildLinks(controllers) {
-  controllers.forEach(function () {});
+  controllers.forEach(function() {});
   return {};
 }
 
 function buildCallbacks(controllers) {
-  controllers.forEach(function () {});
+  controllers.forEach(function() {});
   return {};
 }
 
@@ -245,18 +241,18 @@ function clone(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
-//build an specific spec based on options and filtered controllers
+// build an specific spec based on options and filtered controllers
 function generateResourceListingForVersion(options) {
-  var clone = JSON.parse(JSON.stringify(options.rootDocument));
+  const clone = JSON.parse(JSON.stringify(options.rootDocument));
   if (!clone.info.version) {
-    //Set baucis version if not provided previously by options
+    // Set baucis version if not provided previously by options
     clone.info.version = options.version;
   }
   clone.paths = clone.paths || {};
   mergeIn(clone.paths, buildPaths(options.controllers));
 
   clone.components.schemas = clone.components.schemas || {};
-  var compo2 = buildComponents(options, options.controllers);
+  const compo2 = buildComponents(options, options.controllers);
   mergeIn(clone.components.schemas, compo2.schemas);
 
   return clone;
@@ -266,27 +262,24 @@ function mergeIn(container, items) {
   if (!items) {
     return;
   }
-  for (var key in items) {
+  for (const key in items) {
     if (items.hasOwnProperty(key)) {
       container[key] = items[key];
     }
   }
 }
 
+module.exports = function extendApi(api) {
+  let customOpts = {};
 
-// __Module Definition__
-module.exports = function (options, protect) {
-  var api = this;
-  var customOpts = options;
-
-  api.generateOpenApi3 = function (opts) {
+  api.generateOpenApi3 = function(opts) {
     if (opts) {
       customOpts = opts;
     }
-    //user can extend this openApi3Document
+    // user can extend this openApi3Document
     api.openApi3Document = generateResourceListing({
       version: null,
-      controllers: protect.controllers('0.0.1'),
+      controllers: api.controllers('0.0.1'),
       basePath: null,
       options: customOpts
     });
@@ -294,17 +287,17 @@ module.exports = function (options, protect) {
   };
 
   // Middleware for the documentation index.
-  api.get('/openapi.json', function (request, response) {
+  api.get('/openapi.json', function(request, response) {
     try {
       if (!api.openApi3Document) {
         api.generateOpenApi3(customOpts);
       }
 
-      //Customize a openApi3Document copy by requested version
-      var versionedApi = generateResourceListingForVersion({
+      // Customize a openApi3Document copy by requested version
+      const versionedApi = generateResourceListingForVersion({
         rootDocument: api.openApi3Document,
         version: request.baucis.release,
-        controllers: protect.controllers(request.baucis.release),
+        controllers: api.controllers(request.baucis.release),
         basePath: getBase(request, 1),
         options: customOpts
       });
@@ -315,6 +308,4 @@ module.exports = function (options, protect) {
       response.status(500).json(e);
     }
   });
-
-  return api;
 };

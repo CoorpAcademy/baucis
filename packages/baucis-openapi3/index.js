@@ -1,13 +1,12 @@
-// __Dependencies__
-var path = require('path');
-var baucis = require('baucis');
-var deco = require('deco');
-var optionsBuilder = require('./src/optionsBuilder');
+const extendApi = require('./src/api');
+const extendController = require('./src/controller');
+const {buildOptions, buildServerVariables, ensureHasInfo} = require('./src/options-builder');
 
-var decorators = deco.require(path.join(__dirname, 'src'), 
-                              [ 'Controller', 'Api' ]).hash;
-
-baucis.Controller.decorators(decorators.Controller);
-baucis.Api.decorators(decorators.Api);
-
-module.exports = optionsBuilder;
+module.exports = baucis => {
+  baucis.Api.addExtension(extendApi);
+  baucis.Controller.addExtension(extendController);
+  return baucis;
+};
+module.exports.buildOptions = buildOptions;
+module.exports.buildServerVariables = buildServerVariables;
+module.exports.ensureHasInfo = ensureHasInfo;

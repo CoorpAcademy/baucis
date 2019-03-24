@@ -1,9 +1,9 @@
-//Module with custom functions
+// Module with custom functions
 
 // A method for capitalizing the first letter of a string
-function capitalize (s) {
-  if (!s) { 
-    return s; 
+function capitalize(s) {
+  if (!s) {
+    return s;
   }
   if (s.length === 1) {
     return s.toUpperCase();
@@ -12,5 +12,5 @@ function capitalize (s) {
 }
 
 module.exports = {
-		capitalize : capitalize
+  capitalize
 };

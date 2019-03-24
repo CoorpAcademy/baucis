@@ -1,16 +1,16 @@
-// __Dependencies__
-var mongoose = require('mongoose');
-var express = require('express');
-var async = require('async');
-var baucis = require('baucis');
-var config = require('./config');
-var plugin = require('../..');
+const mongoose = require('mongoose');
+const express = require('express');
+const async = require('async');
+const baucis = require('@coorpacademy/baucis')(mongoose, express);
+const plugin = require('../..');
+const config = require('./config');
 
-// __Private Module Members__
-var app = null;
-var server = null;
-var Schema = mongoose.Schema;
-var Vegetable = new Schema({
+baucis.addPlugin(plugin);
+
+let app = null;
+let server = null;
+const Schema = mongoose.Schema;
+const Vegetable = new Schema({
   name: {
     type: String,
     required: true
@@ -29,7 +29,7 @@ var Vegetable = new Schema({
     ref: 'vegetable'
   }
 });
-var Fungus = new Schema({
+const Fungus = new Schema({
   dork: {
     type: Boolean,
     default: true
@@ -43,13 +43,13 @@ var Fungus = new Schema({
     default: '123'
   }
 });
-var Stuffing = new Schema({
+const Stuffing = new Schema({
   bread: {
     type: Boolean,
     default: true
   }
 });
-var Goose = new Schema({
+const Goose = new Schema({
   cooked: {
     type: Boolean,
     default: true
@@ -57,7 +57,7 @@ var Goose = new Schema({
   stuffed: [Stuffing]
 });
 
-var ChargeArea = new Schema({
+const ChargeArea = new Schema({
   name: {
     type: String,
     required: true
@@ -70,12 +70,14 @@ var ChargeArea = new Schema({
     type: [Number],
     required: false
   },
-  clusters: [{
-    type: Schema.Types.ObjectId,
-    ref: 'ChargeCluster'
-  }]
+  clusters: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'ChargeCluster'
+    }
+  ]
 });
-var ChargeCluster = new Schema({
+const ChargeCluster = new Schema({
   name: {
     type: String,
     required: true
@@ -91,49 +93,49 @@ mongoose.model('goose', Goose).plural('geese');
 mongoose.model('chargeCluster', ChargeCluster);
 mongoose.model('chargeArea', ChargeArea);
 
-// __Module Definition__
-var fixture = module.exports = {
-  init: function (done) {
+const fixture =  {
+  init(done) {
     mongoose.connect(config.mongo.url, {
-      useMongoClient: true 
+      useMongoClient: true
     });
 
-    var serverVars = plugin
+    const serverVars = plugin
       .buildServerVariables()
-      .addServerVar("user", ["demo", "joe", "alicia"], "alicia", "User name for authentication.")
-      .addServerVar("env", ["dev", "qa", "prod"], "qa", "Development to test.");
+      .addServerVar('user', ['demo', 'joe', 'alicia'], 'alicia', 'User name for authentication.')
+      .addServerVar('env', ['dev', 'qa', 'prod'], 'qa', 'Development to test.');
 
-    //Customize OpenAPI contract ----
-    var openApiCustomizations =
-      plugin.buildOptions()
-      .title("my app")
-      .version("3.14.15")
-      .description("OpenAPI 3.0.0-RC implementors sample doc.")
-      .contact("Pedro J. Molina", "http://pjmolina.com", "pjmolina@acme.com")
-      .addServer("http://api1.acme.com", "My prod server", serverVars)
-      .addServer("http://api2.acme.com/qa", "My QA server", serverVars)
-      .addSecuritySchemeBasicAuth("authentication_basic")
-      .addSecurityJWT("autentication_jwt")
-      .addSecuritySchemeApiKey("authentication_apikey")
-      .license("Apache 2", "http://apache.org")
-      .termsOfService("My TOS");
+    // Customize OpenAPI contract ----
+    const openApiCustomizations = plugin
+      .buildOptions()
+      .title('my app')
+      .version('3.14.15')
+      .description('OpenAPI 3.0.0-RC implementors sample doc.')
+      .contact('Pedro J. Molina', 'http://pjmolina.com', 'pjmolina@acme.com')
+      .addServer('http://api1.acme.com', 'My prod server', serverVars)
+      .addServer('http://api2.acme.com/qa', 'My QA server', serverVars)
+      .addSecuritySchemeBasicAuth('authentication_basic')
+      .addSecurityJWT('autentication_jwt')
+      .addSecuritySchemeApiKey('authentication_apikey')
+      .license('Apache 2', 'http://apache.org')
+      .termsOfService('My TOS');
 
-    fixture.controller = baucis.rest('vegetable')
-                               .hints(true)
-                               .comments(true);
+    fixture.controller = baucis
+      .rest('vegetable')
+      .hints(true)
+      .comments(true);
     fixture.controller.generateOpenApi3();
 
-    //forbiden extension
+    // forbiden extension
     fixture.controller.openApi3.lambic = 'kriek';
-    //allowed on extensions points for controllers (paths & defintions)
+    // allowed on extensions points for controllers (paths & defintions)
     fixture.controller.openApi3.paths['/starkTrek'] = {
       get: {
         operationId: 'enterprise',
         responses: {
-          "200": {
-            "description": "Sucessful response.",
-            "schema": {
-              "$ref": "#/components/schemas/Vegetable"
+          '200': {
+            description: 'Sucessful response.',
+            schema: {
+              $ref: '#/components/schemas/Vegetable'
             }
           }
         }
@@ -148,51 +150,63 @@ var fixture = module.exports = {
 
     app = express();
 
-    var baucisInstance = baucis();
+    const baucisInstance = baucis();
 
-    //extend root document for OpenApi 3 (neeeds access to baucisInstance to access api extensibility)
+    // extend root document for OpenApi 3 (neeeds access to baucisInstance to access api extensibility)
     baucisInstance.generateOpenApi3(openApiCustomizations);
     baucisInstance.openApi3Document['x-powered-by'] = 'baucis';
 
     baucisInstance.openApi3Document.components.schemas.customDefinition = {
       properties: {
         a: {
-          type: "string"
+          type: 'string'
         }
       }
     };
 
     app.use('/api', baucisInstance);
 
-    app.use(function (error, request, response, next) {
-      if (error) { return response.status(500).send(error.toString()); }
+    app.use(function(error, request, response, next) {
+      if (error) {
+        return response.status(500).send(error.toString());
+      }
       next();
     });
 
     server = app.listen(8012);
     done();
   },
-  deinit: function (done) {
+  deinit(done) {
     server.close();
     mongoose.disconnect();
     done();
   },
-  create: function (done) {
-    var Vegetable = mongoose.model('vegetable');
-    var vegetableNames = ['Turnip', 'Spinach', 'Pea', 'Shitake', 'Lima Bean', 'Carrot', 'Zucchini', 'Radicchio'];
-    var vegetables = vegetableNames.map(function (name) {
+  create(done) {
+    const Vegetable = mongoose.model('vegetable');
+    const vegetableNames = [
+      'Turnip',
+      'Spinach',
+      'Pea',
+      'Shitake',
+      'Lima Bean',
+      'Carrot',
+      'Zucchini',
+      'Radicchio'
+    ];
+    const vegetables = vegetableNames.map(function(name) {
       return new Vegetable({
-        name: name
+        name
       });
     });
-    var deferred = [
-      Vegetable.remove.bind(Vegetable)
-    ];
+    let deferred = [Vegetable.remove.bind(Vegetable)];
 
-    deferred = deferred.concat(vegetables.map(function (vegetable) {
-      return vegetable.save.bind(vegetable);
-    }));
+    deferred = deferred.concat(
+      vegetables.map(function(vegetable) {
+        return vegetable.save.bind(vegetable);
+      })
+    );
 
     async.series(deferred, done);
   }
 };
+module.exports = fixture;

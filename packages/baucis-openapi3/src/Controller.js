@@ -1,40 +1,33 @@
 // This is a Controller mixin to add methods for generating OpenAPI data.
 
-// __Dependencies__
-var mongoose = require('mongoose');
-var utils = require('./utils');
-var params = require('./parameters');
+const mongoose = require('mongoose'); // §FIXME : to kill
+const utils = require('./utils');
+const params = require('./parameters');
 
-// __Private Members__
-
-// __Module Definition__
-module.exports = function () {
-  var controller = this;
-
-  // __Private Instance Members__
-
-
+module.exports = function extendController(controller) {
   function buildTags(resourceName) {
     return [resourceName];
   }
 
   function humanVerb(verb) {
-    switch(verb) {
-      case "put":
-        return "Update";
-      case "post":
-        return "Create";
+    switch (verb) {
+      case 'put':
+        return 'Update';
+      case 'post':
+        return 'Create';
       default:
-        return "undef";
+        return 'undef';
     }
   }
   function buildRequestBodyFor(isInstance, verb, resourceName) {
-    var requestBody = {
-      description: humanVerb(verb) + " a " + resourceName +" by sending the paths to be updated in the request body.",
+    const requestBody = {
+      description: `${humanVerb(
+        verb
+      )} a ${resourceName} by sending the paths to be updated in the request body.`,
       content: {
-        "application/json": {
-          schema:{
-            $ref: "#/components/schemas/" + utils.capitalize(resourceName)
+        'application/json': {
+          schema: {
+            $ref: `#/components/schemas/${utils.capitalize(resourceName)}`
           }
         }
       }
@@ -45,15 +38,15 @@ module.exports = function () {
     return null;
   }
   function buildResponsesFor(isInstance, verb, resourceName, pluralName) {
-    var responses = {};
+    const responses = {};
 
-    //default errors on baucis httpStatus code + string
+    // default errors on baucis httpStatus code + string
     responses.default = {
       description: 'Unexpected error.',
       content: {
-        "application/json": {
+        'application/json': {
           schema: {
-            'type': 'string'
+            type: 'string'
           }
         }
       }
@@ -62,9 +55,9 @@ module.exports = function () {
       responses['200'] = {
         description: 'Sucessful response. Single resource.',
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
-              '$ref': '#/components/schemas/' + utils.capitalize(resourceName)
+              $ref: `#/components/schemas/${utils.capitalize(resourceName)}`
             }
           }
         }
@@ -73,11 +66,11 @@ module.exports = function () {
       responses['200'] = {
         description: 'Sucessful response. Collection of resources.',
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
               type: 'array',
               items: {
-                $ref: '#/components/schemas/' + utils.capitalize(resourceName)
+                $ref: `#/components/schemas/${utils.capitalize(resourceName)}`
               }
             }
           }
@@ -86,13 +79,14 @@ module.exports = function () {
     }
     // Add other errors if needed: (400, 403, 412 etc. )
     responses['404'] = {
-      description: (isInstance) ?
-        'No ' + resourceName + ' was found with that ID.' : 'No ' + pluralName + ' matched that query.',
+      description: isInstance
+        ? `No ${resourceName} was found with that ID.`
+        : `No ${pluralName} matched that query.`,
       content: {
-        "application/json": {
+        'application/json': {
           schema: {
-            'type': 'string'
-          //'$ref': '#/components/schemas/ErrorModel'
+            type: 'string'
+            // '$ref': '#/components/schemas/ErrorModel'
           }
         }
       }
@@ -101,11 +95,11 @@ module.exports = function () {
       responses['422'] = {
         description: 'Validation error.',
         content: {
-          "application/json": {
+          'application/json': {
             schema: {
               type: 'array',
               items: {
-                '$ref': '#/components/schemas/ValidationError'
+                $ref: '#/components/schemas/ValidationError'
               }
             }
           }
@@ -116,7 +110,7 @@ module.exports = function () {
   }
 
   function buildSecurityFor() {
-    return null; //no security defined
+    return null; // no security defined
   }
 
   function buildOperationInfo(res, operationId, summary, description) {
@@ -127,22 +121,22 @@ module.exports = function () {
   }
 
   function buildBaseOperation(mode, verb, controller) {
-    var resourceName = controller.model().singular();
-    var pluralName = controller.model().plural();
-    var isInstance = (mode === 'instance');
-    var resourceKey = utils.capitalize(resourceName);
-    var res = {
+    const resourceName = controller.model().singular();
+    const pluralName = controller.model().plural();
+    const isInstance = mode === 'instance';
+    const resourceKey = utils.capitalize(resourceName);
+    const res = {
       parameters: params.generateOperationParameters(isInstance, verb),
       responses: buildResponsesFor(isInstance, verb, resourceName, pluralName)
     };
-    var rBody = buildRequestBodyFor(isInstance, verb, resourceName);
+    const rBody = buildRequestBodyFor(isInstance, verb, resourceName);
     if (rBody) {
       res.requestBody = rBody;
-    } 
-    if (res.parameters.length === 0) {
-      delete(res.parameters);
     }
-    var sec = buildSecurityFor();
+    if (res.parameters.length === 0) {
+      delete res.parameters;
+    }
+    const sec = buildSecurityFor();
     if (sec) {
       res.security = sec;
     }
@@ -150,52 +144,64 @@ module.exports = function () {
     if (isInstance) {
       return buildBaseOperationInstance(verb, res, resourceKey, resourceName);
     } else {
-      //collection
+      // collection
       return buildBaseOperationCollection(verb, res, resourceKey, pluralName);
     }
   }
 
   function buildBaseOperationInstance(verb, res, resourceKey, resourceName) {
-    if ('get' === verb) {
-      return buildOperationInfo(res,
-        'get' + resourceKey + 'ById',
-        'Get a ' + resourceName + ' by its unique ID',
-        'Retrieve a ' + resourceName + ' by its ID' + '.');
-    } else if ('put' === verb) {
-      return buildOperationInfo(res,
-        'update' + resourceKey,
-        'Modify a ' + resourceName + ' by its unique ID',
-        'Update an existing ' + resourceName + ' by its ID' + '.');
-    } else if ('delete' === verb) {
-      return buildOperationInfo(res,
-        'delete' + resourceKey + 'ById',
-        'Delete a ' + resourceName + ' by its unique ID',
-        'Deletes an existing ' + resourceName + ' by its ID' + '.');
+    if (verb === 'get') {
+      return buildOperationInfo(
+        res,
+        `get${resourceKey}ById`,
+        `Get a ${resourceName} by its unique ID`,
+        `Retrieve a ${resourceName} by its ID` + `.`
+      );
+    } else if (verb === 'put') {
+      return buildOperationInfo(
+        res,
+        `update${resourceKey}`,
+        `Modify a ${resourceName} by its unique ID`,
+        `Update an existing ${resourceName} by its ID` + `.`
+      );
+    } else if (verb === 'delete') {
+      return buildOperationInfo(
+        res,
+        `delete${resourceKey}ById`,
+        `Delete a ${resourceName} by its unique ID`,
+        `Deletes an existing ${resourceName} by its ID` + `.`
+      );
     }
   }
 
   function buildBaseOperationCollection(verb, res, resourceKey, pluralName) {
-    if ('get' === verb) {
-      return buildOperationInfo(res,
-        'query' + resourceKey,
-        'Query some ' + pluralName,
-        'Query over ' + pluralName + '.');
-    } else if ('post' === verb) {
-      return buildOperationInfo(res,
-        'create' + resourceKey,
-        'Create some ' + pluralName,
-        'Create one or more ' + pluralName + '.');
-    } else if ('delete' === verb) {
-      return buildOperationInfo(res,
-        'delete' + resourceKey + 'ByQuery',
-        'Delete some ' + pluralName + ' by query',
-        'Delete all ' + pluralName + ' matching the specified query.');
+    if (verb === 'get') {
+      return buildOperationInfo(
+        res,
+        `query${resourceKey}`,
+        `Query some ${pluralName}`,
+        `Query over ${pluralName}.`
+      );
+    } else if (verb === 'post') {
+      return buildOperationInfo(
+        res,
+        `create${resourceKey}`,
+        `Create some ${pluralName}`,
+        `Create one or more ${pluralName}.`
+      );
+    } else if (verb === 'delete') {
+      return buildOperationInfo(
+        res,
+        `delete${resourceKey}ByQuery`,
+        `Delete some ${pluralName} by query`,
+        `Delete all ${pluralName} matching the specified query.`
+      );
     }
   }
 
   function buildOperation(containerPath, mode, verb) {
-    var resourceName = controller.model().singular();
-    var operation = buildBaseOperation(mode, verb, controller);
+    const resourceName = controller.model().singular();
+    const operation = buildBaseOperation(mode, verb, controller);
     operation.tags = buildTags(resourceName);
     containerPath[verb] = operation;
     return operation;
@@ -212,24 +218,26 @@ module.exports = function () {
     if (type === Boolean) {
       return 'boolean';
     }
-    if (type === String ||
+    if (
+      type === String ||
       type === Date ||
       type === mongoose.Schema.Types.ObjectId ||
-      type === mongoose.Schema.Types.Oid) {
+      type === mongoose.Schema.Types.Oid
+    ) {
       return 'string';
     }
-    if (type === mongoose.Schema.Types.Array ||
-      Array.isArray(type) ||
-      type.name === "Array") {
+    if (type === mongoose.Schema.Types.Array || Array.isArray(type) || type.name === 'Array') {
       return 'array';
     }
-    if (type === Object ||
+    if (
+      type === Object ||
       type instanceof Object ||
       type === mongoose.Schema.Types.Mixed ||
-      type === mongoose.Schema.Types.Buffer) {
+      type === mongoose.Schema.Types.Buffer
+    ) {
       return null;
     }
-    throw new Error('Unrecognized type: ' + type);
+    throw new Error(`Unrecognized type: ${type}`);
   }
 
   function openApi30TypeFormatFor(type) {
@@ -259,10 +267,10 @@ module.exports = function () {
   }
 
   function skipProperty(name, path, controller) {
-    var select = controller.select();
-    var mode = (select && select.match(/(?:^|\s)[-]/g)) ? 'exclusive' : 'inclusive';
-    var exclusiveNamePattern = new RegExp('\\B-' + name + '\\b', 'gi');
-    var inclusiveNamePattern = new RegExp('(?:\\B[+]|\\b)' + name + '\\b', 'gi');
+    const select = controller.select();
+    const mode = select && select.match(/(?:^|\s)[-]/g) ? 'exclusive' : 'inclusive';
+    const exclusiveNamePattern = new RegExp(`\\B-${name}\\b`, 'gi');
+    const inclusiveNamePattern = new RegExp(`(?:\\B[+]|\\b)${name}\\b`, 'gi');
     // Keep deselected paths private
     if (path.selected === false) {
       return true;
@@ -281,35 +289,35 @@ module.exports = function () {
   }
   // A method used to generated an OpenAPI property for a model
   function generatePropertyDefinition(name, path, definitionName) {
-    var property = {};
-    var type = path.options.type ? openApi30TypeFor(path.options.type) : 'string'; // virtuals don't have type
+    const property = {};
+    const type = path.options.type ? openApi30TypeFor(path.options.type) : 'string'; // virtuals don't have type
 
     if (skipProperty(name, path, controller)) {
       return;
     }
     // Configure the property
     if (path.options.type === mongoose.Schema.Types.ObjectId) {
-      if ("_id" === name) {
+      if (name === '_id') {
         property.type = 'string';
       } else if (path.options.ref) {
-        property.$ref = '#/components/schemas/' + utils.capitalize(path.options.ref);
+        property.$ref = `#/components/schemas/${utils.capitalize(path.options.ref)}`;
       }
     } else if (path.schema) {
-      //Choice (1. embed schema here or 2. reference and publish as a root definition)
+      // Choice (1. embed schema here or 2. reference and publish as a root definition)
       property.type = 'array';
       property.items = {
-        //2. reference 
-        $ref: '#/components/schemas/' + definitionName + utils.capitalize(name)
+        // 2. reference
+        $ref: `#/components/schemas/${definitionName}${utils.capitalize(name)}`
       };
     } else {
       property.type = type;
-      if ('array' === type) {
+      if (type === 'array') {
         if (isArrayOfRefs(path.options.type)) {
           property.items = {
-            type: 'string' //handle references as string (serialization for objectId)
+            type: 'string' // handle references as string (serialization for objectId)
           };
         } else {
-          var resolvedType = referenceForType(path.options.type);
+          const resolvedType = referenceForType(path.options.type);
           if (resolvedType.isPrimitive) {
             property.items = {
               type: resolvedType.type
@@ -321,11 +329,11 @@ module.exports = function () {
           }
         }
       }
-      var format = openApi30TypeFormatFor(path.options.type);
+      const format = openApi30TypeFormatFor(path.options.type);
       if (format) {
         property.format = format;
       }
-      if ('__v' === name) {
+      if (name === '__v') {
         property.format = 'int32';
       }
     }
@@ -355,40 +363,48 @@ module.exports = function () {
 
   function referenceForType(type) {
     if (type && type.length > 0 && type[0]) {
-      var sw2Type = openApi30TypeFor(type[0]);
+      const sw2Type = openApi30TypeFor(type[0]);
       if (sw2Type) {
         return {
           isPrimitive: true,
-          type: sw2Type //primitive type
+          type: sw2Type // primitive type
         };
       } else {
         return {
           isPrimitive: false,
-          type: '#/components/schemas/' + type[0].name //not primitive: asume complex type def and reference schema
+          type: `#/components/schemas/${type[0].name}` // not primitive: asume complex type def and reference schema
         };
       }
     }
     return {
       isPrimitive: true,
       type: 'string'
-    }; //No info provided
+    }; // No info provided
   }
 
   function isArrayOfRefs(type) {
-    return (type && type.length > 0 && type[0] && type[0].ref &&
-      type[0].type && type[0].type.name === 'ObjectId');
+    return (
+      type &&
+      type.length > 0 &&
+      type[0] &&
+      type[0].ref &&
+      type[0].type &&
+      type[0].type.name === 'ObjectId'
+    );
   }
 
   function warnInvalidType(name, path) {
-    console.log('Warning: That field type is not yet supported in baucis OpenAPI definitions, using "string."');
+    console.log(
+      'Warning: That field type is not yet supported in baucis OpenAPI definitions, using "string."'
+    );
     console.log('Path name: %s.%s', utils.capitalize(controller.model().singular()), name);
     console.log('Mongoose type: %s', path.options.type);
   }
 
   function mergePaths(oaSchema, pathsCollection, definitionName) {
-    Object.keys(pathsCollection).forEach(function (name) {
-      var path = pathsCollection[name];
-      var property = generatePropertyDefinition(name, path, definitionName);
+    Object.keys(pathsCollection).forEach(function(name) {
+      const path = pathsCollection[name];
+      const property = generatePropertyDefinition(name, path, definitionName);
       oaSchema.properties[name] = property;
       if (path.options.required) {
         oaSchema.required.push(name);
@@ -398,47 +414,46 @@ module.exports = function () {
 
   // A method used to generate an OpenAPI model schema for a controller
   function generateModelOpenApiSchema(schema, definitionName) {
-    var oaSchema = {
+    const oaSchema = {
       required: [],
       properties: {}
     };
     mergePaths(oaSchema, schema.paths, definitionName);
     mergePaths(oaSchema, schema.virtuals, definitionName);
 
-    //remove empty arrays -> OpenAPI 3.0 validates 
+    // remove empty arrays -> OpenAPI 3.0 validates
     if (oaSchema.required.length === 0) {
-      delete(oaSchema.required);
+      delete oaSchema.required;
     }
     if (oaSchema.properties.length === 0) {
-      delete(oaSchema.properties);
+      delete oaSchema.properties;
     }
     return oaSchema;
   }
 
   function mergePathsForInnerSchemaDef(schemaDefs, collectionPaths, definitionName) {
-    Object.keys(collectionPaths).forEach(function (name) {
-      var path = collectionPaths[name];
+    Object.keys(collectionPaths).forEach(function(name) {
+      const path = collectionPaths[name];
       if (path.schema) {
-        var newdefinitionName = definitionName + utils.capitalize(name); //<-- synthetic name (no info for this in input model)
-        var def = generateModelOpenApiSchema(path.schema, newdefinitionName);
+        const newdefinitionName = definitionName + utils.capitalize(name); // <-- synthetic name (no info for this in input model)
+        const def = generateModelOpenApiSchema(path.schema, newdefinitionName);
         schemaDefs[newdefinitionName] = def;
       }
     });
   }
 
   function addInnerModelSchemas(schemaDefs, definitionName) {
-    var schema = controller.model().schema;
+    const schema = controller.model().schema;
     mergePathsForInnerSchemaDef(schemaDefs, schema.paths, definitionName);
     mergePathsForInnerSchemaDef(schemaDefs, schema.virtuals, definitionName);
   }
 
-  // __Build the Definition__
-  controller.generateOpenApi3 = function () {
+  controller.generateOpenApi3 = function() {
     if (controller.openApi3) {
       return controller;
     }
 
-    var modelName = utils.capitalize(controller.model().singular());
+    const modelName = utils.capitalize(controller.model().singular());
 
     controller.openApi3 = {
       paths: {},
@@ -448,18 +463,20 @@ module.exports = function () {
     };
 
     // Add Resource Model
-    controller.openApi3.components.schemas[modelName] =
-      generateModelOpenApiSchema(controller.model().schema, modelName);
+    controller.openApi3.components.schemas[modelName] = generateModelOpenApiSchema(
+      controller.model().schema,
+      modelName
+    );
 
     addInnerModelSchemas(controller.openApi3.components.schemas, modelName);
 
     // Paths
-    var pluralName = controller.model().plural();
+    const pluralName = controller.model().plural();
 
-    var collectionPath = '/' + pluralName;
-    var instancePath = '/' + pluralName + '/{id}';
+    const collectionPath = `/${pluralName}`;
+    const instancePath = `/${pluralName}/{id}`;
 
-    var paths = {};
+    const paths = {};
     buildPathParams(paths, instancePath, true);
     buildPathParams(paths, collectionPath, false);
 
@@ -475,7 +492,7 @@ module.exports = function () {
   };
 
   function buildPathParams(pathContainer, path, isInstance) {
-    var pathParams = params.generatePathParameters(isInstance);
+    const pathParams = params.generatePathParameters(isInstance);
     if (pathParams.length > 0) {
       pathContainer[path] = {
         parameters: pathParams
