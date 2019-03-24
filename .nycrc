@@ -5,12 +5,8 @@
     "html"
   ],
   "include": [
-      "src/**/*.js",
-      "index.js"
-  ],
-  "exclude": [
-    "examples",
-    "test"
+      "packages/*/src/**/*.js",
+      "packages/*/index.js"
   ],
   "all": true
 }

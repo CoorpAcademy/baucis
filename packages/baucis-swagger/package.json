@@ -14,7 +14,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --bail --timeout 5000",
-    "cover": "nyc npm test",
+    "cover": "nyc --cwd ../.. npm test",
     "lint": "eslint src/ test/ index.js",
     "publish-coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },

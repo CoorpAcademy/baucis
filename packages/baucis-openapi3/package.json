@@ -13,7 +13,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --recursive --timeout 5000 -R spec --exit",
-    "cover": "nyc npm test",
+    "cover": "nyc --cwd ../.. npm test",
     "test:tdd": "mocha --recursive --timeout 5000 -R min --watch"
   },
   "author": {

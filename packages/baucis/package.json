@@ -10,9 +10,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha --bail --exit",
-    "cover": "nyc npm test",
-    "lint": "eslint src/ test/ index.js",
-    "publish-coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
+    "cover": "nyc --cwd ../.. npm test",
+    "lint": "eslint src/ test/ index.js"
   },
   "repository": {
     "type": "git",
