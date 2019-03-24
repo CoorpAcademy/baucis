@@ -1,3 +1,10 @@
+## Upgrading Baucis
+
+### To migrate from original baucis to @coorpacademy/baucis
+§TODO
+
+### To upgrade older version of baucis
+
 **_This page was started by a supporter of the project and may not reflect the true state or the proper way of doing things. Viewer discretion is advised._**
 
 # Upgrading to 1.0

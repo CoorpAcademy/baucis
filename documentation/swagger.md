@@ -1,3 +1,5 @@
+## Swagger
+
 Here's how to use swagger.  First, install the plugin:
 
     npm install --save baucis-swagger

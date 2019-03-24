@@ -1,3 +1,5 @@
+## HTTP Verbs
+
 | HTTP Verb     | /vegetables   | /vegetables/:id |
 | ------------- | ------------- | --------------- |
 | GET           | Get all documents, or documents that match the query conditions. | Get the addressed document. |

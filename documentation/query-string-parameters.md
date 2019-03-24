@@ -1,6 +1,8 @@
+## Query string parameters
+
 Use query options from the client to make dynamic requests.  Query options can be mixed as you see fit.
 
-### conditions
+### `conditions`
 
 Set the Mongoose query's `find` or `remove` arguments.  This can take full advtange of the MongoDB query syntax, using geolocation, regular expressions, or full text search.  Special query operators are fine, and in fact geolocation, regular expression, and full text search capabilities are available to your API clients by default!
 
@@ -9,13 +11,13 @@ Set the Mongoose query's `find` or `remove` arguments.  This can take full advta
     GET /api/cats?sort=-name&limit=1&conditions={ "features": "stripes" }
     DELETE /api/people?conditions={ "name": { "$regex": "^Bob W", "$options": "i" } }
 
-### skip
+### `skip`
 
 Skip sending the first *n* matched documents in the response.  Useful for paging.
 
     GET /api/horses?skip=3
 
-### limit
+### `limit`
 
 Limit the response document count to *n* at maximum.
 
@@ -23,13 +25,13 @@ Limit the response document count to *n* at maximum.
 
 If both limit and skip are used on a request, the response `Link` header will be set with extra relations that give URLs for paging.
 
-### sort
+### `sort`
 
 Sort response documents by the given criteria. Here's how you'd sort the collection by `name` in ascending order, then by `age` in descending order.
 
     GET /api/cheeses?sort=name -age
 
-### select
+### `select`
 
 Set which fields should be selected for response documents.
 
@@ -41,7 +43,7 @@ You can deselect paths in the Mongoose schema definition using `select: false` o
 
 Note that mixing inluding and excluding fields causes an error.
 
-### populate
+### `populate`
 
 Set which fields should be populated for response documents.  See the Mongoose [population documentation](http://mongoosejs.com/docs/populate.html) for more information.  The string or object syntax can be used:
 
@@ -50,25 +52,25 @@ Set which fields should be populated for response documents.  See the Mongoose [
 
 The `select` option of `populate` is disallowed.  Only paths deselected at the model level will be deselected in populate queries.
 
-### count
+### `count`
 
 May be set to true for GET requests to specify that a count should be returned instead of documents
 
     GET /api/stereos?count=true
 
-### distinct
+### `distinct`
 
 Set to a path name to retrieve an array of distinct values.
 
     GET /api/restaurants?distinct=category
 
-### hint
+### `hint`
 
 Add an index hint to the query (must be enabled per controller).
 
     GET /api/pools?hint={ name: 1 }
 
-### comment
+### `comment`
 
 Add a comment to a query (must be enabled per controller).
 

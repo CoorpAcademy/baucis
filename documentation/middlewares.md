@@ -1,3 +1,4 @@
+## Middlewares
 Baucis adds middleware registration functions for two stages of the request cycle:
 
 ### request

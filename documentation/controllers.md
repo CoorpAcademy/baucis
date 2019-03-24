@@ -1,4 +1,6 @@
-### controller.model
+## Controllers
+
+### `controller.mode()`
 
 This property sets the controller's mongoose model.  You can pass in a string or a directly pass in a mongoose model.
 
@@ -6,7 +8,7 @@ This property sets the controller's mongoose model.  You can pass in a string or
 controller.model('cheese');
 ```
 
-### controller.select
+### `controller.select()`
 
 Select or deselect fields for all queries.
 
@@ -17,7 +19,7 @@ controller.select('+groats');
 
 Note that mixing inluding and excluding fields causes an error.
 
-### controller.relations
+### `controller.relations()`
 
 By default the response Link header is set with various useful links based on context.  This is especially useful for paging.  May be disabled using this method.
 
@@ -25,7 +27,7 @@ By default the response Link header is set with various useful links based on co
 controller.relations(false);
 ```
 
-### controller.findBy
+### `controller.findBy()`
 
 The unique path used to identify documents for this controller.  Defaults to `_id`.
 
@@ -33,7 +35,7 @@ The unique path used to identify documents for this controller.  Defaults to `_i
 controller.findBy('name');
 ```
 
-### controller.hints
+### `controller.hints()`
 
 Allow sending an index hint for the query from the client.  Disabled by default.
 
@@ -41,7 +43,7 @@ Allow sending an index hint for the query from the client.  Disabled by default.
 controller.hints(true);
 ```
 
-### controller.comments
+### `controller.comments()`
 
 Allow sending a query comment from the client.  Disabled by default.
 
@@ -49,7 +51,7 @@ Allow sending a query comment from the client.  Disabled by default.
 controller.comments(true);
 ```
 
-### controller.methods
+### `controller.methods()`
 
 Used to disable specific HTTP methods for the controller.
 
@@ -57,7 +59,7 @@ Used to disable specific HTTP methods for the controller.
 controller.methods('post put delete', false);
 ```
 
-### controller.operators
+### `controller.operators()`
 
 **BYPASSES VALIDATION** Use this method to enable non-default update operators.  The update method can be set using the `Update-Operator` header field.
 
@@ -66,7 +68,7 @@ controller.operators('$push $set', 'foo some.path some.other.path');
 controller.operators('$pull', 'another.path');
 ```
 
-### controller.fragment
+### `controller.fragment()`
 
 This is the fragment to match request URLs agains.  Defaults to the plural name of the model.
 
@@ -74,7 +76,7 @@ This is the fragment to match request URLs agains.  Defaults to the plural name 
 controller.fragment('/somewhere');
 ```
 
-### controller.emptyCollection
+### `controller.emptyCollection()`
 
 This can be used to set what status code & body are returned for requests that yield empty query results.  The default is status code 200 with a JSON body containing an empty array.  Other possible options are 204 No Content and 404 Not Found.
 
@@ -84,7 +86,7 @@ controller.emptyCollection(204);
 controller.emptyCollection(404);
 ```
 
-### controller.handleErrors
+### `controller.handleErrors()`
 
 Baucis sets the response status code based on different errors.  By default, it also catches and builds responses for certain errors.  Set this to false to have the controller only set status codes, and not handle errors further.
 
@@ -93,7 +95,7 @@ controller.handleErrors(false);
 ```
 
 
-### controller.versions
+### `controller.versions()`
 
 Versioning is implemented using [semver](http://semver.org).  Supported releases are specified when calling `baucis()`.  The release(s) that a controller belongs to are specified with the `versions` controller option.
 

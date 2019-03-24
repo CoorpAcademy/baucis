@@ -1,6 +1,8 @@
+## Getting started
+
 To install:
 
-    npm install --save baucis
+    npm install --save @coorpacademy/baucis
 
 An example of creating a REST API from a couple Mongoose schemata.
 
