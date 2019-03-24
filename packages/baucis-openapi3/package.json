@@ -12,7 +12,6 @@
   },
   "main": "index.js",
   "scripts": {
-    "lint": "eslint *.js src/**/*.js test/**/*.js",
     "test": "mocha --recursive --timeout 5000 -R spec --exit",
     "cover:": "nyc npm test",
     "test:tdd": "mocha --recursive --timeout 5000 -R min --watch"
