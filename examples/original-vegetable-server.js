@@ -1,9 +1,11 @@
 const mongoose = require('mongoose');
 const express = require('express');
-const baucisSwagger = require('../packages/baucis-swagger');
+const swagger = require('../packages/baucis-swagger');
 const baucis = require('../packages/baucis')(mongoose, express);
+const swagger2 = require('../packages/baucis-swagger2');
+const openapi3 = require('../packages/baucis-openapi3');
 
-baucis.addPlugin(baucisSwagger);
+baucis.addPlugin(swagger, swagger2, openapi3);
 
 const config = {mongo: {url: 'mongodb://127.0.0.1/legumes'}};
 
@@ -39,6 +41,8 @@ const controller = baucis
   .comments(true);
 
 controller.generateSwagger();
+controller.generateSwagger2();
+controller.generateOpenApi3();
 controller.swagger.lambic = 'kriek';
 
 baucis.rest('fungus').select('-hyphenated-field-name -password');
