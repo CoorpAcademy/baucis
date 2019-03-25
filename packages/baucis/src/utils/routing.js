@@ -74,8 +74,20 @@ const defineRoutes = function(stage, params) {
   return factor(options);
 };
 
+function combineErrorMiddleware(middlewares) {
+  return middlewares.reduce((mid1, mid2) => {
+    return function(err, req, res, next) {
+      mid1(err, req, res, function(err2) {
+        if (!err2) return next();
+        mid2(err2, req, res, next);
+      });
+    };
+  });
+}
+
 module.exports = {
   isRecognizedMethod,
   factor,
-  defineRoutes
+  defineRoutes,
+  combineErrorMiddleware
 };

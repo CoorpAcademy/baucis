@@ -264,4 +264,21 @@ describe('Middleware', function() {
   //     done();
   //   });
   // });
+  it('should handle injected error middlewares', function(done) {
+    const options = {
+      url: 'http://localhost:8012/api/etherals/etheral',
+      qs: {deleteNutrients: true},
+      json: true
+    };
+    request.get(options, function(error, response, body) {
+      if (error) return done(error);
+      try {
+        expect(response.statusCode).to.equal(404);
+        expect(body.message).to.equal("I'm an etheral, you cannot access me (404).");
+      } catch (err) {
+        return done(err);
+      }
+      done();
+    });
+  });
 });
