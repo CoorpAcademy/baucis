@@ -1,6 +1,6 @@
 {
   "name": "@coorpacademy/baucis",
-  "version": "0.2.0-alpha.0",
+  "version": "0.2.0",
   "author": {
     "name": "William Riley-Land",
     "email": "william@kun.io",
@@ -38,8 +38,8 @@
     "http"
   ],
   "dependencies": {
-    "@coorpacademy/baucis-json": "^0.2.0-alpha.0",
-    "@coorpacademy/baucis-links": "^0.2.0-alpha.0",
+    "@coorpacademy/baucis-json": "^0.2.0",
+    "@coorpacademy/baucis-links": "^0.2.0",
     "event-stream": "^4.0.1",
     "lodash": "^4.17.11",
     "mongoose-legacy-pluralize": "^1.0.2",
