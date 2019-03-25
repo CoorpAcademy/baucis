@@ -49,7 +49,7 @@ mongoose.model('chargeArea', ChargeArea);
 
 const fixture = {
   init(done) {
-    mongoose.connect(config.mongo.url);
+    mongoose.connect(config.mongo.url, {useNewUrlParser: true});
 
     fixture.controller = baucis
       .rest('vegetable')
@@ -127,7 +127,7 @@ const fixture = {
     const vegetables = vegetableNames.map(function(name) {
       return new Vegetable({name});
     });
-    let deferred = [Vegetable.remove.bind(Vegetable)];
+    let deferred = [Vegetable.deleteMany.bind(Vegetable)];
 
     deferred = deferred.concat(
       vegetables.map(function(vegetable) {
