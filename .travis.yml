@@ -8,7 +8,8 @@ matrix:
   allow_failures:
     - node_js: 10
 env:
-- PACKAGE=baucis
+- PACKAGE=baucis MONGOOSE_VERSION=4
+- PACKAGE=baucis MONGOOSE_VERSION=5
 - PACKAGE=baucis-swagger
 - PACKAGE=baucis-swagger2
 - PACKAGE=baucis-openapi3
@@ -17,6 +18,7 @@ services:
 - docker
 
 install:
+  - if [ $PACKAGE = baucis ] ; then (cd packages/baucis && npm install --save-dev mongoose@$MONGOOSE_VERSION ); fi
   - npm install
 
 before_script:
