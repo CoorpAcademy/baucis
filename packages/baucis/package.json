@@ -9,7 +9,7 @@
   "homepage": "https://github.com/wprl/baucis",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --bail --exit",
+    "test": "mocha --exit",
     "cover": "nyc --cwd ../.. npm test",
     "lint": "eslint src/ test/ index.js"
   },
