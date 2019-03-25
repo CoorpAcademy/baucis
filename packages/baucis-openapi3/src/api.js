@@ -1,3 +1,4 @@
+const _ = require('lodash/fp');
 const utils = require('./utils');
 const params = require('./parameters');
 
@@ -5,12 +6,7 @@ const params = require('./parameters');
 // https://www.openapis.org/blog/2017/03/01/openapi-spec-3-implementers-draft-released#
 // https://github.com/OAI/OpenAPI-Specification/blob/3.0.0-rc0/versions/3.0.md
 
-function clone(obj) {
-  if (!obj) {
-    return {};
-  }
-  return JSON.parse(JSON.stringify(obj));
-}
+const clone = obj => (obj ? _.cloneDeep(obj) : {});
 
 function mergeIn(container, items) {
   if (!items) {
@@ -256,19 +252,19 @@ function generateResourceListing(options) {
 
 // build an specific spec based on options and filtered controllers
 function generateResourceListingForVersion(options) {
-  const clone = JSON.parse(JSON.stringify(options.rootDocument));
-  if (!clone.info.version) {
+  const cloned = clone(options.rootDocument);
+  if (!cloned.info.version) {
     // Set baucis version if not provided previously by options
     clone.info.version = options.version;
   }
-  clone.paths = clone.paths || {};
-  mergeIn(clone.paths, buildPaths(options.controllers));
+  cloned.paths = cloned.paths || {};
+  mergeIn(cloned.paths, buildPaths(options.controllers));
 
-  clone.components.schemas = clone.components.schemas || {};
+  cloned.components.schemas = cloned.components.schemas || {};
   const compo2 = buildComponents(options, options.controllers);
-  mergeIn(clone.components.schemas, compo2.schemas);
+  mergeIn(cloned.components.schemas, compo2.schemas);
 
-  return clone;
+  return cloned;
 }
 
 module.exports = function extendApi(api) {

@@ -1,3 +1,4 @@
+const _ = require('lodash/fp');
 const utils = require('./utils');
 const params = require('./parameters');
 
@@ -9,16 +10,9 @@ module.exports = function extendController(controller) {
     return [resourceName];
   }
 
-  function humanVerb(verb) {
-    switch (verb) {
-      case 'put':
-        return 'Update';
-      case 'post':
-        return 'Create';
-      default:
-        return 'undef';
-    }
-  }
+  const verbToHuman = {put: 'Update', post: 'Create'};
+  const humanVerb = verb => verbToHuman[verb] || 'undef';
+
   function buildRequestBodyFor(isInstance, verb, resourceName) {
     const requestBody = {
       description: `${humanVerb(
@@ -246,18 +240,6 @@ module.exports = function extendController(controller) {
       return 'date-time';
     }
 
-    /*
-    if (type === String) { return null; }
-    if (type === Boolean) { return null; }
-    if (type === mongoose.Schema.Types.ObjectId) { return null; }
-    if (type === mongoose.Schema.Types.Oid) { return null; }
-    if (type === mongoose.Schema.Types.Array) { return null; }
-    if (Array.isArray(type) || type.name === "Array") { return null; }
-    if (type === Object) { return null; }
-    if (type instanceof Object) { return null; }
-    if (type === mongoose.Schema.Types.Mixed) { return null; }
-    if (type === mongoose.Schema.Types.Buffer) { return null; }
-	*/
     return null;
   }
 
@@ -305,14 +287,7 @@ module.exports = function extendController(controller) {
   }
 
   function isArrayOfRefs(type) {
-    return (
-      type &&
-      type.length > 0 &&
-      type[0] &&
-      type[0].ref &&
-      type[0].type &&
-      type[0].type.name === 'ObjectId'
-    );
+    return _.has('[0].ref') && _.get('[0].type.name', type) === 'ObjectId';
   }
 
   function warnInvalidType(name, path) {
