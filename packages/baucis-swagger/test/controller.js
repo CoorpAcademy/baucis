@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 
 const {swaggerTypeFor} = require('../src/controller');
 
@@ -21,7 +21,7 @@ describe('swaggerTypeFor tag correctly types', function() {
   itCheckForType(function Buffer() {}, null);
   itCheckForType(function Mixed() {}, null);
   itCheckForType(Object, null);
-  itCheckForType({}, null);
+  itCheckForType({name: '{}'}, null);
   it('throw when not recognize', function(done) {
     try {
       swaggerTypeFor('Toto');

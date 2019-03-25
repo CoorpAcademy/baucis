@@ -1,3 +1,5 @@
+const _ = require('lodash/fp');
+
 function ensureHasInfo(opt) {
   if (!opt.info) {
     opt.info = {
@@ -150,6 +152,9 @@ function buildServerVariables() {
   return new ServerVariables();
 }
 
+ServerVariables.prototype.toPlainObject = function() {
+  return _.omit(['toPlainObject', 'addServerVar'], _.toPlainObject(this));
+};
 ServerVariables.prototype.addServerVar = function(name, enumerations, defaultValue, description) {
   const vData = {
     default: defaultValue

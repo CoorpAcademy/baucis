@@ -1,4 +1,4 @@
-const expect = require('expect.js');
+const {expect} = require('chai');
 const request = require('request');
 
 const fixtures = require('./fixtures/vegetable');
@@ -23,14 +23,14 @@ describe('Swagger Resource Listing', function() {
       expect(body).to.have.property('apis');
 
       // Check the API listing
-      expect(body.apis).to.be.an(Array);
+      expect(body.apis).to.be.an('Array');
       expect(body.apis).to.have.property('length', 3);
-      expect(body.apis[0].path).to.be('/documentation/vegetables');
-      expect(body.apis[0].description).to.be('Operations about vegetables.');
-      expect(body.apis[1].path).to.be('/documentation/fungi');
-      expect(body.apis[1].description).to.be('Operations about fungi.');
-      expect(body.apis[2].path).to.be('/documentation/geese');
-      expect(body.apis[2].description).to.be('Operations about geese.');
+      expect(body.apis[0].path).to.equal('/documentation/vegetables');
+      expect(body.apis[0].description).to.equal('Operations about vegetables.');
+      expect(body.apis[1].path).to.equal('/documentation/fungi');
+      expect(body.apis[1].description).to.equal('Operations about fungi.');
+      expect(body.apis[2].path).to.equal('/documentation/geese');
+      expect(body.apis[2].description).to.equal('Operations about geese.');
 
       done();
     });
@@ -51,7 +51,7 @@ describe('Swagger Resource Listing', function() {
       expect(body).to.have.property('resourcePath', '/vegetables');
       expect(body).to.have.property('models');
       expect(body).to.have.property('apis');
-      expect(body.apis).to.be.an(Array);
+      expect(body.apis).to.be.an('Array');
 
       // Check the model
       expect(body.models).to.have.property('Vegetable');
@@ -69,10 +69,10 @@ describe('Swagger Resource Listing', function() {
       expect(body.models.Vegetable.properties).not.to.have.property('diseases');
 
       // Check the API listing
-      expect(body.apis[1].path).to.be('/vegetables');
-      expect(body.apis[0].path).to.be('/vegetables/{id}');
-      expect(body.apis[1].operations).to.be.an(Array);
-      expect(body.apis[0].operations).to.be.an(Array);
+      expect(body.apis[1].path).to.equal('/vegetables');
+      expect(body.apis[0].path).to.equal('/vegetables/{id}');
+      expect(body.apis[1].operations).to.be.an('Array');
+      expect(body.apis[0].operations).to.be.an('Array');
       expect(body.apis[1].operations).to.have.property('length', 3);
       expect(body.apis[0].operations).to.have.property('length', 3);
 
