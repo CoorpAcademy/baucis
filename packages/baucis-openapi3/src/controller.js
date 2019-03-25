@@ -5,7 +5,7 @@ const params = require('./parameters');
 /**
  * extends Controller to add methods for generating OpenAPI data.
  */
-module.exports = function extendController(controller) {
+module.exports = pluginOptions => function extendController(controller) {
   function buildTags(resourceName) {
     return [resourceName];
   }

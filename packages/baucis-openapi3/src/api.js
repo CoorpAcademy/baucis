@@ -267,7 +267,7 @@ function generateResourceListingForVersion(options) {
   return cloned;
 }
 
-module.exports = function extendApi(api) {
+module.exports = pluginOptions => function extendApi(api) {
   let customOpts = {};
 
   api.generateOpenApi3 = function(opts) {
