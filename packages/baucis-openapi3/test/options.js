@@ -1,9 +1,13 @@
-const expect = require('expect.js');
 const sut = require('..');
+const chai = require('chai');
+const chaiSubset = require('chai-subset');
+
+chai.use(chaiSubset);
+const {expect} = chai;
 
 describe('OptionsBuilder', function() {
   it('empty options', function() {
-    expect(sut.buildOptions()).eql({
+    expect(sut.buildOptions()).containSubset({
       info: {
         title: 'app',
         version: '0.0.1'
@@ -11,7 +15,7 @@ describe('OptionsBuilder', function() {
     });
   });
   it('add title', function() {
-    expect(sut.buildOptions().title('Spook')).eql({
+    expect(sut.buildOptions().title('Spook')).containSubset({
       info: {
         title: 'Spook',
         version: '0.0.1'
@@ -24,7 +28,7 @@ describe('OptionsBuilder', function() {
         .buildOptions()
         .title('Spook')
         .version('3.14.0')
-    ).eql({
+    ).containSubset({
       info: {
         title: 'Spook',
         version: '3.14.0'
@@ -37,7 +41,7 @@ describe('OptionsBuilder', function() {
         .buildOptions()
         .title('Spook')
         .description('my desc')
-    ).eql({
+    ).containSubset({
       info: {
         title: 'Spook',
         version: '0.0.1',
@@ -51,7 +55,7 @@ describe('OptionsBuilder', function() {
         .buildOptions()
         .title('Spook')
         .termsOfService('my TOS')
-    ).eql({
+    ).containSubset({
       info: {
         title: 'Spook',
         version: '0.0.1',
@@ -60,7 +64,7 @@ describe('OptionsBuilder', function() {
     });
   });
   it('add contact', function() {
-    expect(sut.buildOptions().contact('Alicia', 'http://ali.ce', 'alicia@ali.ce')).eql({
+    expect(sut.buildOptions().contact('Alicia', 'http://ali.ce', 'alicia@ali.ce')).containSubset({
       info: {
         title: 'app',
         version: '0.0.1',
@@ -73,7 +77,7 @@ describe('OptionsBuilder', function() {
     });
   });
   it('add license', function() {
-    expect(sut.buildOptions().license('MIT', 'http://mit.edu/license')).eql({
+    expect(sut.buildOptions().license('MIT', 'http://mit.edu/license')).containSubset({
       info: {
         title: 'app',
         version: '0.0.1',
@@ -85,7 +89,7 @@ describe('OptionsBuilder', function() {
     });
   });
   it('add server', function() {
-    expect(sut.buildOptions().addServer('http://api.acme.com', 'Prod server', {})).eql({
+    expect(sut.buildOptions().addServer('http://api.acme.com', 'Prod server', {})).containSubset({
       info: {
         title: 'app',
         version: '0.0.1'
@@ -105,7 +109,7 @@ describe('OptionsBuilder', function() {
         .buildOptions()
         .addServer('http://api.acme.com', 'Prod 1 server', {})
         .addServer('http://api2.acme.com', 'Prod 2 server', {})
-    ).eql({
+    ).containSubset({
       info: {
         title: 'app',
         version: '0.0.1'
@@ -125,7 +129,7 @@ describe('OptionsBuilder', function() {
     });
   });
   it('add externalDoc', function() {
-    expect(sut.buildOptions().externalDoc('My external doc', 'http://doc.acme.com')).eql({
+    expect(sut.buildOptions().externalDoc('My external doc', 'http://doc.acme.com')).containSubset({
       info: {
         title: 'app',
         version: '0.0.1'
@@ -137,7 +141,7 @@ describe('OptionsBuilder', function() {
     });
   });
   it('add addSecuritySchemeBasicAuth', function() {
-    expect(sut.buildOptions().addSecuritySchemeBasicAuth('auth9')).eql({
+    expect(sut.buildOptions().addSecuritySchemeBasicAuth('auth9')).containSubset({
       info: {
         title: 'app',
         version: '0.0.1'
@@ -156,7 +160,7 @@ describe('OptionsBuilder', function() {
     });
   });
   it('add addSecuritySchemeApiKey', function() {
-    expect(sut.buildOptions().addSecuritySchemeApiKey('apikey5', 'header')).eql({
+    expect(sut.buildOptions().addSecuritySchemeApiKey('apikey5', 'header')).containSubset({
       info: {
         title: 'app',
         version: '0.0.1'
@@ -176,7 +180,7 @@ describe('OptionsBuilder', function() {
     });
   });
   it('add addSecuritySchemeApiKey missing in', function() {
-    expect(sut.buildOptions().addSecuritySchemeApiKey('apikey5')).eql({
+    expect(sut.buildOptions().addSecuritySchemeApiKey('apikey5')).containSubset({
       info: {
         title: 'app',
         version: '0.0.1'
@@ -196,7 +200,7 @@ describe('OptionsBuilder', function() {
     });
   });
   it('add addSecurityJWT', function() {
-    expect(sut.buildOptions().addSecurityJWT('jwt27')).eql({
+    expect(sut.buildOptions().addSecurityJWT('jwt27')).containSubset({
       info: {
         title: 'app',
         version: '0.0.1'
@@ -221,7 +225,7 @@ describe('OptionsBuilder', function() {
         scope1: 'my scope 1',
         scope2: 'my scope 2'
       })
-    ).eql({
+    ).containSubset({
       info: {
         title: 'app',
         version: '0.0.1'
@@ -255,7 +259,7 @@ describe('OptionsBuilder', function() {
           scope1: 'my scope 1',
           scope2: 'my scope 2'
         })
-    ).eql({
+    ).containSubset({
       info: {
         title: 'app',
         version: '0.0.1'
@@ -286,14 +290,14 @@ describe('OptionsBuilder', function() {
 
 describe('Server Variables', function() {
   it('empty vars', function() {
-    expect(sut.buildServerVariables()).eql({});
+    expect(sut.buildServerVariables()).containSubset({});
   });
   it('add serverVariable', function() {
     expect(
       sut
         .buildServerVariables()
         .addServerVar('v1', ['red', 'green', 'yellow'], 'red', 'Test result colors.')
-    ).eql({
+    ).containSubset({
       v1: {
         default: 'red',
         description: 'Test result colors.',
@@ -301,6 +305,7 @@ describe('Server Variables', function() {
       }
     });
   });
+
   it('add more serverVariables', function() {
     expect(
       sut
@@ -308,7 +313,7 @@ describe('Server Variables', function() {
         .addServerVar('v1', ['red', 'green', 'yellow'], 'red', 'Test result colors.')
         .addServerVar('v2', [1, 2], 1, null)
         .addServerVar('v3', null, 'abc', 'Desc 2')
-    ).eql({
+    ).containSubset({
       v1: {
         default: 'red',
         description: 'Test result colors.',
