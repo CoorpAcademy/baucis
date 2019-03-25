@@ -1,4 +1,4 @@
-const deco = require('deco');
+const _ = require('lodash/fp');
 
 // Figure out the basePath for Swagger API definition
 function getBase(request, extra) {
@@ -47,7 +47,7 @@ module.exports = function extendApi(api) {
     controllers[0].generateSwagger();
 
     response.json(
-      deco.merge(controllers[0].swagger, {
+      _.merge(controllers[0].swagger, {
         apiVersion: request.baucis.release,
         swaggerVersion: '1.1',
         basePath: getBase(request, 2),
