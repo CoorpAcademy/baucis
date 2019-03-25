@@ -28,9 +28,15 @@ const fixture = {
       .sort('color')
       .explain(true);
 
-    baucis.rest('etheral').errorHandlers((err, req, res, next) => {
-      next(RestError.NotFound("I'm an etheral, you cannot access me"));
-    });
+    baucis
+      .rest('etheral')
+      .errorHandlers((err, req, res, next) => {
+        err.who = 'etheral';
+        next(err);
+      })
+      .errorHandlers((err, req, res, next) => {
+        next(RestError.NotFound(`I'm an ${err.who}, you cannot access me`));
+      });
     baucis
       .rest('animal')
       .fragment('empty-array')
