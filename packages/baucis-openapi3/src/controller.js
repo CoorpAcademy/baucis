@@ -485,7 +485,6 @@ module.exports = function extendController(controller) {
     buildPathParams(paths, instancePath, true);
     buildPathParams(paths, collectionPath, false);
 
-    // FIXME: test that disabled methods does not appear
     const authorizedMethods = controller.methods();
 
     if (authorizedMethods.includes('get')) buildOperation(paths[instancePath], 'instance', 'get');

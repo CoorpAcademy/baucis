@@ -333,6 +333,28 @@ describe('OpenAPI 3.0 Resources', function() {
         done();
       });
     });
+    it('should not generate the DELETE /geese operation', function(done) {
+      const options = {
+        url: contractUrl,
+        json: true
+      };
+      request.get(options, function(err, response, body) {
+        if (err) {
+          return done(err);
+        }
+
+        expect(response).to.have.property('statusCode', 200);
+
+        const pathCollection = body.paths['/geese'];
+        expect(pathCollection).to.be.an(Object);
+        expect(pathCollection.delete).to.be(undefined);
+        const pathInstance = body.paths['/geese/{id}'];
+        expect(pathInstance).to.be.an(Object);
+        expect(pathInstance.delete).to.be(undefined);
+
+        done();
+      });
+    });
   });
 
   describe('models', function() {

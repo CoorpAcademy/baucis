@@ -142,7 +142,7 @@ const fixture = {
     fixture.controller.openApi3.components.schemas.Spook = {};
 
     baucis.rest('fungus').select('-hyphenated-field-name -password');
-    baucis.rest('goose');
+    baucis.rest('goose').methods('delete', false);
     baucis.rest('chargeArea');
     baucis.rest('chargeCluster');
 
