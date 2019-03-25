@@ -9,7 +9,7 @@
   "homepage": "https://github.com/wprl/baucis",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --bail --exit",
+    "test": "mocha --exit --timeout 5000",
     "cover": "nyc --cwd ../.. npm test",
     "lint": "eslint src/ test/ index.js"
   },
@@ -52,7 +52,7 @@
   },
   "peerDependencies": {
     "express": "^4.12.0",
-    "mongoose": "5"
+    "mongoose": ">=4"
   },
   "devDependencies": {
     "@coorpacademy/eslint-plugin-coorpacademy": "^8.1.1",
