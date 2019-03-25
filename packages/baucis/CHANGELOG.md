@@ -1,5 +1,13 @@
 # Baucis Change Log
 
+## v0.2.0 - 2019-03-25
+Refactored baucis:
+- dropping `deco`
+- new plugin system
+-  transformation into monorepo with plugins
+
+## v0.1.6
+Publication of the original baucis under the new organisation. (shifted version)
 
 ***Coorpacademy Fork took place at v1.6.8***
 --------
