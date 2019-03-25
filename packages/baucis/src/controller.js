@@ -11,7 +11,7 @@ const {
   getAsInt,
   isNonNegativeInteger
 } = require('./utils/predicates-and-accessors');
-const {defineRoutes} = require('./utils/routing');
+const {defineRoutes, combineErrorMiddleware} = require('./utils/routing');
 
 module.exports = function(baucis, mongoose, express) {
   /**
@@ -191,6 +191,17 @@ module.exports = function(baucis, mongoose, express) {
         return controller;
       } else {
         return controller._handleErrors;
+      }
+    };
+    controller._errorHandlers = [];
+    controller.errorHandlers = function(...handlers) {
+      if (handlers.length >= 1) {
+        console.log('YOOOOOOOO')
+        controller._errorHandlers.push(...handlers);
+        console.log(controller._errorHandlers)
+        return controller;
+      } else {
+        return controller._errorHandlers;
       }
     };
 
@@ -1268,6 +1279,12 @@ module.exports = function(baucis, mongoose, express) {
       const error2 = RestError.InternalServerError(err.message);
       error2.stack = err.stack;
       next(error2);
+    });
+
+    controller._use(function(err, req, res, next) {
+      if (!err) return next();
+      if (_.isEmpty(controller._errorHandlers)) return next(err);
+      combineErrorMiddleware(controller._errorHandlers)(err, req, res, next);
     });
 
     // Format the error based on the Accept header.

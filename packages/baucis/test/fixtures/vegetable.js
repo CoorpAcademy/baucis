@@ -44,7 +44,11 @@ const fixture = {
     veggies
       .relations(false)
       .hints(true)
-      .comments(true);
+      .comments(true)
+      .errorHandlers((err, req, res, next) => {
+        console.log('boom', '💥');
+        next(err);
+      });
 
     veggies.request(function(request, response, next) {
       if (request.query.block === 'true') return response.sendStatus(401);
