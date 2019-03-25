@@ -17,7 +17,7 @@
   "author": "William Riley-Land <william@kun.io>",
   "license": "MIT",
   "dependencies": {
-    "event-stream": "~3.2.2"
+    "event-stream": "~4.0.1"
   },
   "repository": {
     "type": "git",
