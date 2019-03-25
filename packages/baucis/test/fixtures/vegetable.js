@@ -30,11 +30,11 @@ const fixture = {
 
     baucis
       .rest('etheral')
-      .errorHandlers((err, req, res, next) => {
+      .errorHandler((err, req, res, next) => {
         err.who = 'etheral';
         next(err);
       })
-      .errorHandlers((err, req, res, next) => {
+      .errorHandler((err, req, res, next) => {
         next(RestError.NotFound(`I'm an ${err.who}, you cannot access me`));
       });
     baucis

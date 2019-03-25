@@ -195,7 +195,7 @@ module.exports = function(baucis, mongoose, express) {
     };
     controller._errorHandlers = [];
     controller._combinedErrorHandler = null;
-    controller.errorHandlers = function(...handlers) {
+    controller.errorHandler = function(...handlers) {
       if (handlers.length >= 1) {
         controller._errorHandlers.push(...handlers);
         controller._combinedErrorHandler =
