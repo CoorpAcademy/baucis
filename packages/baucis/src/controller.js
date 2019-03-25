@@ -1194,47 +1194,47 @@ module.exports = function(baucis, mongoose, express) {
     });
 
     // If it's a Mongo bad hint error, convert to a bad request error.
-    controller._use(function(error, req, res, next) {
-      if (!error) return next();
-      if (!error.message) return next(error);
+    controller._use(function(err, req, res, next) {
+      if (!err) return next();
+      if (!err.message) return next(err);
 
       const message = 'The requested query hint is invalid';
       // Bad Mongo query hint (2.x).
-      if (error.message === 'bad hint') {
+      if (err.message === 'bad hint') {
         next(RestError.BadRequest(message));
         return;
       }
       // Bad Mongo query hint (3.x).
-      if (error.message.match('planner returned error: bad hint')) {
+      if (err.message.match('planner returned error: bad hint')) {
         next(RestError.BadRequest(message));
         return;
       }
-      if (!error.$err) return next(error);
+      if (!err.$err) return next(err);
       // Mongoose 3
-      if (error.$err.match('planner returned error: bad hint')) {
+      if (err.$err.match('planner returned error: bad hint')) {
         next(RestError.BadRequest(message));
         return;
       }
-      next(error);
+      next(err);
     });
     // Convert Mongo duplicate key error to an unprocessible entity error
-    controller._use(function(error, req, res, next) {
-      if (!error) return next();
-      if (!error.message) return next(error);
-      if (error.message.indexOf('E11000 duplicate key error') === -1) {
-        next(error);
+    controller._use(function(err, req, res, next) {
+      if (!err) return next();
+      if (!err.message) return next(err);
+      if (err.message.indexOf('E11000 duplicate key error') === -1) {
+        next(err);
         return;
       }
 
       const body = {};
       const scrape = /(?:[$]|index: )(.+)[_]\d+\s+dup key: [{] : "([^"]+)" [}]/;
 
-      const scraped = scrape.exec(error.message);
+      const scraped = scrape.exec(err.message);
       const path = scraped ? scraped[1] : '???';
       const value = scraped ? scraped[2] : '???';
       body[path] = {
         message: util.format('Path `%s` (%s) must be unique.', path, value),
-        originalMessage: error.message,
+        originalMessage: err.message,
         name: 'MongoError',
         path,
         type: 'unique',
@@ -1248,54 +1248,55 @@ module.exports = function(baucis, mongoose, express) {
     });
 
     // Convert Mongo validation errors to unprocessable entity errors.
-    controller._use(function(error, req, res, next) {
-      if (!error) return next();
-      if (!(error instanceof mongoose.Error.ValidationError)) return next(error);
+    controller._use(function(err, req, res, next) {
+      if (!err) return next();
+      if (!(err instanceof mongoose.Error.ValidationError)) return next(err);
       const newError = RestError.UnprocessableEntity();
-      newError.errors = error.errors;
+      newError.errors = err.errors;
       next(newError);
     });
     // Convert Mongoose version conflict error to LockConflict.
-    controller._use(function(error, req, res, next) {
-      if (!error) return next();
-      if (!(error instanceof mongoose.Error.VersionError)) return next(error);
+    controller._use(function(err, req, res, next) {
+      if (!err) return next();
+      if (!(err instanceof mongoose.Error.VersionError)) return next(err);
       next(RestError.LockConflict());
     });
     // Translate other errors to internal server errors.
-    controller._use(function(error, request, response, next) {
-      if (!error) return next();
-      if (error instanceof RestError) return next(error);
-      const error2 = RestError.InternalServerError(error.message);
-      error2.stack = error.stack;
+    controller._use(function(err, req, res, next) {
+      if (!err) return next();
+      if (err instanceof RestError) return next(err);
+      const error2 = RestError.InternalServerError(err.message);
+      error2.stack = err.stack;
       next(error2);
     });
+
     // Format the error based on the Accept header.
-    controller._use(function(error, req, res, next) {
-      if (!error) return next();
+    controller._use(function(err, req, res, next) {
+      if (!err) return next();
       // Always set the status code if available.
-      if (error.status >= 100) {
-        res.status(error.status);
+      if (err.status >= 100) {
+        res.status(err.status);
       }
 
-      if (!controller.handleErrors()) return next(error);
+      if (!controller.handleErrors()) return next(err);
 
-      baucis._formatters(res, function(error2, formatter) {
-        if (error2) return next(error2);
+      baucis._formatters(res, function(err2, formatter) {
+        if (err2) return next(err2);
 
         let errors;
 
-        if (!error.errors) {
-          errors = [error];
-        } else if (Array.isArray(error.errors) && error.errors.length !== 0) {
-          errors = error.errors;
+        if (!err.errors) {
+          errors = [err];
+        } else if (Array.isArray(err.errors) && err.errors.length !== 0) {
+          errors = err.errors;
         } else {
-          errors = Object.keys(error.errors).map(function(key) {
-            return error.errors[key];
+          errors = Object.keys(err.errors).map(function(key) {
+            return err.errors[key];
           });
         }
 
         if (errors.length === 0) {
-          errors = [error];
+          errors = [err];
         }
 
         errors = errors.map(function(error3) {
@@ -1310,7 +1311,7 @@ module.exports = function(baucis, mongoose, express) {
         });
 
         // TODO deprecated -- always send as single error in 2.0.0
-        const f = formatter(error instanceof RestError.UnprocessableEntity);
+        const f = formatter(err instanceof RestError.UnprocessableEntity);
         f.on('error', next);
 
         eventStream
