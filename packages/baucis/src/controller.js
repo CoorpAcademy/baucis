@@ -194,11 +194,14 @@ module.exports = function(baucis, mongoose, express) {
       }
     };
     controller._errorHandlers = [];
+    controller._combinedErrorHandler = null;
     controller.errorHandlers = function(...handlers) {
       if (handlers.length >= 1) {
-        console.log('YOOOOOOOO')
         controller._errorHandlers.push(...handlers);
-        console.log(controller._errorHandlers)
+        controller._combinedErrorHandler =
+          controller._errorHandlers.length === 1
+            ? controller._errorHandlers[0]
+            : combineErrorMiddleware(controller._errorHandlers);
         return controller;
       } else {
         return controller._errorHandlers;
@@ -1283,8 +1286,8 @@ module.exports = function(baucis, mongoose, express) {
 
     controller._use(function(err, req, res, next) {
       if (!err) return next();
-      if (_.isEmpty(controller._errorHandlers)) return next(err);
-      combineErrorMiddleware(controller._errorHandlers)(err, req, res, next);
+      if (!controller._combinedErrorHandler) return next(err);
+      controller._combinedErrorHandler(err, req, res, next);
     });
 
     // Format the error based on the Accept header.
