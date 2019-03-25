@@ -157,7 +157,7 @@ const fixture = {
     });
 
     app = express();
-    app.use('/api', baucis());
+    app.use('/api', baucis.get());
 
     server = app.listen(8012);
 

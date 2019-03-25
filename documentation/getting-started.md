@@ -16,7 +16,7 @@ mongoose.model('vegetable', Vegetable);
 baucis.rest('vegetable');
 // Create the app and listen for API requests
 const app = express();
-app.use('/api', baucis());
+app.use('/api', baucis.get()); // or baucis()
 app.listen(80);
 ```
 ### `baucis.rest()`
@@ -41,10 +41,10 @@ Calling `baucis.rest()` also adds the newly created controller to the current AP
 ```javascript
 // Creating the first API.
 baucis.rest('legume');
-const api = baucis();
+const api = baucis.get();
 // Creating another API.
 baucis.rest('tuber');
-const api2 = baucis();
+const api2 = baucis.get();
 ```
 
 Controllers also have the usual Express features.  Controllers are Express 4 `Router`.

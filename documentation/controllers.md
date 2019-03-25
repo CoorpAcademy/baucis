@@ -94,6 +94,17 @@ Baucis sets the response status code based on different errors.  By default, it 
 controller.handleErrors(false);
 ```
 
+### `controller.errorHandler()`
+Baucis now enable you to inject some error middleware into its error handling mecanism.
+This takes place between the handling of the mongo error, and the final reporting of the error by baucis.
+For instance you can there change the error to be reported, offuscating the error message.
+
+```js
+controlerr.errorHandler(function(err, req, res, next){
+    // Do something with err, req, or res
+    next(err); // or next() or next(new Error())
+})
+```
 
 ### `controller.versions()`
 

@@ -1,5 +1,12 @@
 # Baucis Change Log
 
+## v0.3.0 - 2019-03-25
+Introduce error handling mecanism with `errorHandler()`.
+See [documentation](../../documentation/controllers.md#controllererrorhandler)
+
+Introduce `baucis.get()` way to retrieve the baucis router without reseting it.
+Aim to replace `baucis.empty()` access method, and to be prefered over `baucis()` for better readability
+
 ## v0.2.0 - 2019-03-25
 Refactored baucis:
 - dropping `deco`

@@ -50,7 +50,7 @@ baucis.rest('fungus').select('-hyphenated-field-name -password');
 baucis.rest('goose');
 
 const app = express();
-app.use('/api', baucis());
+app.use('/api', baucis.get());
 
 app.use('/explorer', express.static(path.join(__dirname, 'explorer')));
 app.use(function(error, request, response, next) {
