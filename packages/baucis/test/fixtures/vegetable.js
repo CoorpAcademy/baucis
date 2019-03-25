@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const async = require('async');
 const eventStream = require('event-stream');
+const RestError = require('rest-error');
 const baucis = require('../..')(mongoose, express);
 const config = require('./config');
 
@@ -27,6 +28,9 @@ const fixture = {
       .sort('color')
       .explain(true);
 
+    baucis.rest('etheral').errorHandlers((err, req, res, next) => {
+      next(RestError.NotFound("I'm an etheral, you cannot access me"));
+    });
     baucis
       .rest('animal')
       .fragment('empty-array')
@@ -44,11 +48,7 @@ const fixture = {
     veggies
       .relations(false)
       .hints(true)
-      .comments(true)
-      .errorHandlers((err, req, res, next) => {
-        console.log('boom', '💥');
-        next(err);
-      });
+      .comments(true);
 
     veggies.request(function(request, response, next) {
       if (request.query.block === 'true') return response.sendStatus(401);
@@ -226,13 +226,15 @@ const fixture = {
   }
 };
 
-// __Fixture Schemata__
 const {Schema} = mongoose;
 const Fungus = new Schema({'hyphenated-field-name': String});
 const Animal = new Schema({name: String});
 const Mineral = new Schema({
   color: String,
   enables: [{type: Schema.Types.ObjectId, ref: 'fungus'}]
+});
+const Etheral = new Schema({
+  string: String
 });
 const Vegetable = new Schema({
   name: {type: String, required: true},
@@ -268,5 +270,6 @@ mongoose.model('vegetable', Vegetable).lastModified('lastModified');
 mongoose.model('fungus', Fungus).plural('fungi');
 mongoose.model('mineral', Mineral);
 mongoose.model('animal', Animal);
+mongoose.model('etheral', Etheral);
 
 module.exports = fixture;
