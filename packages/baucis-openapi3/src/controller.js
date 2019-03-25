@@ -485,12 +485,19 @@ module.exports = function extendController(controller) {
     buildPathParams(paths, instancePath, true);
     buildPathParams(paths, collectionPath, false);
 
-    buildOperation(paths[instancePath], 'instance', 'get');
-    buildOperation(paths[instancePath], 'instance', 'put');
-    buildOperation(paths[instancePath], 'instance', 'delete');
-    buildOperation(paths[collectionPath], 'collection', 'get');
-    buildOperation(paths[collectionPath], 'collection', 'post');
-    buildOperation(paths[collectionPath], 'collection', 'delete');
+    // FIXME: test that disabled methods does not appear
+    const authorizedMethods = controller.methods();
+
+    if (authorizedMethods.includes('get')) buildOperation(paths[instancePath], 'instance', 'get');
+    if (authorizedMethods.includes('put')) buildOperation(paths[instancePath], 'instance', 'put');
+    if (authorizedMethods.includes('delete'))
+      buildOperation(paths[instancePath], 'instance', 'delete');
+    if (authorizedMethods.includes('get'))
+      buildOperation(paths[collectionPath], 'collection', 'get');
+    if (authorizedMethods.includes('post'))
+      buildOperation(paths[collectionPath], 'collection', 'post');
+    if (authorizedMethods.includes('delete'))
+      buildOperation(paths[collectionPath], 'collection', 'delete');
     controller.openApi3.paths = paths;
 
     return controller;
