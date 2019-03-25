@@ -1,3 +1,4 @@
+const _ = require('lodash/fp');
 const utils = require('./utils');
 const params = require('./parameters');
 
@@ -5,12 +6,7 @@ const params = require('./parameters');
 // https://www.openapis.org/blog/2017/03/01/openapi-spec-3-implementers-draft-released#
 // https://github.com/OAI/OpenAPI-Specification/blob/3.0.0-rc0/versions/3.0.md
 
-function clone(obj) {
-  if (!obj) {
-    return {};
-  }
-  return JSON.parse(JSON.stringify(obj));
-}
+const clone = obj => (obj ? _.cloneDeep(obj) : {});
 
 function mergeIn(container, items) {
   if (!items) {
@@ -256,58 +252,59 @@ function generateResourceListing(options) {
 
 // build an specific spec based on options and filtered controllers
 function generateResourceListingForVersion(options) {
-  const clone = JSON.parse(JSON.stringify(options.rootDocument));
-  if (!clone.info.version) {
+  const clonedDoc = clone(options.rootDocument);
+  if (!clonedDoc.info.version) {
     // Set baucis version if not provided previously by options
-    clone.info.version = options.version;
+    clonedDoc.info.version = options.version;
   }
-  clone.paths = clone.paths || {};
-  mergeIn(clone.paths, buildPaths(options.controllers));
+  clonedDoc.paths = clonedDoc.paths || {};
+  mergeIn(clonedDoc.paths, buildPaths(options.controllers));
 
-  clone.components.schemas = clone.components.schemas || {};
+  clonedDoc.components.schemas = clonedDoc.components.schemas || {};
   const compo2 = buildComponents(options, options.controllers);
-  mergeIn(clone.components.schemas, compo2.schemas);
+  mergeIn(clonedDoc.components.schemas, compo2.schemas);
 
-  return clone;
+  return clonedDoc;
 }
 
-module.exports = function extendApi(api) {
-  let customOpts = {};
+module.exports = (pluginOptions = {}) =>
+  function extendApi(api) {
+    let customOpts = {};
 
-  api.generateOpenApi3 = function(opts) {
-    if (opts) {
-      customOpts = opts;
-    }
-    // user can extend this openApi3Document
-    api.openApi3Document = generateResourceListing({
-      version: null,
-      controllers: api.controllers('0.0.1'),
-      basePath: null,
-      options: customOpts
-    });
-    return api;
-  };
-
-  // Middleware for the documentation index.
-  api.get('/openapi.json', function(request, response) {
-    try {
-      if (!api.openApi3Document) {
-        api.generateOpenApi3(customOpts);
+    api.generateOpenApi3 = function(opts) {
+      if (opts) {
+        customOpts = opts;
       }
-
-      // Customize a openApi3Document copy by requested version
-      const versionedApi = generateResourceListingForVersion({
-        rootDocument: api.openApi3Document,
-        version: request.baucis.release,
-        controllers: api.controllers(request.baucis.release),
-        basePath: getBase(request, 1),
+      // user can extend this openApi3Document
+      api.openApi3Document = generateResourceListing({
+        version: null,
+        controllers: api.controllers('0.0.1'),
+        basePath: null,
         options: customOpts
       });
+      return api;
+    };
 
-      response.json(versionedApi);
-    } catch (e) {
-      console.error(JSON.stringify(e));
-      response.status(500).json(e);
-    }
-  });
-};
+    // Middleware for the documentation index.
+    api.get('/openapi.json', function(request, response) {
+      try {
+        if (!api.openApi3Document) {
+          api.generateOpenApi3(customOpts);
+        }
+
+        // Customize a openApi3Document copy by requested version
+        const versionedApi = generateResourceListingForVersion({
+          rootDocument: api.openApi3Document,
+          version: request.baucis.release,
+          controllers: api.controllers(request.baucis.release),
+          basePath: getBase(request, 1),
+          options: customOpts
+        });
+
+        response.json(versionedApi);
+      } catch (e) {
+        console.error(JSON.stringify(e));
+        response.status(500).json(e);
+      }
+    });
+  };

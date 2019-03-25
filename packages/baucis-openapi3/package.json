@@ -47,5 +47,8 @@
     "openapi3",
     "swagger",
     "documentation"
-  ]
+  ],
+  "dependencies": {
+    "lodash": "^4.17.11"
+  }
 }

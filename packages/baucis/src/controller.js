@@ -944,17 +944,14 @@ module.exports = function(baucis, mongoose, express) {
           if (!context.doc.get) return this.emit('data', context);
 
           const current = context.doc.get(lastModifiedPath);
-          if (latest === null) latest = current;
-          else latest = new Date(Math.max(latest, current));
+          latest = latest === null ? current : new Date(Math.max(latest, current));
           if (!useTrailer) {
             response.set('Last-Modified', latest.toUTCString());
           }
           this.emit('data', context);
         },
         function() {
-          if (useTrailer) {
-            if (latest) trailers['Last-Modified'] = latest.toUTCString();
-          }
+          if (useTrailer && latest) trailers['Last-Modified'] = latest.toUTCString();
 
           this.emit('end');
         }
@@ -1045,7 +1042,7 @@ module.exports = function(baucis, mongoose, express) {
       pipeline(req.baucis.outgoing());
 
       // Set the document formatter based on the Accept header of the request.
-      baucis.formatters(res, function(error, formatter) {
+      baucis._formatters(res, function(error, formatter) {
         if (error) return next(error);
         req.baucis.formatter = formatter;
         next();
@@ -1086,7 +1083,7 @@ module.exports = function(baucis, mongoose, express) {
       pipeline(req.baucis.outgoing());
 
       // Set the document formatter based on the Accept header of the request.
-      baucis.formatters(res, function(error, formatter) {
+      baucis._formatters(res, function(error, formatter) {
         if (error) return next(error);
         req.baucis.formatter = formatter;
         next();
@@ -1282,7 +1279,7 @@ module.exports = function(baucis, mongoose, express) {
 
       if (!controller.handleErrors()) return next(error);
 
-      baucis.formatters(res, function(error2, formatter) {
+      baucis._formatters(res, function(error2, formatter) {
         if (error2) return next(error2);
 
         let errors;
