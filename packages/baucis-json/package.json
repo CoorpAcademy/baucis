@@ -21,10 +21,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/wprl/baucis-json.git"
+    "url": "https://github.com/Coorpacademy/baucis.git"
   },
   "bugs": {
-    "url": "https://github.com/wprl/baucis-json/issues/new",
-    "email": "william@kun.io"
+    "url": "https://github.com/Coorpacademy/baucis/issues/new"
   }
 }

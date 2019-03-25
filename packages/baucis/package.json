@@ -15,14 +15,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/wprl/baucis.git"
+    "url": "https://github.com/Coorpacademy/baucis.git"
   },
   "bugs": {
-    "url": "https://github.com/wprl/baucis/issues/new",
-    "email": "william@kun.io"
-  },
-  "publishConfig": {
-    "registry": "http://registry.npmjs.org/"
+    "url": "https://github.com/Coorpacademy/baucis/issues/new"
   },
   "license": "MIT",
   "description": "Build scalable REST APIs using the open source tools and standards you already know.",
