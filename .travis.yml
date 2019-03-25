@@ -8,7 +8,8 @@ matrix:
   allow_failures:
     - node_js: 10
 env:
-- PACKAGE=baucis MONGOOSE_VERSION=3.8.x # cf https://github.com/Automattic/mongoose/issues/3436#issuecomment-146198805
+# Disabled for now, cf issue: https://github.com/CoorpAcademy/baucis/issues/7
+# - PACKAGE=baucis MONGOOSE_VERSION=3.8.x # cf https://github.com/Automattic/mongoose/issues/3436#issuecomment-146198805
 - PACKAGE=baucis MONGOOSE_VERSION=4
 - PACKAGE=baucis MONGOOSE_VERSION=5
 - PACKAGE=baucis-swagger

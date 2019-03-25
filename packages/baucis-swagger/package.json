@@ -36,7 +36,7 @@
   },
   "peerDependencies": {
     "@coorpacademy/baucis": "^0.1.6",
-    "mongoose": "^5.2.0"
+    "mongoose": ">=4"
   },
   "devDependencies": {
     "@coorpacademy/baucis": "^0.2.0-alpha.0",
