@@ -252,19 +252,19 @@ function generateResourceListing(options) {
 
 // build an specific spec based on options and filtered controllers
 function generateResourceListingForVersion(options) {
-  const cloned = clone(options.rootDocument);
-  if (!cloned.info.version) {
+  const clonedDoc = clone(options.rootDocument);
+  if (!clonedDoc.info.version) {
     // Set baucis version if not provided previously by options
-    clone.info.version = options.version;
+    clonedDoc.info.version = options.version;
   }
-  cloned.paths = cloned.paths || {};
-  mergeIn(cloned.paths, buildPaths(options.controllers));
+  clonedDoc.paths = clonedDoc.paths || {};
+  mergeIn(clonedDoc.paths, buildPaths(options.controllers));
 
-  cloned.components.schemas = cloned.components.schemas || {};
+  clonedDoc.components.schemas = clonedDoc.components.schemas || {};
   const compo2 = buildComponents(options, options.controllers);
-  mergeIn(cloned.components.schemas, compo2.schemas);
+  mergeIn(clonedDoc.components.schemas, compo2.schemas);
 
-  return cloned;
+  return clonedDoc;
 }
 
 module.exports = (pluginOptions = {}) =>
