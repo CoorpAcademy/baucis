@@ -1,6 +1,6 @@
 {
   "name": "@coorpacademy/baucis-swagger2",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Generate customizable swagger version 2.0 definitions for your Baucis REST API.",
   "homepage": "https://github.com/Coorpacademy/baucis/tree/master/packages/baucis-swagger2",
   "repository": {
@@ -37,7 +37,7 @@
     "@coorpacademy/baucis": "^1.0.0"
   },
   "devDependencies": {
-    "@coorpacademy/baucis": "^0.3.1",
+    "@coorpacademy/baucis": "^0.3.2",
     "async": "^2.6.2",
     "chai": "^4.2.0",
     "codeclimate-test-reporter": "^0.5.1",
