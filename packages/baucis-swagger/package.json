@@ -31,7 +31,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "deco": "~0.10.2"
+    "deco": "~0.10.2",
+    "lodash": "^4.17.11"
   },
   "peerDependencies": {
     "@coorpacademy/baucis": "^0.2.0",

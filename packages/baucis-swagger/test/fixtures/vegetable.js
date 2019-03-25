@@ -27,6 +27,7 @@ const Stuffing = new Schema({
 });
 const Goose = new Schema({
   cooked: {type: Boolean, default: true},
+  taste: {type: Schema.Types.Mixed},
   stuffed: [Stuffing]
 });
 

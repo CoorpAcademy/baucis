@@ -1,4 +1,4 @@
-// This is a Controller mixin to add methods for generating Swagger data.
+const _ = require('lodash/fp');
 
 // Convert a Mongoose type into a Swagger type
 function swaggerTypeFor(type) {
@@ -11,23 +11,13 @@ function swaggerTypeFor(type) {
   // mongoose Types
   if (type.name === 'ObjectID' || type.name === 'ObjectId') return 'string';
   if (type.name === 'Oid') return 'string';
-  if (type.name === 'Array') return 'Array';
   if (type.name === 'Buffer') return null;
   if (type.name === 'Mixed') return null;
   // Fallbacks
   if (type instanceof Object) return null;
-  if (type === Object) return null;
   throw new Error(`Unrecognized type: ${type}`);
 }
 
-// A method for capitalizing the first letter of a string
-function capitalize(s) {
-  if (!s) return s;
-  if (s.length === 1) return s.toUpperCase();
-  return s[0].toUpperCase() + s.substring(1);
-}
-
-// __Module Definition__
 module.exports = function extendController(controller) {
   // A method used to generated a Swagger property for a model
   function generatePropertyDefinition(name, path) {
@@ -76,7 +66,7 @@ module.exports = function extendController(controller) {
       console.log(
         'Warning: That field type is not yet supported in baucis Swagger definitions, using "string."'
       );
-      console.log('Path name: %s.%s', capitalize(controller.model().singular()), name);
+      console.log('Path name: %s.%s', _.capitalize(controller.model().singular()), name);
       console.log('Mongoose type: %s', path.options.type);
       property.type = 'string';
     }
@@ -89,7 +79,7 @@ module.exports = function extendController(controller) {
     const definition = {};
     const schema = controller.model().schema;
 
-    definition.id = capitalize(controller.model().singular());
+    definition.id = _.capitalize(controller.model().singular());
     definition.properties = {};
 
     Object.keys(schema.paths).forEach(function(name) {
@@ -206,7 +196,7 @@ module.exports = function extendController(controller) {
         paramType: 'body',
         name: 'document',
         description: 'Create a document by sending the paths to be updated in the request body.',
-        dataType: capitalize(controller.model().singular()),
+        dataType: _.capitalize(controller.model().singular()),
         required: true,
         allowMultiple: false
       });
@@ -217,7 +207,7 @@ module.exports = function extendController(controller) {
         paramType: 'body',
         name: 'document',
         description: 'Update a document by sending the paths to be updated in the request body.',
-        dataType: capitalize(controller.model().singular()),
+        dataType: _.capitalize(controller.model().singular()),
         required: true,
         allowMultiple: false
       });
@@ -261,8 +251,9 @@ module.exports = function extendController(controller) {
 
     controller.methods().forEach(function(verb) {
       const operation = {};
-      const titlePlural = capitalize(controller.model().plural());
-      const titleSingular = capitalize(controller.model().singular());
+      const model = controller.model();
+      const titlePlural = _.capitalize(model.plural());
+      const titleSingular = _.capitalize(model.singular());
 
       // Don't do head, post/put for single/plural
       if (verb === 'head') return;
@@ -279,11 +270,8 @@ module.exports = function extendController(controller) {
 
       operation.responseClass = titleSingular; // TODO sometimes an array!
 
-      if (plural) operation.summary = `${capitalize(verb)} some ${controller.model().plural()}`;
-      else
-        operation.summary = `${capitalize(
-          verb
-        )} a ${controller.model().singular()} by its unique ID`;
+      if (plural) operation.summary = `${_.capitalize(verb)} some ${model.plural()}`;
+      else operation.summary = `${_.capitalize(verb)} a ${model.singular()} by its unique ID`;
 
       operation.parameters = generateParameters(verb, plural);
       operation.errorResponses = generateErrorResponses(plural);
@@ -297,7 +285,7 @@ module.exports = function extendController(controller) {
   controller.generateSwagger = function() {
     if (controller.swagger) return controller;
 
-    const modelName = capitalize(controller.model().singular());
+    const modelName = _.capitalize(controller.model().singular());
 
     controller.swagger = {apis: [], models: {}};
 
@@ -323,3 +311,5 @@ module.exports = function extendController(controller) {
 
   return controller;
 };
+
+module.exports.swaggerTypeFor = swaggerTypeFor;
