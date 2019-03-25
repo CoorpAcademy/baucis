@@ -691,8 +691,12 @@ describe('Queries', function() {
     };
     request.get(options, function(error, response, body) {
       if (error) return done(error);
-      expect(response.statusCode).to.equal(400);
-      expect(body).to.have.property('message', 'The requested query hint is invalid (400).');
+      try {
+        expect(response.statusCode).to.equal(400);
+        expect(body).to.have.property('message', 'The requested query hint is invalid (400).');
+      } catch(err){
+        return done(err);
+      }
       done();
     });
     // NOTE: for some reason in node 10 the exception gets uncaught.
