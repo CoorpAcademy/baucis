@@ -27,6 +27,7 @@ const Stuffing = new Schema({
 });
 const Goose = new Schema({
   cooked: {type: Boolean, default: true},
+  taste: {type: Schema.Types.Mixed},
   stuffed: [Stuffing]
 });
 
@@ -36,7 +37,7 @@ mongoose.model('goose', Goose).plural('geese');
 
 const fixture = {
   init(done) {
-    mongoose.connect(config.mongo.url);
+    mongoose.connect(config.mongo.url, {useNewUrlParser: true});
 
     fixture.controller = baucis
       .rest('vegetable')
@@ -80,7 +81,7 @@ const fixture = {
     const vegetables = vegetableNames.map(function(name) {
       return new Vegetable({name});
     });
-    let deferred = [Vegetable.remove.bind(Vegetable)];
+    let deferred = [Vegetable.deleteMany.bind(Vegetable)];
 
     deferred = deferred.concat(
       vegetables.map(function(vegetable) {
