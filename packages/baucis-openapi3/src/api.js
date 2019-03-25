@@ -267,43 +267,44 @@ function generateResourceListingForVersion(options) {
   return cloned;
 }
 
-module.exports = pluginOptions => function extendApi(api) {
-  let customOpts = {};
+module.exports = (pluginOptions = {}) =>
+  function extendApi(api) {
+    let customOpts = {};
 
-  api.generateOpenApi3 = function(opts) {
-    if (opts) {
-      customOpts = opts;
-    }
-    // user can extend this openApi3Document
-    api.openApi3Document = generateResourceListing({
-      version: null,
-      controllers: api.controllers('0.0.1'),
-      basePath: null,
-      options: customOpts
-    });
-    return api;
-  };
-
-  // Middleware for the documentation index.
-  api.get('/openapi.json', function(request, response) {
-    try {
-      if (!api.openApi3Document) {
-        api.generateOpenApi3(customOpts);
+    api.generateOpenApi3 = function(opts) {
+      if (opts) {
+        customOpts = opts;
       }
-
-      // Customize a openApi3Document copy by requested version
-      const versionedApi = generateResourceListingForVersion({
-        rootDocument: api.openApi3Document,
-        version: request.baucis.release,
-        controllers: api.controllers(request.baucis.release),
-        basePath: getBase(request, 1),
+      // user can extend this openApi3Document
+      api.openApi3Document = generateResourceListing({
+        version: null,
+        controllers: api.controllers('0.0.1'),
+        basePath: null,
         options: customOpts
       });
+      return api;
+    };
 
-      response.json(versionedApi);
-    } catch (e) {
-      console.error(JSON.stringify(e));
-      response.status(500).json(e);
-    }
-  });
-};
+    // Middleware for the documentation index.
+    api.get('/openapi.json', function(request, response) {
+      try {
+        if (!api.openApi3Document) {
+          api.generateOpenApi3(customOpts);
+        }
+
+        // Customize a openApi3Document copy by requested version
+        const versionedApi = generateResourceListingForVersion({
+          rootDocument: api.openApi3Document,
+          version: request.baucis.release,
+          controllers: api.controllers(request.baucis.release),
+          basePath: getBase(request, 1),
+          options: customOpts
+        });
+
+        response.json(versionedApi);
+      } catch (e) {
+        console.error(JSON.stringify(e));
+        response.status(500).json(e);
+      }
+    });
+  };

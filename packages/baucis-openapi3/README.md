@@ -38,6 +38,13 @@ app.use('/api', baucis());
 
 Then, access e.g. `GET http://localhost:3333/api/openapi.json`.  See the [Baucis](https://github.com/Coorpacademy/baucis) repo for more information about building REST APIs with [Baucis](https://github.com/Coorpacademy/baucis).
 
+
+If you wish to disable the Invalid type warning, you can load the plugin with the following options:
+
+```javascript
+baucis.addPlugin(apiDoc.withOptions({noWarning: true}));
+```
+
 ## Tests
 
 Change the `test/fixures/config.json` if needed, to point to a valid mongodb database.
