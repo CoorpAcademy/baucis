@@ -39,6 +39,7 @@
   "devDependencies": {
     "@coorpacademy/baucis": "^0.3.1",
     "async": "^2.6.2",
+    "chai": "^4.2.0",
     "codeclimate-test-reporter": "^0.5.1",
     "expect.js": "~0.3.1",
     "express": "~4.16.4",
