@@ -694,7 +694,7 @@ describe('Queries', function() {
       try {
         expect(response.statusCode).to.equal(400);
         expect(body).to.have.property('message', 'The requested query hint is invalid (400).');
-      } catch(err){
+      } catch (err) {
         return done(err);
       }
       done();

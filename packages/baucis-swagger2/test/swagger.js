@@ -653,7 +653,7 @@ describe('Swagger 2.0 Resources', function() {
         expect(param).to.have.property('in', 'query');
         expect(param).to.have.property(
           'description',
-          'How many documents to skip. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#skip)'
+          'How many documents to skip. [📖](https://github.com/wprl/baucis/wiki/Query-String-Parameters#skip)'
         );
         expect(param).to.have.property('type', 'integer');
         expect(param).to.have.property('format', 'int32');
@@ -676,7 +676,7 @@ describe('Swagger 2.0 Resources', function() {
         expect(param).to.have.property('in', 'query');
         expect(param).to.have.property(
           'description',
-          'The maximum number of documents to send. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#limit)'
+          'The maximum number of documents to send. [📖](https://github.com/wprl/baucis/wiki/Query-String-Parameters#limit)'
         );
         expect(param).to.have.property('type', 'integer');
         expect(param).to.have.property('format', 'int32');
@@ -698,7 +698,7 @@ describe('Swagger 2.0 Resources', function() {
         expect(param).to.have.property('in', 'query');
         expect(param).to.have.property(
           'description',
-          'Set to true to return count instead of documents. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#count)'
+          'Set to true to return count instead of documents. [📖](https://github.com/wprl/baucis/wiki/Query-String-Parameters#count)'
         );
         expect(param).to.have.property('type', 'boolean');
         expect(param).to.have.property('required', false);
@@ -719,7 +719,7 @@ describe('Swagger 2.0 Resources', function() {
         expect(param).to.have.property('in', 'query');
         expect(param).to.have.property(
           'description',
-          'Set the conditions used to find or remove the document(s). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#conditions)'
+          'Set the conditions used to find or remove the document(s). [📖](https://github.com/wprl/baucis/wiki/Query-String-Parameters#conditions)'
         );
         expect(param).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -742,7 +742,7 @@ describe('Swagger 2.0 Resources', function() {
         expect(param).to.have.property('in', 'query');
         expect(param).to.have.property(
           'description',
-          'Set the fields by which to sort. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#sort)'
+          'Set the fields by which to sort. [📖](https://github.com/wprl/baucis/wiki/Query-String-Parameters#sort)'
         );
         expect(param).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -765,7 +765,7 @@ describe('Swagger 2.0 Resources', function() {
         expect(param).to.have.property('in', 'query');
         expect(param).to.have.property(
           'description',
-          'Select which paths will be returned by the query. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#select)'
+          'Select which paths will be returned by the query. [📖](https://github.com/wprl/baucis/wiki/Query-String-Parameters#select)'
         );
         expect(param).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -788,7 +788,7 @@ describe('Swagger 2.0 Resources', function() {
         expect(param).to.have.property('in', 'query');
         expect(param).to.have.property(
           'description',
-          'Specify which paths to populate. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#populate)'
+          'Specify which paths to populate. [📖](https://github.com/wprl/baucis/wiki/Query-String-Parameters#populate)'
         );
         expect(param).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -810,7 +810,7 @@ describe('Swagger 2.0 Resources', function() {
         expect(param).to.have.property('in', 'query');
         expect(param).to.have.property(
           'description',
-          'Set to a path name to retrieve an array of distinct values. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#distinct)'
+          'Set to a path name to retrieve an array of distinct values. [📖](https://github.com/wprl/baucis/wiki/Query-String-Parameters#distinct)'
         );
         expect(param).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -833,7 +833,7 @@ describe('Swagger 2.0 Resources', function() {
         expect(param).to.have.property('in', 'query');
         expect(param).to.have.property(
           'description',
-          'Add an index hint to the query (must be enabled per controller). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#hint)'
+          'Add an index hint to the query (must be enabled per controller). [📖](https://github.com/wprl/baucis/wiki/Query-String-Parameters#hint)'
         );
         expect(param).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -856,7 +856,7 @@ describe('Swagger 2.0 Resources', function() {
         expect(param).to.have.property('in', 'query');
         expect(param).to.have.property(
           'description',
-          'Add a comment to a query (must be enabled per controller). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#comment)'
+          'Add a comment to a query (must be enabled per controller). [📖](https://github.com/wprl/baucis/wiki/Query-String-Parameters#comment)'
         );
         expect(param).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);
@@ -898,7 +898,7 @@ describe('Swagger 2.0 Resources', function() {
         expect(param).to.have.property('in', 'header');
         expect(param).to.have.property(
           'description',
-          '**BYPASSES VALIDATION** May be used with PUT to update the document using $push, $pull, or $set. [doc](https://github.com/wprl/baucis/wiki/HTTP-Headers)'
+          '**BYPASSES VALIDATION** May be used with PUT to update the document using $push, $pull, or $set. [📖](https://github.com/wprl/baucis/wiki/HTTP-Headers)'
         );
         expect(param).to.have.property('type', 'string');
         expect(param).to.have.property('required', false);

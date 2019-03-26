@@ -1985,7 +1985,7 @@
       "skip": {
         "name": "skip",
         "in": "query",
-        "description": "How many documents to skip. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#skip)",
+        "description": "How many documents to skip. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parameters.md#skip)",
         "schema": {
           "type": "integer",
           "format": "int32"
@@ -1995,7 +1995,7 @@
       "limit": {
         "name": "limit",
         "in": "query",
-        "description": "The maximum number of documents to send. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#limit)",
+        "description": "The maximum number of documents to send. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parameters.md#limit)",
         "schema": {
           "type": "integer",
           "format": "int32"
@@ -2005,7 +2005,7 @@
       "count": {
         "name": "count",
         "in": "query",
-        "description": "Set to true to return count instead of documents. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#count)",
+        "description": "Set to true to return count instead of documents. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parameters.md#count)",
         "schema": {
           "type": "boolean"
         },
@@ -2014,7 +2014,7 @@
       "conditions": {
         "name": "conditions",
         "in": "query",
-        "description": "Set the conditions used to find or remove the document(s). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#conditions)",
+        "description": "Set the conditions used to find or remove the document(s). [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parameters.md#conditions)",
         "schema": {
           "type": "string"
         },
@@ -2023,7 +2023,7 @@
       "sort": {
         "name": "sort",
         "in": "query",
-        "description": "Set the fields by which to sort. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#sort)",
+        "description": "Set the fields by which to sort. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parameters.md#sort)",
         "schema": {
           "type": "string"
         },
@@ -2032,7 +2032,7 @@
       "distinct": {
         "name": "distinct",
         "in": "query",
-        "description": "Set to a path name to retrieve an array of distinct values. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#distinct)",
+        "description": "Set to a path name to retrieve an array of distinct values. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parameters.md#distinct)",
         "schema": {
           "type": "string"
         },
@@ -2041,7 +2041,7 @@
       "hint": {
         "name": "hint",
         "in": "query",
-        "description": "Add an index hint to the query (must be enabled per controller). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#hint)",
+        "description": "Add an index hint to the query (must be enabled per controller). [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parameters.md#hint)",
         "schema": {
           "type": "string"
         },
@@ -2050,7 +2050,7 @@
       "comment": {
         "name": "comment",
         "in": "query",
-        "description": "Add a comment to a query (must be enabled per controller). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#comment)",
+        "description": "Add a comment to a query (must be enabled per controller). [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parameters.md#comment)",
         "schema": {
           "type": "string"
         },
@@ -2059,7 +2059,7 @@
       "select": {
         "name": "select",
         "in": "query",
-        "description": "Select which paths will be returned by the query. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#select)",
+        "description": "Select which paths will be returned by the query. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parameters.md#select)",
         "schema": {
           "type": "string"
         },
@@ -2068,7 +2068,7 @@
       "populate": {
         "name": "populate",
         "in": "query",
-        "description": "Specify which paths to populate. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#populate)",
+        "description": "Specify which paths to populate. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parameters.md#populate)",
         "schema": {
           "type": "string"
         },
@@ -2077,7 +2077,7 @@
       "X-Baucis-Update-Operator": {
         "name": "X-Baucis-Update-Operator",
         "in": "header",
-        "description": "**BYPASSES VALIDATION** May be used with PUT to update the document using $push, $pull, or $set. [doc](https://github.com/wprl/baucis/wiki/HTTP-Headers)",
+        "description": "**BYPASSES VALIDATION** May be used with PUT to update the document using $push, $pull, or $set. [📖](https://github.com/CoorpAcademy/baucis/documentation/http-headers.md)",
         "schema": {
           "type": "string"
         },
