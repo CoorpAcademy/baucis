@@ -1,6 +1,6 @@
 {
   "name": "@coorpacademy/baucis-openapi3",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Generate customizable OpenAPI version 3.0.0 definitions for your Baucis REST API.",
   "homepage": "https://github.com/Coorpacademy/baucis/tree/master/packages/baucis-openapi3",
   "repository": {
