@@ -15,7 +15,7 @@ function getParamXBaucisUpdateOperator() {
     name: 'X-Baucis-Update-Operator',
     in: 'header',
     description:
-      '**BYPASSES VALIDATION** May be used with PUT to update the document using $push, $pull, or $set. [doc](https://github.com/wprl/baucis/wiki/HTTP-Headers)',
+      '**BYPASSES VALIDATION** May be used with PUT to update the document using $push, $pull, or $set. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/http-headers.md)',
     type: 'string',
     required: false
   };
@@ -25,7 +25,7 @@ function getParamSkip() {
     name: 'skip',
     in: 'query',
     description:
-      'How many documents to skip. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#skip)',
+      'How many documents to skip. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parametelrs.mdskip)',
     type: 'integer',
     format: 'int32',
     required: false
@@ -36,7 +36,7 @@ function getParamLimit() {
     name: 'limit',
     in: 'query',
     description:
-      'The maximum number of documents to send. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#limit)',
+      'The maximum number of documents to send. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parametelrs.mdlimit)',
     type: 'integer',
     format: 'int32',
     required: false
@@ -47,7 +47,7 @@ function getParamCount() {
     name: 'count',
     in: 'query',
     description:
-      'Set to true to return count instead of documents. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#count)',
+      'Set to true to return count instead of documents. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parametelrs.mdcount)',
     type: 'boolean',
     required: false
   };
@@ -57,7 +57,7 @@ function getParamConditions() {
     name: 'conditions',
     in: 'query',
     description:
-      'Set the conditions used to find or remove the document(s). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#conditions)',
+      'Set the conditions used to find or remove the document(s). [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parametelrs.mdconditions)',
     type: 'string',
     required: false
   };
@@ -67,7 +67,7 @@ function getParamSort() {
     name: 'sort',
     in: 'query',
     description:
-      'Set the fields by which to sort. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#sort)',
+      'Set the fields by which to sort. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parametelrs.mdsort)',
     type: 'string',
     required: false
   };
@@ -77,7 +77,7 @@ function getParamSelect() {
     name: 'select',
     in: 'query',
     description:
-      'Select which paths will be returned by the query. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#select)',
+      'Select which paths will be returned by the query. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parametelrs.mdselect)',
     type: 'string',
     required: false
   };
@@ -87,7 +87,7 @@ function getParamPopulate() {
     name: 'populate',
     in: 'query',
     description:
-      'Specify which paths to populate. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#populate)',
+      'Specify which paths to populate. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parametelrs.mdpopulate)',
     type: 'string',
     required: false
   };
@@ -97,7 +97,7 @@ function getParamDistinct() {
     name: 'distinct',
     in: 'query',
     description:
-      'Set to a path name to retrieve an array of distinct values. [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#distinct)',
+      'Set to a path name to retrieve an array of distinct values. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parametelrs.mddistinct)',
     type: 'string',
     required: false
   };
@@ -107,7 +107,7 @@ function getParamHint() {
     name: 'hint',
     in: 'query',
     description:
-      'Add an index hint to the query (must be enabled per controller). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#hint)',
+      'Add an index hint to the query (must be enabled per controller). [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parametelrs.mdhint)',
     type: 'string',
     required: false
   };
@@ -117,7 +117,7 @@ function getParamComment() {
     name: 'comment',
     in: 'query',
     description:
-      'Add a comment to a query (must be enabled per controller). [doc](https://github.com/wprl/baucis/wiki/Query-String-Parameters#comment)',
+      'Add a comment to a query (must be enabled per controller). [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/query-string-parametelrs.mdcomment)',
     type: 'string',
     required: false
   };

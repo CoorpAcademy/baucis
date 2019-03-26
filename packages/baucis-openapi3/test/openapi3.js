@@ -1076,7 +1076,7 @@ describe('OpenAPI 3.0 Resources', function() {
         expect(param).to.have.property('in', 'header');
         expect(param).to.have.property(
           'description',
-          '**BYPASSES VALIDATION** May be used with PUT to update the document using $push, $pull, or $set. [📖](https://github.com/CoorpAcademy/baucis/documentation/http-headers.md)'
+          '**BYPASSES VALIDATION** May be used with PUT to update the document using $push, $pull, or $set. [📖](https://github.com/CoorpAcademy/baucis/blob/master/documentation/http-headers.md)'
         );
         expect(param).to.not.have.property('type'); // v2
         expect(param).to.have.property('schema');
