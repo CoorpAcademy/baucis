@@ -63,7 +63,7 @@ const ChargeArea = new Schema({
     required: true
   },
   tags: {
-    type: [String],
+    type: [{type: String}],
     required: false
   },
   orders: {

@@ -207,6 +207,10 @@ module.exports = (pluginOptions = {}) =>
       if (!type) {
         return null;
       }
+      if (type.type) {
+        // needed for Mongoose array type complex definitions
+        type = type.type;
+      }
       if (type === Number) {
         return 'number';
       }
