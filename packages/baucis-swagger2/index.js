@@ -1,8 +1,11 @@
 const extendApi = require('./src/api');
 const extendController = require('./src/controller');
 
-module.exports = baucis => {
-  baucis.Api.addExtension(extendApi);
-  baucis.Controller.addExtension(extendController);
+const extendBaucis = (baucis, options) => {
+  baucis.Api.addExtension(extendApi(options));
+  baucis.Controller.addExtension(extendController(options));
   return baucis;
 };
+
+module.exports = baucis => extendBaucis(baucis, {});
+module.exports.withOptions = options => baucis => extendBaucis(baucis, options);

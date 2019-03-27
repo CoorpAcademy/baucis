@@ -166,37 +166,37 @@ function generateResourceListingForVersion(options) {
   return clone;
 }
 
-// __Module Definition__
-module.exports = function extendApi(api) {
-  const options = {}; // §TODO: check
+module.exports = (pluginOptions = {}) =>
+  function extendApi(api) {
+    const options = {}; // FIXME: initialize with pluginOptions field
 
-  api.generateSwagger2 = function() {
-    // user can extend this swagger2Document
-    api.swagger2Document = generateResourceListing({
-      version: null,
-      controllers: api.controllers('0.0.1'),
-      basePath: null,
-      options
+    api.generateSwagger2 = function() {
+      // user can extend this swagger2Document
+      api.swagger2Document = generateResourceListing({
+        version: null,
+        controllers: api.controllers('0.0.1'),
+        basePath: null,
+        options
+      });
+      return api;
+    };
+
+    // Middleware for the documentation index.
+    api.get('/swagger.json', function(request, response) {
+      if (!api.swagger2Document) {
+        api.generateSwagger2();
+      }
+      // Customize a swagger2Document copy by requested version
+      const versionedApi = generateResourceListingForVersion({
+        rootDocument: api.swagger2Document,
+        version: request.baucis.release,
+        controllers: api.controllers(request.baucis.release),
+        basePath: getBase(request, 1),
+        options
+      });
+
+      response.json(versionedApi);
     });
+
     return api;
   };
-
-  // Middleware for the documentation index.
-  api.get('/swagger.json', function(request, response) {
-    if (!api.swagger2Document) {
-      api.generateSwagger2();
-    }
-    // Customize a swagger2Document copy by requested version
-    const versionedApi = generateResourceListingForVersion({
-      rootDocument: api.swagger2Document,
-      version: request.baucis.release,
-      controllers: api.controllers(request.baucis.release),
-      basePath: getBase(request, 1),
-      options
-    });
-
-    response.json(versionedApi);
-  });
-
-  return api;
-};

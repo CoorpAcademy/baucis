@@ -71,6 +71,14 @@ baucisInstance.swagger2Document.host = "api.weylandindustries.com:5000";
 
 app.use('/api', baucisInstance);
 ```
+## Configuration
+
+If you wish to disable the Invalid type warning, you can load the plugin with the following options:
+
+```javascript
+baucis.addPlugin(apiDoc.withOptions({noWarning: true}));
+```
+
 
 ## Base
 

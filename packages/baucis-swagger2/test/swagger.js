@@ -338,7 +338,8 @@ describe('Swagger 2.0 Resources', function() {
         expect(body.definitions.Goose.properties.__v.type).to.equal('number');
         expect(body.definitions.Goose.properties.__v.format).to.equal('int32');
         expect(body.definitions.Goose.properties.id.type).to.equal('string');
-        expect(Object.keys(body.definitions.Goose.properties).length).to.equal(5);
+        expect(body.definitions.Goose.properties.taste.type).to.equal('string');
+        expect(Object.keys(body.definitions.Goose.properties).length).to.equal(6);
 
         expect(body.definitions.GooseStuffed).to.be.an('Object');
         expect(body.definitions.GooseStuffed.required).to.equal(undefined);
