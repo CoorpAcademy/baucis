@@ -25,36 +25,37 @@ function generateResourceListing(options) {
   return listing;
 }
 
-module.exports = function extendApi(api) {
-  // Middleware for the documentation index.
-  api.get('/documentation', function(request, response) {
-    response.json(
-      generateResourceListing({
-        version: request.baucis.release,
-        controllers: api.controllers(request.baucis.release),
-        basePath: getBase(request, 1)
-      })
-    );
-  });
+module.exports = (pluginOptions = {}) =>
+  function extendApi(api) {
+    // Middleware for the documentation index.
+    api.get('/documentation', function(request, response) {
+      response.json(
+        generateResourceListing({
+          version: request.baucis.release,
+          controllers: api.controllers(request.baucis.release),
+          basePath: getBase(request, 1)
+        })
+      );
+    });
 
-  // Find the correct controller to handle the request.
-  api.get('/documentation/:path', function(request, response, next) {
-    const fragment = `/${request.params.path}`;
-    const controllers = api.controllers(request.baucis.release, fragment);
-    // If not found, bail.
-    if (controllers.lenth === 0) return next();
+    // Find the correct controller to handle the request.
+    api.get('/documentation/:path', function(request, response, next) {
+      const fragment = `/${request.params.path}`;
+      const controllers = api.controllers(request.baucis.release, fragment);
+      // If not found, bail.
+      if (controllers.lenth === 0) return next();
 
-    controllers[0].generateSwagger();
+      controllers[0].generateSwagger();
 
-    response.json(
-      _.merge(controllers[0].swagger, {
-        apiVersion: request.baucis.release,
-        swaggerVersion: '1.1',
-        basePath: getBase(request, 2),
-        resourcePath: fragment
-      })
-    );
-  });
+      response.json(
+        _.merge(controllers[0].swagger, {
+          apiVersion: request.baucis.release,
+          swaggerVersion: '1.1',
+          basePath: getBase(request, 2),
+          resourcePath: fragment
+        })
+      );
+    });
 
-  return api;
-};
+    return api;
+  };

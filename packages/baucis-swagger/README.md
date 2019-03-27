@@ -37,3 +37,9 @@ If you want to modify the swagger definition, generate the definition first.  (T
 controller.generateSwagger();
 controller.swagger.xyz = '123';
 ```
+
+If you wish to disable the Invalid type warning, you can load the plugin with the following options:
+
+```javascript
+baucis.addPlugin(swagger.withOptions({noWarning: true}));
+```
