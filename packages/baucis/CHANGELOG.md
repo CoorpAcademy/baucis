@@ -1,5 +1,9 @@
 # Baucis Change Log
 
+## v0.3.4 - 2019-04-06
+Enable handling of http error others than RestErrors:
+(meaning errors with `.status` or `.statusCode` property won't be send back as 500)
+
 ## v0.3.0 - 2019-03-25
 Introduce error handling mecanism with `errorHandler()`.
 See [documentation](../../documentation/controllers.md#controllererrorhandler)
