@@ -1279,6 +1279,7 @@ module.exports = function(baucis, mongoose, express) {
     controller._use(function(err, req, res, next) {
       if (!err) return next();
       if (err instanceof RestError) return next(err);
+      if (_.isInteger(err.status) || _.isInteger(err.statusCode)) return next(err);
       const error2 = RestError.InternalServerError(err.message);
       error2.stack = err.stack;
       next(error2);
@@ -1296,6 +1297,8 @@ module.exports = function(baucis, mongoose, express) {
       // Always set the status code if available.
       if (err.status >= 100) {
         res.status(err.status);
+      } else if (err.statusCode >= 100) {
+        res.status(err.statusCode);
       }
 
       if (!controller.handleErrors()) return next(err);
