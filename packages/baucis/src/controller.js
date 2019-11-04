@@ -1223,6 +1223,15 @@ module.exports = function(baucis, mongoose, express) {
         next(RestError.BadRequest(message));
         return;
       }
+      // Bad Mongo query hint (5.x).
+      if (
+        err.message.match(
+          'planner returned error :: caused by :: hint provided does not correspond to an existing index'
+        )
+      ) {
+        next(RestError.BadRequest(message));
+        return;
+      }
       if (!err.$err) return next(err);
       // Mongoose 3
       if (err.$err.match('planner returned error: bad hint')) {
