@@ -1250,11 +1250,11 @@ module.exports = function(baucis, mongoose, express) {
       }
 
       const body = {};
-      const scrape = /(?:[$]|index: )(.+)[_]\d+\s+dup key: [{] : "([^"]+)" [}]/;
+      const scrape = /(.*?[:]){2} (.*)[_](.*?["])(.*)(.*?["])/;
 
       const scraped = scrape.exec(err.message);
-      const path = scraped ? scraped[1] : '???';
-      const value = scraped ? scraped[2] : '???';
+      const path = scraped ? scraped[2] : '???';
+      const value = scraped ? scraped[4] : '???';
       body[path] = {
         message: util.format('Path `%s` (%s) must be unique.', path, value),
         originalMessage: err.message,
