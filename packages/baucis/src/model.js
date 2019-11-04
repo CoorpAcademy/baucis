@@ -1,5 +1,4 @@
-const pluralizer = require('mongoose-legacy-pluralize');
-const pluralizeFn = require('pluralize');
+const pluralize = require('pluralize');
 
 module.exports = function(mongoose) {
   function extendModel(model) {
@@ -43,7 +42,7 @@ module.exports = function(mongoose) {
       }
     };
 
-    model._plural = pluralizer(model.singular(), pluralizeFn);
+    model._plural = pluralize(model.singular());
     model.plural = function(value) {
       if (arguments.length === 1) {
         model._plural = value;
