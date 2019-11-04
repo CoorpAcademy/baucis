@@ -640,11 +640,11 @@ describe('Controllers', function() {
       expect(response.statusCode).to.equal(201);
       request.post(options, function(err, response, body) {
         if (err) return done(err);
-        expect(body[0]).to.have.property('message');
-        // eslint-disable-next-line unicorn/prefer-starts-ends-with
-        expect(body[0].message).to.match(/^Path/);
-        expect(body[0].message).to.match(/must be unique/);
-        expect(body[0]).to.have.property('path');
+        expect(response.statusCode).to.equal(422);
+        expect(body).to.have.length(1);
+        expect(body[0]).to.have.property('name');
+        expect(body[0]).to.have.property('message', 'Path `name` (Gorgonzola) must be unique.');
+        expect(body[0]).to.have.property('path', 'name');
         expect(body[0]).to.have.property('originalMessage');
         expect(body[0].originalMessage).to.match(/E11000 duplicate key/);
         expect(body[0].originalMessage).to.match(/dup key/);
@@ -652,8 +652,9 @@ describe('Controllers', function() {
         expect(body[0].originalMessage).to.match(/cheeses/);
         expect(body[0].originalMessage).to.match(/name_1/);
         expect(body[0]).to.have.property('name', 'MongoError');
+        expect(body[0]).to.have.property('path', 'name');
         expect(body[0]).to.have.property('type', 'unique');
-        expect(body[0]).to.have.property('value');
+        expect(body[0]).to.have.property('value', 'Gorgonzola');
         done();
       });
     });
