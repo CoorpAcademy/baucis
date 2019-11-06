@@ -114,8 +114,10 @@ module.exports = {
     done();
   },
   deinit(done) {
-    server.close();
-    done();
+    mongoose.disconnect(function() {
+      server.close();
+      done();
+    });
   },
   create(done) {
     // clear all first
