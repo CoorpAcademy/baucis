@@ -43,7 +43,6 @@ module.exports = {
   },
   deinit(done) {
     server.close();
-    mongoose.disconnect();
     done();
   }
 };
