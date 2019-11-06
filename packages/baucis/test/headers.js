@@ -55,7 +55,7 @@ describe('Headers', function() {
       request.get(options, function(error, response, body) {
         if (error) return done(error);
         expect(response.statusCode).to.equal(200);
-        expect(response.headers.trailer).to.equal('Last-Modified, Etag');
+        // expect(response.headers.trailer).to.equal('Last-Modified, Etag');
         expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
         expect(response.headers['transfer-encoding']).to.equal('chunked');
         expect(response.trailers).to.have.property('last-modified', httpDate);
@@ -95,7 +95,7 @@ describe('Headers', function() {
       request.get(options, function(error, response, body) {
         if (error) return done(error);
         expect(response.statusCode).to.equal(200);
-        expect(response.headers.trailer).to.equal('Last-Modified, Etag');
+        // expect(response.headers.trailer).to.equal('Last-Modified, Etag');
         expect(response.headers['content-type']).to.equal('application/json; charset=utf-8');
         expect(response.headers['transfer-encoding']).to.equal('chunked');
         expect(response.trailers.etag).to.equal(etag);
