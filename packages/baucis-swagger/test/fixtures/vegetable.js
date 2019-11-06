@@ -62,8 +62,10 @@ const fixture = {
     done();
   },
   deinit(done) {
-    server.close();
-    done();
+    mongoose.disconnect(function() {
+      server.close();
+      done();
+    });
   },
   create(done) {
     const Vegetable = mongoose.model('vegetable');
