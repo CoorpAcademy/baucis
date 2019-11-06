@@ -880,12 +880,13 @@ module.exports = function(baucis, mongoose, express) {
 
     /**
      *  Format the Trailer header.
+     *  Deprecated. See: https://stackoverflow.com/questions/22033933/using-trailer-header-with-http-chunked-transfer-how-to-set-cookie-using-it
      */
-    function addTrailer(response, header) {
-      const current = response.get('Trailer');
-      if (!current) response.set('Trailer', header);
-      else response.set('Trailer', `${current}, ${header}`);
-    }
+    // function addTrailer(response, header) {
+    //   const current = response.get('Trailer');
+    //   if (!current) response.set('Trailer', header);
+    //   else response.set('Trailer', `${current}, ${header}`);
+    // }
     /**
      * A map that is used to create empty response body.
      */
@@ -903,7 +904,7 @@ module.exports = function(baucis, mongoose, express) {
      */
     function etag(response, useTrailer) {
       if (useTrailer) {
-        addTrailer(response, 'Etag');
+        // addTrailer(response, 'Etag');
         response.set('Transfer-Encoding', 'chunked');
       }
 
@@ -945,7 +946,7 @@ module.exports = function(baucis, mongoose, express) {
      */
     function lastModified(response, useTrailer) {
       if (useTrailer) {
-        addTrailer(response, 'Last-Modified');
+        // addTrailer(response, 'Last-Modified');
         response.set('Transfer-Encoding', 'chunked');
       }
 
