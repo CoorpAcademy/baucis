@@ -47,7 +47,8 @@
     "mocha": "~6.0.2",
     "mongoose": "^5.4.19",
     "nyc": "^13.3.0",
-    "request": "^2.87.0"
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5"
   },
   "keywords": [
     "baucis",

@@ -1,18 +1,14 @@
 const {expect} = require('chai');
 const utils = require('../src/utils');
-require('mocha');
 
 describe('Utils module', function() {
-  it('capitalize should handle null', function(done) {
+  it('capitalize should handle null', function() {
     expect(utils.capitalize(null)).to.equal(null);
-    done();
   });
-  it('capitalize should handle single chars', function(done) {
+  it('capitalize should handle single chars', function() {
     expect(utils.capitalize('a')).to.equal('A');
-    done();
   });
-  it('capitalize should handle longer strings', function(done) {
+  it('capitalize should handle longer strings', function() {
     expect(utils.capitalize('abc')).to.equal('Abc');
-    done();
   });
 });
