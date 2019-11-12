@@ -4,7 +4,7 @@
   "description": "Baucisses packages",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "lerna run test --concurrency 1 --stream",
     "lint": "eslint 'packages/**/*.js'",
     "postinstall": "lerna bootstrap",
     "publish": "lerna publish",
@@ -26,13 +26,16 @@
     "url": "https://github.com/CoorpAcademy/baucis/issues"
   },
   "homepage": "https://github.com/CoorpAcademy/baucis#readme",
+  "peerDependencies": {
+    "mongoose": "^5.0.0"
+  },
   "devDependencies": {
     "@coorpacademy/eslint-plugin-coorpacademy": "^8.1.1",
-    "codecov": "^3.2.0",
+    "codecov": "^3.6.1",
     "eslint": "^5.15.3",
-    "express": "^4.16.4",
-    "lerna": "^3.13.1",
-    "mongoose": "^5.4.19",
-    "nyc": "^13.3.0"
+    "express": "^4.17.1",
+    "lerna": "^3.18.4",
+    "mongoose": "^5.7.10",
+    "nyc": "^14.1.1"
   }
 }
