@@ -7,12 +7,18 @@
     "url": "http://kun.io"
   },
   "homepage": "https://github.com/wprl/baucis",
-  "main": "index.js",
   "scripts": {
     "test": "mocha --exit --timeout 5000",
     "cover": "nyc --cwd ../.. npm test",
-    "lint": "eslint src/ test/ index.js"
+    "lint": "eslint ."
   },
+  "main": "index.js",
+  "files": [
+    "src",
+    "index.js",
+    "README.md",
+    "package.json"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/Coorpacademy/baucis.git",

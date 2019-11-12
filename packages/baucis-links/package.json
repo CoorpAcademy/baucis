@@ -2,12 +2,16 @@
   "name": "@coorpacademy/baucis-links",
   "version": "0.2.0",
   "description": "Set links and Link header for baucis JSON responses.'",
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Coorpacademy/baucis.git",
     "directory": "packages/baucis-links"
   },
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "package.json"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0"
   },

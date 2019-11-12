@@ -12,6 +12,12 @@
     "url": "https://github.com/Coorpacademy/baucis/issues/new"
   },
   "main": "index.js",
+  "files": [
+    "src",
+    "index.js",
+    "README.md",
+    "package.json"
+  ],
   "scripts": {
     "test": "mocha --recursive --timeout 5000 -R spec --exit",
     "cover": "nyc --cwd ../.. npm test",

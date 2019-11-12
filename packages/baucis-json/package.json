@@ -18,6 +18,11 @@
   "maintainers": [
     "Adrien Becchis <adrien.becchis@coorpacademy.com>"
   ],
+  "files": [
+    "index.js",
+    "README.md",
+    "package.json"
+  ],
   "license": "MIT",
   "dependencies": {
     "event-stream": "~4.0.1"
