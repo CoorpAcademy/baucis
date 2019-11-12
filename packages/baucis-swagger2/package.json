@@ -5,7 +5,8 @@
   "homepage": "https://github.com/Coorpacademy/baucis/tree/master/packages/baucis-swagger2",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Coorpacademy/baucis.git"
+    "url": "https://github.com/Coorpacademy/baucis.git",
+    "directory": "packages/baucis-swagger2"
   },
   "bugs": {
     "url": "https://github.com/Coorpacademy/baucis/issues/new"
@@ -20,6 +21,9 @@
     "email": "pjmolina@icinetic.com",
     "url": "http://pjmolina.com/metalevel"
   },
+  "maintainers": [
+    "Adrien Becchis <adrien.becchis@coorpacademy.com>"
+  ],
   "contributors": [
     {
       "name": "William Riley-Land",
@@ -30,6 +34,11 @@
       "name": "Robbie Trencheny",
       "email": "me@robbiet.us",
       "url": "http://robbie.io/"
+    },
+    {
+      "name": "Adrien Becchis",
+      "email": "adrien.becchis@coorpacademy.com",
+      "url": "https://github.com/AdrieanKhisbe/"
     }
   ],
   "license": "MIT",

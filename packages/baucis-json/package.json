@@ -15,13 +15,17 @@
     "format"
   ],
   "author": "William Riley-Land <william@kun.io>",
+  "maintainers": [
+    "Adrien Becchis <adrien.becchis@coorpacademy.com>"
+  ],
   "license": "MIT",
   "dependencies": {
     "event-stream": "~4.0.1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Coorpacademy/baucis.git"
+    "url": "https://github.com/Coorpacademy/baucis.git",
+    "directory": "packages/baucis-json"
   },
   "bugs": {
     "url": "https://github.com/Coorpacademy/baucis/issues/new"

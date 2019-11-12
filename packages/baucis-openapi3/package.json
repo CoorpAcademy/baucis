@@ -5,7 +5,8 @@
   "homepage": "https://github.com/Coorpacademy/baucis/tree/master/packages/baucis-openapi3",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Coorpacademy/baucis.git"
+    "url": "https://github.com/Coorpacademy/baucis.git",
+    "directory": "packages/baucis-openapi3"
   },
   "bugs": {
     "url": "https://github.com/Coorpacademy/baucis/issues/new"
@@ -21,6 +22,9 @@
     "email": "pjmolina@gmail.com",
     "url": "http://pjmolina.com"
   },
+  "maintainers": [
+    "Adrien Becchis <adrien.becchis@coorpacademy.com>"
+  ],
   "license": "MIT",
   "peerDependencies": {
     "@coorpacademy/baucis": "^0.2.0"

@@ -15,7 +15,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Coorpacademy/baucis.git"
+    "url": "https://github.com/Coorpacademy/baucis.git",
+    "directory": "packages/baucis"
   },
   "bugs": {
     "url": "https://github.com/Coorpacademy/baucis/issues/new"
@@ -67,6 +68,12 @@
     "request": "^2.88.0",
     "through": "^2.3.8"
   },
+  "maintainers": [
+    {
+      "name": "AdrieanKhisbe",
+      "url": "https://github.com/AdrieanKhisbe"
+    }
+  ],
   "contributors": [
     {
       "name": "eguneys",

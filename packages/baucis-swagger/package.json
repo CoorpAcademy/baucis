@@ -5,7 +5,8 @@
   "homepage": "https://github.com/Coorpacademy/baucis/tree/master/packages/baucis-swagger",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Coorpacademy/baucis.git"
+    "url": "https://github.com/Coorpacademy/baucis.git",
+    "directory": "packages/baucis-swagger"
   },
   "bugs": {
     "url": "https://github.com/Coorpacademy/baucis/issues/new"
@@ -22,11 +23,19 @@
     "email": "william@kun.io",
     "url": "http://kun.io/wprl"
   },
+  "maintainers": [
+    "Adrien Becchis <adrien.becchis@coorpacademy.com>"
+  ],
   "contributors": [
     {
       "name": "Robbie Trencheny",
       "email": "me@robbiet.us",
       "url": "http://robbie.io/"
+    },
+    {
+      "name": "Adrien Becchis",
+      "email": "adrien.becchis@coorpacademy.com",
+      "url": "https://github.com/AdrieanKhisbe/"
     }
   ],
   "license": "MIT",
