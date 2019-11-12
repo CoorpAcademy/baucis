@@ -54,7 +54,7 @@ function extendControllerWithLinks(controller) {
     if (request.method !== 'GET') return done();
     if (!request.query.limit) return done();
 
-    controller.model().count(request.baucis.conditions, function(error, count) {
+    controller.model().countDocuments(request.baucis.conditions, function(error, count) {
       if (error) return next(error);
 
       const limit = Number(request.query.limit);
