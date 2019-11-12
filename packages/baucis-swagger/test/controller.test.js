@@ -4,13 +4,8 @@ const {swaggerTypeFor} = require('../src/controller');
 
 describe('swaggerTypeFor tag correctly types', function() {
   const itCheckForType = (type, returnValue) =>
-    it(type ? type.name : `${type}`, function(done) {
-      try {
-        expect(swaggerTypeFor(type)).to.equal(returnValue);
-      } catch (err) {
-        return done(err);
-      }
-      done();
+    it(type ? type.name : `${type}`, function() {
+      expect(swaggerTypeFor(type)).to.equal(returnValue);
     });
   itCheckForType(undefined, null);
   itCheckForType(false, null);
@@ -22,17 +17,7 @@ describe('swaggerTypeFor tag correctly types', function() {
   itCheckForType(function Mixed() {}, null);
   itCheckForType(Object, null);
   itCheckForType({name: '{}'}, null);
-  it('throw when not recognize', function(done) {
-    try {
-      swaggerTypeFor('Toto');
-      done(new Error('exception not triggered'));
-    } catch (err) {
-      try {
-        expect(err.message).to.equal('Unrecognized type: Toto');
-      } catch (expecterr) {
-        return done(expecterr);
-      }
-      done();
-    }
+  it('throw when not recognize', function() {
+    expect(() => swaggerTypeFor('Toto')).to.throw('Unrecognized type: Toto');
   });
 });
