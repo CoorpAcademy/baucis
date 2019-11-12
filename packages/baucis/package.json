@@ -49,7 +49,7 @@
   },
   "peerDependencies": {
     "express": "^4.12.0",
-    "mongoose": ">=4"
+    "mongoose": ">=5"
   },
   "devDependencies": {
     "@coorpacademy/eslint-plugin-coorpacademy": "^9.0.1",
