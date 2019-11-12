@@ -999,7 +999,7 @@ module.exports = function(baucis, mongoose, express) {
     controller.finalize(function(req, res, next) {
       if (!req.baucis.count) return next();
 
-      req.baucis.query.count(function(error, n) {
+      req.baucis.query.countDocuments(function(error, n) {
         if (error) return next(error);
         res.removeHeader('Transfer-Encoding');
         return res.json(n); // TODO support other content types
