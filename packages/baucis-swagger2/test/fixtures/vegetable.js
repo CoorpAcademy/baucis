@@ -105,8 +105,7 @@ const fixture = {
       next();
     });
 
-    server = app.listen(8012);
-    done();
+    server = app.listen(8012, done);
   },
   deinit(done) {
     server.close();
