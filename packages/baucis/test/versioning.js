@@ -1,8 +1,7 @@
 const {expect} = require('chai');
 const request = require('request');
-const baucis = require('..')();
-
 const fixtures = require('./fixtures');
+const baucis = require('..')();
 
 describe('Versioning', function() {
   before(fixtures.versioning.init);

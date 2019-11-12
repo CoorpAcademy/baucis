@@ -1,8 +1,8 @@
 // __Dependencies__
 const mongoose = require('mongoose');
 const express = require('express');
-const baucisSwagger = require('..');
 const baucis = require('../../baucis')(mongoose, express);
+const baucisSwagger = require('..');
 
 baucis.addPlugin(baucisSwagger);
 

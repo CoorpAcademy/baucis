@@ -1,6 +1,6 @@
-const sut = require('..');
 const chai = require('chai');
 const chaiSubset = require('chai-subset');
+const sut = require('..');
 
 chai.use(chaiSubset);
 const {expect} = chai;

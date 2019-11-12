@@ -34,9 +34,8 @@ module.exports = function(baucis) {
         // If only one document emit it unwrapped, unless always returning an array.
         if (!multiple && alwaysArray) this.emit('data', '[');
         if (!multiple) this.emit('data', JSON.stringify(first));
-        else
-          // For greater than one document, emit the closing array.
-          this.emit('data', ']');
+        // For greater than one document, emit the closing array.
+        else this.emit('data', ']');
         if (!multiple && alwaysArray) this.emit('data', ']');
         // Done.  End the stream.
         this.emit('end');
