@@ -1,5 +1,5 @@
 const {expect} = require('chai');
-const request = require('request');
+const request = require('request-promise');
 
 const fixtures = require('./fixtures');
 
@@ -15,45 +15,34 @@ describe('DELETE singular', function() {
   );
   after(fixtures.vegetable.deinit);
 
-  it('should delete the addressed document', function(done) {
+  it('should delete the addressed document', async function() {
     const shitake = vegetables[3];
-    const options = {
+    const body = await request({
       url: `http://localhost:8012/api/vegetables/${shitake._id}`,
+      method: 'DELETE',
       json: true
-    };
-    request.del(options, function(error, response, body) {
-      if (error) return done(error);
-
-      const options = {
-        url: `http://localhost:8012/api/vegetables/${shitake._id}`,
-        json: true
-      };
-
-      expect(response.statusCode).to.equal(200);
-      expect(body).to.equal(1); // count of deleted objects
-
-      request.del(options, function(error, response, body) {
-        if (error) return done(error);
-
-        expect(response.statusCode).to.equal(404);
-        expect(body).to.have.property('message', 'Nothing matched the requested query (404).');
-        done();
-      });
     });
+    expect(body).to.equal(1); // count of deleted objects
+
+    const response = await request({
+      url: `http://localhost:8012/api/vegetables/${shitake._id}`,
+      method: 'DELETE',
+      resolveWithFullResponse: true,
+      json: true
+    });
+    expect(response.statusCode).to.equal(404);
+    expect(response.body).to.have.property('message', 'Nothing matched the requested query (404).');
   });
 
-  it('should invoke "remove" middleware', function(done) {
+  it('should invoke "remove" middleware', async function() {
     const shitake = vegetables[3];
-    const options = {
-      url: `http://localhost:8012/api/vegetables/${shitake._id}`,
-      json: true
-    };
 
     fixtures.vegetable.removeCount = 0;
-    request.del(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(fixtures.vegetable).to.have.property('removeCount', 1);
-      done();
+    await request({
+      url: `http://localhost:8012/api/vegetables/${shitake._id}`,
+      method: 'DELETE',
+      json: true
     });
+    expect(fixtures.vegetable).to.have.property('removeCount', 1);
   });
 });

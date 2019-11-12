@@ -15,30 +15,26 @@ describe('HEAD singular', function() {
   );
   after(fixtures.vegetable.deinit);
 
-  it('should get the header for the addressed document', function(done) {
+  it('should get the header for the addressed document', async function() {
     const turnip = vegetables[0];
-    const options = {
+    const {statusCode, body} = await request({
       url: `http://localhost:8012/api/vegetables/${turnip._id}`,
+      method: 'HEAD',
+      resolveWithFullResponse: true,
       json: true
-    };
-    request.head(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(200);
-      expect(body).to.equal(undefined);
-      done();
     });
+    expect(statusCode).to.equal(200);
+    expect(body).to.equal(undefined);
   });
 
-  it('should return a 404 when ID not found', function(done) {
-    const options = {
+  it('should return a 404 when ID not found', async function() {
+    const {statusCode, body} = await request({
       url: 'http://localhost:8012/api/vegetables/666666666666666666666666',
+      method: 'HEAD',
+      resolveWithFullResponse: true,
       json: true
-    };
-    request.head(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(404);
-      expect(body).to.equal(undefined);
-      done();
     });
+    expect(statusCode).to.equal(404);
+    expect(body).to.equal(undefined);
   });
 });

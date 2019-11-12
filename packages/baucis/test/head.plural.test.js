@@ -1,5 +1,5 @@
 const {expect} = require('chai');
-const request = require('request');
+const request = require('request-promise');
 
 const fixtures = require('./fixtures');
 
@@ -8,16 +8,14 @@ describe('HEAD plural', function() {
   beforeEach(fixtures.vegetable.create);
   after(fixtures.vegetable.deinit);
 
-  it('should get the header', function(done) {
-    const options = {
+  it('should get the header', async function() {
+    const {statusCode, body} = await request({
       url: 'http://localhost:8012/api/vegetables',
-      json: true
-    };
-    request.head(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(200);
-      expect(body).to.equal(undefined);
-      done();
+      method: 'HEAD',
+      json: true,
+      resolveWithFullResponse: true
     });
+    expect(statusCode).to.equal(200);
+    expect(body).to.equal(undefined);
   });
 });
