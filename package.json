@@ -4,7 +4,8 @@
   "description": "Baucisses packages",
   "private": true,
   "scripts": {
-    "test": "lerna run test --concurrency 1 --stream",
+    "test": "npm run lint && npm run test:unit",
+    "test:unit": "lerna run test --concurrency 1 --stream",
     "lint": "eslint 'packages/**/*.js'",
     "postinstall": "lerna bootstrap",
     "publish": "lerna publish",
