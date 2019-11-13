@@ -50,7 +50,7 @@
   },
   "peerDependencies": {
     "@coorpacademy/baucis": "^0.2.0",
-    "mongoose": ">=4"
+    "mongoose": ">=5"
   },
   "devDependencies": {
     "@coorpacademy/baucis": "^0.3.4",
