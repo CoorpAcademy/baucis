@@ -1,6 +1,5 @@
-const pluralizer = require('mongoose-legacy-pluralize');
-
 module.exports = function(mongoose) {
+  const {_pluralize: pluralizer} = new mongoose.Mongoose({pluralization: true});
   function extendModel(model) {
     model._locking = false;
     model.locking = function(value) {
