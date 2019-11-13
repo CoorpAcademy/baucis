@@ -1,5 +1,5 @@
 const {expect} = require('chai');
-const request = require('request');
+const request = require('request-promise');
 const fixtures = require('./fixtures');
 const baucis = require('..')();
 
@@ -8,71 +8,59 @@ describe('Versioning', function() {
   beforeEach(baucis.empty.bind(baucis));
   after(fixtures.versioning.deinit);
 
-  it('should use the highest release if no request version is specified', function(done) {
-    const options = {
+  it('should use the highest release if no request version is specified', async function() {
+    const {headers} = await request({
       url: 'http://localhost:8012/api/versioned/parties',
-      json: true
-    };
-    request.get(options, function(err, response, body) {
-      if (err) return done(err);
-      expect(response.headers).to.have.property('api-version', '3.0.1');
-      done();
+      json: true,
+      resolveWithFullResponse: true
     });
+    expect(headers).to.have.property('api-version', '3.0.1');
   });
 
-  it('should cause an error when an invalid release is specified', function(done) {
+  it('should cause an error when an invalid release is specified', function() {
     const fn = function() {
       baucis()
         .releases('1.0.0')
         .releases('abc');
     };
     expect(fn).to.throw(/^Release version "abc" is not a valid semver version [(]500[)][.]$/);
-    done();
   });
 
-  it('should use the highest valid release in the requested version range', function(done) {
-    const options = {
+  it('should use the highest valid release in the requested version range', async function() {
+    const {headers} = await request({
       url: 'http://localhost:8012/api/versioned/parties',
       json: true,
-      headers: {'API-Version': '<3'}
-    };
-    request.get(options, function(err, response, body) {
-      if (err) return done(err);
-      expect(response.headers).to.have.property('api-version', '2.1.0');
-      done();
+      headers: {'API-Version': '<3'},
+      resolveWithFullResponse: true
     });
+    expect(headers).to.have.property('api-version', '2.1.0');
   });
 
-  it('should use the requested release if specific version is given', function(done) {
-    const options = {
+  it('should use the requested release if specific version is given', async function() {
+    const {headers} = await request({
       url: 'http://localhost:8012/api/versioned/parties',
       json: true,
-      headers: {'API-Version': '1.0.0'}
-    };
-    request.get(options, function(err, response, body) {
-      if (err) return done(err);
-      expect(response.headers).to.have.property('api-version', '1.0.0');
-      done();
+      headers: {'API-Version': '1.0.0'},
+      resolveWithFullResponse: true
     });
+    expect(headers).to.have.property('api-version', '1.0.0');
   });
 
-  it("should 400 if the requested release range can't be satisfied", function(done) {
-    const options = {
+  it("should 400 if the requested release range can't be satisfied", async function() {
+    const {statusCode, headers, body} = await request({
       url: 'http://localhost:8012/api/versioned/parties',
       json: true,
-      headers: {'API-Version': '>3.0.1'}
-    };
-    request.get(options, function(err, response, body) {
-      if (err) return done(err);
-      expect(response.statusCode).to.equal(400);
-      expect(response.headers['content-type']).to.contain('text/html'); // I would expect JSON instead of html as negociated with json: true in the caller
-      // now is HTML / before was plain/text
-      expect(body).to.contain(
-        'Bad Request: The requested API version range &quot;&gt;3.0.1&quot; could not be satisfied (400).'
-      );
-      expect(response.headers).not.to.have.property('api-version');
-      done();
+      headers: {'API-Version': '>3.0.1'},
+      resolveWithFullResponse: true,
+      simple: false
     });
+    expect(statusCode).to.equal(400);
+    expect(headers['content-type']).to.contain('text/html'); // I would expect JSON instead of html as negociated with json: true in the caller
+    // now is HTML / before was plain/text
+    expect(body).to.contain(
+      'Bad Request: The requested API version range &quot;&gt;3.0.1&quot; could not be satisfied (400).'
+    );
+    expect(headers).not.to.have.property('api-version');
   });
 
   it(
@@ -93,14 +81,13 @@ describe('Versioning', function() {
     done();
   });*/
 
-  it('should catch controllers with invalid version range', function(done) {
+  it('should catch controllers with invalid version range', function() {
     const fn = function() {
       baucis.rest('party').versions('abc');
     };
     expect(fn).to.throw(
       /^Controller version range "abc" was not a valid semver range [(]500[)][.]$/
     );
-    done();
   });
 
   it(
@@ -121,142 +108,110 @@ describe('Versioning', function() {
     done();
   });*/
 
-  it('should work seamlessly when no versioning info is supplied', function(done) {
-    const options = {
+  it('should work seamlessly when no versioning info is supplied', async function() {
+    const {headers} = await request({
       url: 'http://localhost:8012/api/unversioned/dungeons',
-      json: true
-    };
-    request.get(options, function(err, response, body) {
-      if (err) return done(err);
-      expect(response.headers).to.have.property('api-version', '0.0.1');
-      done();
+      json: true,
+      resolveWithFullResponse: true
     });
+    expect(headers).to.have.property('api-version', '0.0.1');
   });
 
-  it('should set the `Vary` header', function(done) {
-    const options = {
+  it('should set the `Vary` header', async function() {
+    const {headers} = await request({
       url: 'http://localhost:8012/api/unversioned/dungeons',
-      json: true
-    };
-    request.get(options, function(err, response, body) {
-      if (err) return done(err);
-      expect(response.headers).to.have.property('vary', 'API-Version, Accept');
-      done();
+      json: true,
+      resolveWithFullResponse: true
     });
+    expect(headers).to.have.property('vary', 'API-Version, Accept');
   });
 
-  it('should send "409 Conflict" if there is a version conflict', function(done) {
-    const options = {
+  it('should send "409 Conflict" if there is a version conflict', async function() {
+    const body = await request({
       url: 'http://localhost:8012/api/versioned/pumpkins',
       json: true,
-      body: {title: 'Franklin'}
-    };
-    request.post(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(201);
-
-      const options = {
-        url: `http://localhost:8012/api/versioned/pumpkins/${body._id}`,
-        json: true,
-        body: {title: 'Ranken', __v: 0}
-      };
-
-      request.put(options, function(error, response, body) {
-        if (error) return done(error);
-
-        expect(response.statusCode).to.equal(200);
-
-        request.put(options, function(error, response, body) {
-          if (error) return done(error);
-          expect(response.statusCode).to.equal(409);
-          expect(body).to.have.property(
-            'message',
-            'The requested update would conflict with a previous update (409).'
-          );
-          done();
-        });
-      });
+      body: {title: 'Franklin'},
+      method: 'POST'
     });
+    await request({
+      url: `http://localhost:8012/api/versioned/pumpkins/${body._id}`,
+      json: true,
+      body: {title: 'Ranken', __v: 0},
+      method: 'PUT'
+    });
+    const response = await request({
+      url: `http://localhost:8012/api/versioned/pumpkins/${body._id}`,
+      json: true,
+      body: {title: 'Ranken', __v: 0},
+      method: 'PUT',
+      resolveWithFullResponse: true,
+      simple: false
+    });
+
+    expect(response.statusCode).to.equal(409);
+    expect(response.body).to.have.property(
+      'message',
+      'The requested update would conflict with a previous update (409).'
+    );
   });
 
-  it('should send "409 Conflict" if there is a version conflict (greater than)', function(done) {
-    const options = {
+  it('should send "409 Conflict" if there is a version conflict (greater than)', async function() {
+    const body = await request({
       url: 'http://localhost:8012/api/versioned/pumpkins?sort=-_id',
       json: true
-    };
-    request.get(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(200);
-      expect(body).not.to.equal(undefined);
-      expect(body).to.be.an('array');
-      expect(body.length).to.be.above(0);
-
-      const options = {
-        url: `http://localhost:8012/api/versioned/pumpkins/${body[0]._id}`,
-        json: true,
-        body: {__v: body[0].__v + 10}
-      };
-      request.put(options, function(error, response, body) {
-        if (error) return done(error);
-        expect(response.statusCode).to.equal(409);
-        expect(body).to.have.property(
-          'message',
-          'The requested update would conflict with a previous update (409).'
-        );
-        done();
-      });
     });
+    expect(body).not.to.equal(undefined);
+    expect(body).to.be.an('array');
+    expect(body.length).to.be.above(0);
+
+    const response = await request({
+      url: `http://localhost:8012/api/versioned/pumpkins/${body[0]._id}`,
+      json: true,
+      body: {__v: body[0].__v + 10},
+      method: 'PUT',
+      resolveWithFullResponse: true,
+      simple: false
+    });
+    expect(response.statusCode).to.equal(409);
+    expect(response.body).to.have.property(
+      'message',
+      'The requested update would conflict with a previous update (409).'
+    );
   });
 
-  it('should not send "409 Conflict" if there is no version conflict (equal)', function(done) {
-    const options = {
+  it('should not send "409 Conflict" if there is no version conflict (equal)', async function() {
+    const body = await request({
       url: 'http://localhost:8012/api/versioned/pumpkins?sort=-_id',
       json: true
-    };
-    request.get(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(200);
-
-      const options = {
-        url: `http://localhost:8012/api/versioned/pumpkins/${body[0]._id}`,
-        json: true,
-        body: {__v: body[0].__v}
-      };
-      request.put(options, function(error, response, body) {
-        if (error) return done(error);
-        expect(response.statusCode).to.equal(200);
-        done();
-      });
+    }); // ensure 200
+    await request({
+      url: `http://localhost:8012/api/versioned/pumpkins/${body[0]._id}`,
+      json: true,
+      body: {__v: body[0].__v},
+      method: 'PUT'
     });
   });
 
-  it('should cause an error if locking is enabled and no version is selected on the doc', function(done) {
-    const options = {
+  it('should cause an error if locking is enabled and no version is selected on the doc', async function() {
+    const body = await request({
       url: 'http://localhost:8012/api/versioned/pumpkins',
       json: true
-    };
-    request.get(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(200);
-
-      const options = {
-        url: `http://localhost:8012/api/versioned/pumpkins/${body[0]._id}`,
-        json: true,
-        body: {title: 'Forest Expansion'}
-      };
-      request.put(options, function(error, response, body) {
-        if (error) return done(error);
-        expect(response.statusCode).to.equal(422);
-        expect(body).to.eql([
-          {
-            message:
-              'Locking is enabled, but the target version was not provided in the request body.',
-            name: 'RestError',
-            path: '__v'
-          }
-        ]);
-        done();
-      });
     });
+    const response = await request({
+      url: `http://localhost:8012/api/versioned/pumpkins/${body[0]._id}`,
+      json: true,
+      body: {title: 'Forest Expansion'},
+      method: 'PUT',
+      resolveWithFullResponse: true,
+      simple: false
+    });
+    expect(response.statusCode).to.equal(422);
+    expect(response.body).to.eql([
+      {
+        message: 'Locking is enabled, but the target version was not provided in the request body.',
+        name: 'RestError',
+        path: '__v'
+      }
+    ]);
   });
 });

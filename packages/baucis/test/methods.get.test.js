@@ -40,9 +40,9 @@ describe('GET singular', function() {
     const response = await request({
       url: 'http://localhost:8012/api/vegetables/6',
       json: true,
-      resolveWithFullResponse: true
+      resolveWithFullResponse: true,
+      simple: false
     });
     expect(response.headers).not.to.have.property('location');
-    
   });
 });

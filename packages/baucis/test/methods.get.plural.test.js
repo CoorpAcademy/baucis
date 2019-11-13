@@ -1,5 +1,5 @@
 const {expect} = require('chai');
-const request = require('request');
+const request = require('request-promise');
 
 const fixtures = require('./fixtures');
 

@@ -28,6 +28,7 @@ describe('DELETE singular', function() {
       url: `http://localhost:8012/api/vegetables/${shitake._id}`,
       method: 'DELETE',
       resolveWithFullResponse: true,
+      simple: false,
       json: true
     });
     expect(response.statusCode).to.equal(404);

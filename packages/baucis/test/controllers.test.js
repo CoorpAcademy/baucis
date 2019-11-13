@@ -39,7 +39,7 @@ describe('Controllers', function() {
     expect(makeController).to.throw(/You must pass in a model or model name [(]500[)][.]/);
   });
 
-  it('should have methods set by default', function(dne) {
+  it('should have methods set by default', function() {
     let controller;
     const makeController = function() {
       controller = baucis.Controller('unmade');
@@ -77,11 +77,11 @@ describe('Controllers', function() {
   });
 
   it('should support select options for POST requests', async function() {
-    const {statusCode, body} = await request({
+    const body = await request({
+      method: 'POST',
       url: 'http://localhost:8012/api/cheeses',
       body: {name: 'Gorgonzola', color: 'Green'}
     });
-    expect(statusCode).to.equal(201);
     expect(body).to.have.property('color', 'Green');
     expect(body).to.have.property('name', 'Gorgonzola');
     expect(body).not.to.have.property('_id');
@@ -101,12 +101,11 @@ describe('Controllers', function() {
   });
 
   it('should allow POSTing when fields are deselected (issue #67)', async function() {
-    const {body, statusCode} = await request({
+    const body = await request({
       url: 'http://localhost:8012/api/stores',
       body: {name: "Lou's"},
-      resolveWithFullResponse: true
+      method: 'POST'
     });
-    expect(statusCode).to.equal(201);
     expect(body).to.have.property('_id');
     expect(body).to.have.property('__v');
     expect(body).to.have.property('name', "Lou's");
@@ -240,6 +239,7 @@ describe('Controllers', function() {
 
   it('should disallow push mode by default', async function() {
     const {body, statusCode} = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/stores/Westlake',
       headers: {'Update-Operator': '$push'},
       body: {molds: 'penicillium roqueforti', __v: 0},
@@ -255,6 +255,7 @@ describe('Controllers', function() {
 
   it('should disallow pushing to non-whitelisted paths', async function() {
     const {statusCode, body} = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/cheeses/Huntsman',
       headers: {'Update-Operator': '$push'},
       body: {'favorite nes game': 'bubble bobble'},
@@ -270,6 +271,7 @@ describe('Controllers', function() {
 
   it("should allow pushing to an instance document's whitelisted arrays when $push mode is enabled", async function() {
     const body = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/cheeses/Huntsman?select=molds',
       headers: {'Update-Operator': '$push'},
       body: {molds: 'penicillium roqueforti'}
@@ -282,9 +284,12 @@ describe('Controllers', function() {
 
   it('should disallow $pull mode by default', async function() {
     const {statusCode, body} = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/stores/Westlake',
       headers: {'Update-Operator': '$pull'},
-      body: {molds: 'penicillium roqueforti', __v: 0}
+      body: {molds: 'penicillium roqueforti', __v: 0},
+      resolveWithFullResponse: true,
+      simple: false
     });
     expect(statusCode).to.equal(403);
     expect(body).to.have.property(
@@ -295,6 +300,7 @@ describe('Controllers', function() {
 
   it('should disallow pulling non-whitelisted paths', async function() {
     const {body, statusCode} = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/cheeses/Huntsman',
       headers: {'Update-Operator': '$pull'},
       body: {'favorite nes game': 'bubble bobble'},
@@ -310,6 +316,7 @@ describe('Controllers', function() {
 
   it("should allow pulling from an instance document's whitelisted arrays when $pull mode is enabled", async function() {
     const body = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/cheeses/Huntsman?select=molds',
       headers: {'Update-Operator': '$push'},
       body: {molds: 'penicillium roqueforti'}
@@ -330,6 +337,7 @@ describe('Controllers', function() {
 
   it('should disallow push mode by default', async function() {
     const {statusCode, body} = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/stores/Westlake',
       headers: {'Update-Operator': '$set'},
       body: {molds: 'penicillium roqueforti', __v: 0},
@@ -345,6 +353,7 @@ describe('Controllers', function() {
 
   it('should disallow setting non-whitelisted paths', async function() {
     const {body, statusCode} = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/cheeses/Huntsman',
       headers: {'Update-Operator': '$set'},
       body: {'favorite nes game': 'bubble bobble'},
@@ -360,6 +369,7 @@ describe('Controllers', function() {
 
   it("should allow setting an instance document's whitelisted paths when $set mode is enabled", async function() {
     const body = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/cheeses/Huntsman?select=molds',
       headers: {'Update-Operator': '$set'},
       body: {molds: ['penicillium roqueforti']}
@@ -372,6 +382,7 @@ describe('Controllers', function() {
 
   it('should allow pushing to embedded arrays using positional $', async function() {
     const body = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/cheeses/Camembert?select=arbitrary',
       headers: {'Update-Operator': '$push'},
       qs: {conditions: JSON.stringify({'arbitrary.goat': true})},
@@ -392,6 +403,7 @@ describe('Controllers', function() {
 
   it('should allow setting embedded fields using positional $', async function() {
     const body = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/cheeses/Camembert?select=arbitrary',
       headers: {'Update-Operator': '$set'},
       qs: {conditions: JSON.stringify({'arbitrary.goat': false})},
@@ -406,6 +418,7 @@ describe('Controllers', function() {
 
   it('should allow pulling from embedded fields using positional $', async function() {
     const body = await request({
+      method: 'PUT',
       url: 'http://localhost:8012/api/cheeses/Camembert?select=arbitrary',
       headers: {'Update-Operator': '$pull'},
       qs: {conditions: JSON.stringify({'arbitrary.goat': true})},

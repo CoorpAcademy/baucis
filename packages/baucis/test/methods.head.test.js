@@ -1,5 +1,5 @@
 const {expect} = require('chai');
-const request = require('request');
+const request = require('request-promise');
 
 const fixtures = require('./fixtures');
 
@@ -32,7 +32,8 @@ describe('HEAD singular', function() {
       url: 'http://localhost:8012/api/vegetables/666666666666666666666666',
       method: 'HEAD',
       resolveWithFullResponse: true,
-      json: true
+      json: true,
+      simple: false
     });
     expect(statusCode).to.equal(404);
     expect(body).to.equal(undefined);

@@ -1,5 +1,5 @@
 const {expect} = require('chai');
-const request = require('request');
+const request = require('request-promise');
 
 const fixtures = require('./fixtures');
 
@@ -15,206 +15,160 @@ describe('Middleware', function() {
   );
   after(fixtures.vegetable.deinit);
 
-  it('should prevent resource from being loaded when block is set', function(done) {
-    const options = {
+  it('should prevent resource from being loaded when block is set', async function() {
+    const {statusCode} = await request({
       url: `http://localhost:8012/api/vegetables/${vegetables[0]._id}`,
       qs: {block: true},
-      json: true
-    };
-    request.get(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(401);
-      done();
+      json: true,
+      resolveWithFullResponse: true,
+      simple: false
     });
+    expect(statusCode).to.equal(401);
   });
 
-  it('should allow resource to be loaded when block is not set', function(done) {
-    const options = {
+  it('should allow resource to be loaded when block is not set', async function() {
+    const body = await request({
       url: `http://localhost:8012/api/vegetables/${vegetables[0]._id}`,
       qs: {block: false},
       json: true
-    };
-
-    request.get(options, function(error, response, body) {
-      if (error) return done(error);
-
-      expect(response.statusCode).to.equal(200);
-      expect(body).to.have.property('name', 'Turnip');
-
-      done();
     });
+    expect(body).to.have.property('name', 'Turnip');
   });
 
-  it('should allow query middleware to alter query', function(done) {
-    const options = {
+  it('should allow query middleware to alter query', async function() {
+    const body = await request({
       url: `http://localhost:8012/api/vegetables/${vegetables[0]._id}`,
       qs: {testQuery: true},
       json: true
-    };
-    request.get(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(200);
-      expect(body).to.have.property('_id');
-      expect(body).not.to.have.property('name');
-      done();
     });
+    expect(body).to.have.property('_id');
+    expect(body).not.to.have.property('name');
   });
 
-  it('should allow custom stream handlers (IN/POST)', function(done) {
+  it('should allow custom stream handlers (IN/POST)', async function() {
     // should set all fields to a string
-    const options = {
+    const body = await request({
       url: 'http://localhost:8012/api/vegetables/',
       qs: {streamIn: true},
-      json: {name: 'zoom'}
-    };
-    request.post(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(201);
-      expect(body).to.have.property('_id');
-      expect(body).to.have.property('name', 'boom');
-      done();
+      json: {name: 'zoom'},
+      method: 'POST'
     });
+    expect(body).to.have.property('_id');
+    expect(body).to.have.property('name', 'boom');
   });
 
-  it('should allow custom stream handlers (IN/PUT)', function(done) {
+  it('should allow custom stream handlers (IN/PUT)', async function() {
     // should set all fields to a string
     const radicchio = vegetables[7];
-    const options = {
+    const body = await request({
       url: `http://localhost:8012/api/vegetables/${radicchio._id}`,
       qs: {streamIn: true},
-      json: {name: 'zoom'}
-    };
-    request.put(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(200);
-      expect(body).to.have.property('_id', radicchio._id.toString());
-      expect(body).to.have.property('name', 'boom');
-      done();
+      json: {name: 'zoom'},
+      method: 'PUT'
     });
+    expect(body).to.have.property('_id', radicchio._id.toString());
+    expect(body).to.have.property('name', 'boom');
   });
 
-  it('should allow custom stream handlers (FUNCTION)', function(done) {
+  it('should allow custom stream handlers (FUNCTION)', async function() {
     // should set all fields to a string
-    const options = {
+    const body = await request({
       url: 'http://localhost:8012/api/vegetables/',
       qs: {streamInFunction: true},
-      json: {name: 'zoom'}
-    };
-    request.post(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(201);
-      expect(body).to.have.property('_id');
-      expect(body).to.have.property('name', 'bimm');
-      done();
+      json: {name: 'zoom'},
+      method: 'POST'
     });
+    expect(body).to.have.property('_id');
+    expect(body).to.have.property('name', 'bimm');
   });
 
-  it('should handle errors in user streams (IN/POST)', function(done) {
-    const options = {
+  it('should handle errors in user streams (IN/POST)', async function() {
+    const {statusCode, body} = await request({
       url: 'http://localhost:8012/api/vegetables/',
       qs: {failIt: true},
-      json: {name: 'zoom'}
-    };
-    request.post(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(403);
-      expect(body).to.have.property('message', 'Bento box (403).');
-      done();
+      json: {name: 'zoom'},
+      method: 'POST',
+      resolveWithFullResponse: true,
+      simple: false
     });
+    expect(statusCode).to.equal(403);
+    expect(body).to.have.property('message', 'Bento box (403).');
   });
 
-  it('should handle errors in user streams (IN/PUT)', function(done) {
+  it('should handle errors in user streams (IN/PUT)', async function() {
     // should set all fields to a string
     const radicchio = vegetables[7];
-    const options = {
+    const {statusCode, body} = await request({
       url: `http://localhost:8012/api/vegetables/${radicchio._id}`,
       qs: {failIt: true},
-      json: {name: 'zoom'}
-    };
-    request.put(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(403);
-      expect(body).to.have.property('message', 'Bento box (403).');
-      done();
+      json: {name: 'zoom'},
+      method: 'PUT',
+      resolveWithFullResponse: true,
+      simple: false
     });
+    expect(statusCode).to.equal(403);
+    expect(body).to.have.property('message', 'Bento box (403).');
   });
 
-  it('should handle errors in user streams (FUNCTION)', function(done) {
+  it('should handle errors in user streams (FUNCTION)', async function() {
     // should set all fields to a string
-    const options = {
+    const {statusCode, body} = await request({
       url: 'http://localhost:8012/api/vegetables/',
       qs: {failItFunction: true},
-      json: {name: 'zoom'}
-    };
-    request.post(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(403);
-      expect(body).to.have.property('message', 'Bento box (403).');
-      done();
+      json: {name: 'zoom'},
+      method: 'POST',
+      resolveWithFullResponse: true,
+      simple: false
     });
+    expect(statusCode).to.equal(403);
+    expect(body).to.have.property('message', 'Bento box (403).');
   });
 
-  it('should handle errors in user streams (OUT)', function(done) {
-    const options = {
+  it('should handle errors in user streams (OUT)', async function() {
+    const {statusCode, body} = await request({
       url: 'http://localhost:8012/api/vegetables/',
       qs: {failIt2: true},
-      json: true
-    };
-    request.get(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(403);
-      expect(body).to.have.property('message', 'Bento box (403).');
-      done();
+      json: true,
+      resolveWithFullResponse: true,
+      simple: false
     });
+    expect(statusCode).to.equal(403);
+    expect(body).to.have.property('message', 'Bento box (403).');
   });
 
-  it('should skip streaming documents in if request.body is already present', function(done) {
-    const options = {
+  it('should skip streaming documents in if request.body is already present', async function() {
+    const body = await request({
       url: 'http://localhost:8012/api/vegetables/',
       qs: {parse: true},
-      json: {name: 'zoom'}
-    };
-    request.post(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(201);
-      expect(body).to.have.property('_id');
-      expect(body).to.have.property('name', 'zoom');
-      done();
+      json: {name: 'zoom'},
+      method: 'POST'
     });
+    expect(body).to.have.property('_id');
+    expect(body).to.have.property('name', 'zoom');
   });
 
-  it('should allow custom stream handlers (OUT)', function(done) {
+  it('should allow custom stream handlers (OUT)', async function() {
     // should set all fields to a string
-    const options = {
+    const body = await request({
       url: 'http://localhost:8012/api/vegetables/',
       qs: {streamOut: true},
       json: true
-    };
-    request.get(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(200);
-      expect(body).to.have.property('length', 8);
-      expect(body[0]).to.have.property('name', 'beam');
-      expect(body[1]).to.have.property('name', 'beam');
-      expect(body[2]).to.have.property('name', 'beam');
-      done();
     });
+    expect(body).to.have.property('length', 8);
+    expect(body[0]).to.have.property('name', 'beam');
+    expect(body[1]).to.have.property('name', 'beam');
+    expect(body[2]).to.have.property('name', 'beam');
   });
 
-  it('allows custom stream handlers to alter documents (delete)', function(done) {
+  it('allows custom stream handlers to alter documents (delete)', async function() {
     // should set all fields to a string
-    const options = {
+    const body = await request({
       url: 'http://localhost:8012/api/vegetables/',
       qs: {deleteNutrients: true},
       json: true
-    };
-    request.get(options, function(error, response, body) {
-      if (error) return done(error);
-      expect(response.statusCode).to.equal(200);
-      expect(body).to.have.property('length', 8);
-      expect(body[0]).not.to.have.property('nutrients');
-      done();
     });
+    expect(body).to.have.property('length', 8);
+    expect(body[0]).not.to.have.property('nutrients');
   });
 
   it('should prevent mixing streaming and documents middleware (maybe)');
@@ -264,21 +218,15 @@ describe('Middleware', function() {
   //     done();
   //   });
   // });
-  it('should handle injected error middlewares', function(done) {
-    const options = {
+  it('should handle injected error middlewares', async function() {
+    const {statusCode, body} = await request({
       url: 'http://localhost:8012/api/etherals/etheral',
       qs: {deleteNutrients: true},
-      json: true
-    };
-    request.get(options, function(error, response, body) {
-      if (error) return done(error);
-      try {
-        expect(response.statusCode).to.equal(404);
-        expect(body.message).to.equal("I'm an etheral, you cannot access me (404).");
-      } catch (err) {
-        return done(err);
-      }
-      done();
+      json: true,
+      resolveWithFullResponse: true,
+      simple: false
     });
+    expect(statusCode).to.equal(404);
+    expect(body.message).to.equal("I'm an etheral, you cannot access me (404).");
   });
 });
