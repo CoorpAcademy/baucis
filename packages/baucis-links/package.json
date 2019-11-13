@@ -1,6 +1,6 @@
 {
   "name": "@coorpacademy/baucis-links",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Set links and Link header for baucis JSON responses.'",
   "repository": {
     "type": "git",
