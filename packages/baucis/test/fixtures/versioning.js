@@ -16,7 +16,11 @@ mongoose.model('pumpkin', Pumpkin).locking(true);
 
 module.exports = {
   init(done) {
-    mongoose.connect(config.mongo.url, {useNewUrlParser: true});
+    mongoose.connect(config.mongo.url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true
+    });
 
     app = express();
 

@@ -15,7 +15,11 @@ let server;
 // __Module Definition__
 const fixture = {
   init(done) {
-    mongoose.connect(config.mongo.url, {useNewUrlParser: true});
+    mongoose.connect(config.mongo.url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true
+    });
 
     fixture.saveCount = 0;
     fixture.removeCount = 0;

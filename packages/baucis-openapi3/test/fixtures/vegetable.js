@@ -95,7 +95,11 @@ mongoose.model('chargeArea', ChargeArea);
 
 const fixture = {
   init(done) {
-    mongoose.connect(config.mongo.url, {useNewUrlParser: true});
+    mongoose.connect(config.mongo.url, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true
+    });
 
     const serverVars = plugin
       .buildServerVariables()
