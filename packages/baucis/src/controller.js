@@ -1,7 +1,7 @@
 const util = require('util');
 const crypto = require('crypto');
 const domain = require('domain');
-const RestError = require('rest-error');
+const errors = require('restify-errors');
 const eventStream = require('event-stream');
 const semver = require('semver');
 const _ = require('lodash/fp');
@@ -33,7 +33,9 @@ module.exports = function(baucis, mongoose, express) {
 
     // §CONFIGURE
     if (typeof model !== 'string' && (!model || !model.schema)) {
-      throw RestError.Misconfigured('You must pass in a model or model name');
+      throw new errors.InternalServerError(
+        'Misconfiguration: You must pass in a model or model name'
+      );
     }
 
     // §FIXME: in a second time use real getter
@@ -87,8 +89,8 @@ module.exports = function(baucis, mongoose, express) {
     controller.versions = function(range) {
       if (arguments.length === 1) {
         if (!semver.validRange(range))
-          throw RestError.Misconfigured(
-            `Controller version range "${range}" was not a valid semver range`
+          throw new errors.InternalServerError(
+            `Misconfiguration: Controller version range "${range}" was not a valid semver range`
           );
         controller._versions = range;
         return controller;
@@ -123,9 +125,10 @@ module.exports = function(baucis, mongoose, express) {
           !findByPath.options.unique &&
           !(findByPath.options.index && findByPath.options.index.unique)
         ) {
-          throw RestError.Misconfigured(
-            '`findBy` path for model "%s" must be unique',
-            controller.model().modelName
+          throw new errors.InternalServerError(
+            `Misconfiguration: \`findBy\` path for model "${
+              controller.model().modelName
+            }" must be unique`
           );
         }
         controller._findBy = path;
@@ -307,14 +310,18 @@ module.exports = function(baucis, mongoose, express) {
       const instance = controller.model().schema.path(controller.findBy()).instance;
       const invalid = controller.isInvalid(req.params.id, instance, 'url.id');
       if (!invalid) return next();
-      next(RestError.BadRequest('The requested document ID "%s" is not a valid document ID', id));
+      next(
+        new errors.BadRequestError(`The requested document ID "${id}" is not a valid document ID`)
+      );
     });
 
     // Check that the HTTP method has not been disabled for this controller.
     controller.request(function(req, res, next) {
       const method = req.method.toLowerCase();
       if (controller.methods(method) !== false) return next();
-      next(RestError.MethodNotAllowed('The requested method has been disabled for this resource'));
+      next(
+        new errors.MethodNotAllowedError('The requested method has been disabled for this resource')
+      );
     });
 
     /**
@@ -322,14 +329,14 @@ module.exports = function(baucis, mongoose, express) {
      * to it.  (Not implemented.)
      */
     controller.request('instance', 'post', function(req, res, next) {
-      return next(RestError.NotImplemented('Cannot POST to an instance'));
+      return next(new errors.NotImplementedError('Cannot POST to an instance'));
     });
 
     /**
      * Update all given docs.  (Not implemented.)
      */
     controller.request('collection', 'put', function(req, res, next) {
-      return next(RestError.NotImplemented('Cannot PUT to the collection'));
+      return next(new errors.NotImplementedError('Cannot PUT to the collection'));
     });
 
     // / ※conditions
@@ -344,7 +351,7 @@ module.exports = function(baucis, mongoose, express) {
           conditions = JSON.parse(conditions);
         } catch (exception) {
           next(
-            RestError.BadRequest(
+            new errors.BadRequestError(
               'The conditions query string value was not valid JSON: "%s"',
               exception.message
             )
@@ -354,7 +361,7 @@ module.exports = function(baucis, mongoose, express) {
       }
 
       if (conditions.$explain && !controller.explain()) {
-        return next(RestError.BadRequest('Using $explain is disabled for this resource'));
+        return next(new errors.BadRequestError('Using $explain is disabled for this resource'));
       }
 
       if (req.params.id !== undefined) {
@@ -422,7 +429,7 @@ module.exports = function(baucis, mongoose, express) {
       } else {
         // Otherwise, stream and parse the request.
         parser = baucis.parser(req.get('content-type'));
-        if (!parser) return next(RestError.UnsupportedMediaType());
+        if (!parser) return next(new errors.UnsupportedMediaTypeError());
         pipeline(req);
         pipeline(parser);
       }
@@ -440,12 +447,10 @@ module.exports = function(baucis, mongoose, express) {
         const Discriminator = type ? Model.discriminators[type] : undefined;
         if (type && !Discriminator) {
           callback(
-            RestError.UnprocessableEntity({
-              message: "A document's type did not match any known discriminators for this resource",
-              name: 'RestError',
-              path: '__t',
-              value: type
-            })
+            new errors.UnprocessableEntity(
+              "A document's type did not match any known discriminators for this resource"
+            )
+            // FIXME: check: path: '__t',value: type
           );
           return;
         }
@@ -484,10 +489,9 @@ module.exports = function(baucis, mongoose, express) {
           // Check for at least one document.
           if (ids.length === 0) {
             next(
-              RestError.UnprocessableEntity({
-                message: 'The request body must contain at least one document',
-                name: 'RestError'
-              })
+              new errors.UnprocessableEntityError(
+                'The request body must contain at least one document'
+              )
             );
             return;
           }
@@ -533,7 +537,7 @@ module.exports = function(baucis, mongoose, express) {
       } else {
         // Otherwise, stream and parse the request.
         parser = baucis.parser(req.get('content-type'));
-        if (!parser) return next(RestError.UnsupportedMediaType());
+        if (!parser) return next(new errors.UnsupportedMediaTypeError());
         pipeline(req);
         pipeline(parser);
       }
@@ -549,7 +553,7 @@ module.exports = function(baucis, mongoose, express) {
           const query = controller.model().findOne(req.baucis.conditions);
           query.exec(function(error, doc) {
             if (error) return callback(error);
-            if (!doc) return callback(RestError.NotFound());
+            if (!doc) return callback(new errors.NotFoundError());
             // Add the Mongoose document to the context.
             callback(null, {doc, incoming: context.incoming});
           });
@@ -563,12 +567,10 @@ module.exports = function(baucis, mongoose, express) {
         if (bodyId === undefined) return callback(null, context);
         if (bodyId === req.params.id) return callback(null, context);
         callback(
-          RestError.UnprocessableEntity({
-            message: "The ID of the update document did not match the URL's document ID.",
-            name: 'RestError',
-            path: controller.findBy(),
-            value: bodyId
-          })
+          new errors.UnprocessableEntityError(
+            "The ID of the update document did not match the URL's document ID."
+          )
+          // FIXME path: controller.findBy(), value: bodyId
         );
       });
       // Ensure the request includes a finite object version if locking is enabled.
@@ -577,12 +579,10 @@ module.exports = function(baucis, mongoose, express) {
           const updateVersion = context.incoming[versionKey];
           if (updateVersion === undefined || !Number.isFinite(Number(updateVersion))) {
             callback(
-              RestError.UnprocessableEntity({
-                message:
-                  'Locking is enabled, but the target version was not provided in the request body.',
-                name: 'RestError',
-                path: versionKey
-              })
+              new errors.UnprocessableEntity(
+                'Locking is enabled, but the target version was not provided in the request body.'
+              )
+              // FIXME: check path: versionKey
             );
             return;
           }
@@ -593,7 +593,9 @@ module.exports = function(baucis, mongoose, express) {
           // Make sure the version key was selected.
           pipeline(function(context, callback) {
             if (!context.doc.isSelected(versionKey)) {
-              callback(RestError.BadRequest('The version key "%s" must be selected', versionKey));
+              callback(
+                new errors.BadRequestError('The version key "%s" must be selected', versionKey)
+              );
               return;
             }
             // Pass through.
@@ -603,7 +605,7 @@ module.exports = function(baucis, mongoose, express) {
             const updateVersion = Number(context.incoming[versionKey]);
             // Update and current version have been found.  Check if they're equal.
             if (updateVersion !== context.doc[versionKey])
-              return callback(RestError.LockConflict());
+              return callback(new errors.ConflictError());
             // One is not allowed to set __v and increment in the same update.
             delete context.incoming[versionKey];
             context.doc.increment();
@@ -620,10 +622,9 @@ module.exports = function(baucis, mongoose, express) {
             if (count === 2) {
               this.emit(
                 'error',
-                RestError.UnprocessableEntity({
-                  message: 'The request body contained more than one update document',
-                  name: 'RestError'
-                })
+                new errors.UnprocessableEntityError(
+                  'The request body contained more than one update document'
+                )
               );
               return;
             }
@@ -635,10 +636,9 @@ module.exports = function(baucis, mongoose, express) {
             if (count === 0) {
               this.emit(
                 'error',
-                RestError.UnprocessableEntity({
-                  message: 'The request body did not contain an update document',
-                  name: 'RestError'
-                })
+                new errors.UnprocessableEntityError(
+                  'The request body did not contain an update document'
+                )
               );
               return;
             }
@@ -665,7 +665,7 @@ module.exports = function(baucis, mongoose, express) {
 
           if (validOperators.indexOf(operator) === -1) {
             callback(
-              RestError.NotImplemented(
+              new errors.NotImplementedError(
                 'The requested update operator "%s" is not supported',
                 operator
               )
@@ -675,7 +675,7 @@ module.exports = function(baucis, mongoose, express) {
           // Ensure that some paths have been enabled for the operator.
           if (!controller.operators(operator)) {
             callback(
-              RestError.Forbidden(
+              new errors.ForbiddenError(
                 'The requested update operator "%s" is not enabled for this resource',
                 operator
               )
@@ -685,7 +685,7 @@ module.exports = function(baucis, mongoose, express) {
           // Make sure paths have been whitelisted for this operator.
           if (checkBadUpdateOperatorPaths(operator, Object.keys(context.incoming))) {
             callback(
-              RestError.Forbidden(
+              new errors.ForbiddenError(
                 'This update path is forbidden for the requested update operator "%s"',
                 operator
               )
@@ -728,7 +728,7 @@ module.exports = function(baucis, mongoose, express) {
       const distinct = req.query.distinct;
       if (!distinct) return next();
       if (controller.deselected(distinct)) {
-        next(RestError.Forbidden('You may not find distinct values for the requested path'));
+        next(new errors.ForbiddenError('You may not find distinct values for the requested path'));
         return;
       }
       const query = controller.model().distinct(distinct, req.baucis.conditions);
@@ -763,10 +763,10 @@ module.exports = function(baucis, mongoose, express) {
       if (!select) return next();
 
       if (select.indexOf('+') !== -1) {
-        return next(RestError.Forbidden('Including excluded fields is not permitted'));
+        return next(new errors.ForbiddenError('Including excluded fields is not permitted'));
       }
       if (checkBadSelection(select)) {
-        return next(RestError.Forbidden('Including excluded fields is not permitted'));
+        return next(new errors.ForbiddenError('Including excluded fields is not permitted'));
       }
 
       req.baucis.query.select(select);
@@ -789,12 +789,14 @@ module.exports = function(baucis, mongoose, express) {
         populate.forEach(function(field) {
           if (error) return;
           if (checkBadSelection(field.path || field)) {
-            return (error = RestError.Forbidden('Including excluded fields is not permitted'));
+            return (error = new errors.ForbiddenError(
+              'Including excluded fields is not permitted'
+            ));
           }
           // Don't allow selecting fields from client when populating
           if (field.select) {
             if (!allowPopulateSelect)
-              return (error = RestError.Forbidden(
+              return (error = new errors.ForbiddenError(
                 'Selecting fields of populated documents is not permitted'
               ));
             console.warn(
@@ -813,7 +815,7 @@ module.exports = function(baucis, mongoose, express) {
       const skip = req.query.skip;
       if (skip === undefined || skip === null) return next();
       if (!isNonNegativeInteger(skip)) {
-        return next(RestError.BadRequest('Skip must be a non-negative integer if set'));
+        return next(new errors.BadRequestError('Skip must be a non-negative integer if set'));
       }
       req.baucis.query.skip(getAsInt(skip));
       next();
@@ -823,7 +825,7 @@ module.exports = function(baucis, mongoose, express) {
       const limit = req.query.limit;
       if (limit === undefined || limit === null) return next();
       if (!isPositiveInteger(limit)) {
-        return next(RestError.BadRequest('Limit must be a positive integer if set'));
+        return next(new errors.BadRequestError('Limit must be a positive integer if set'));
       }
       req.baucis.query.limit(getAsInt(limit));
       next();
@@ -833,17 +835,17 @@ module.exports = function(baucis, mongoose, express) {
       if (!req.query.count) return next();
       if (req.query.count === 'false') return next();
       if (req.query.count !== 'true') {
-        next(RestError.BadRequest('Count must be "true" or "false" if set'));
+        next(new errors.BadRequestError('Count must be "true" or "false" if set'));
         return;
       }
 
       if (req.query.hint) {
-        next(RestError.BadRequest("Hint can't be used with count"));
+        next(new errors.BadRequestError("Hint can't be used with count"));
         return;
       }
 
       if (req.query.comment) {
-        next(RestError.BadRequest("Comment can't be used with count"));
+        next(new errors.BadRequestError("Comment can't be used with count"));
         return;
       }
 
@@ -864,7 +866,7 @@ module.exports = function(baucis, mongoose, express) {
 
       if (!hint) return next();
       if (!controller.hints()) {
-        return next(RestError.Forbidden('Hints are not enabled for this resource'));
+        return next(new errors.ForbiddenError('Hints are not enabled for this resource'));
       }
 
       if (typeof hint === 'string') hint = JSON.parse(hint);
@@ -1048,7 +1050,7 @@ module.exports = function(baucis, mongoose, express) {
               return;
             }
 
-            this.emit('error', RestError.NotFound());
+            this.emit('error', new errors.NotFoundError());
           }
         )
       );
@@ -1089,7 +1091,7 @@ module.exports = function(baucis, mongoose, express) {
           },
           function() {
             if (count > 0) return this.emit('end');
-            this.emit('error', RestError.NotFound());
+            this.emit('error', new errors.NotFoundError());
           }
         )
       );
@@ -1215,18 +1217,18 @@ module.exports = function(baucis, mongoose, express) {
       const message = 'The requested query hint is invalid';
       // Bad Mongo query hint (2.x).
       if (err.message === 'bad hint') {
-        next(RestError.BadRequest(message));
+        next(new errors.BadRequestError(message));
         return;
       }
       // Bad Mongo query hint (3.x).
       if (err.message.match('planner returned error: bad hint')) {
-        next(RestError.BadRequest(message));
+        next(new errors.BadRequestError(message));
         return;
       }
       if (!err.$err) return next(err);
       // Mongoose 3
       if (err.$err.match('planner returned error: bad hint')) {
-        next(RestError.BadRequest(message));
+        next(new errors.BadRequestError(message));
         return;
       }
       next(err);
@@ -1255,7 +1257,7 @@ module.exports = function(baucis, mongoose, express) {
         value
       };
 
-      const translatedError = RestError.UnprocessableEntity();
+      const translatedError = new errors.UnprocessableEntityError();
       translatedError.errors = body;
 
       next(translatedError);
@@ -1265,7 +1267,7 @@ module.exports = function(baucis, mongoose, express) {
     controller._use(function(err, req, res, next) {
       if (!err) return next();
       if (!(err instanceof mongoose.Error.ValidationError)) return next(err);
-      const newError = RestError.UnprocessableEntity();
+      const newError = new errors.UnprocessableEntityError();
       newError.errors = err.errors;
       next(newError);
     });
@@ -1273,14 +1275,14 @@ module.exports = function(baucis, mongoose, express) {
     controller._use(function(err, req, res, next) {
       if (!err) return next();
       if (!(err instanceof mongoose.Error.VersionError)) return next(err);
-      next(RestError.LockConflict());
+      next(new errors.ConflictError());
     });
     // Translate other errors to internal server errors.
     controller._use(function(err, req, res, next) {
       if (!err) return next();
-      if (err instanceof RestError) return next(err);
+      if (err instanceof errors.RestError) return next(err);
       if (_.isInteger(err.status) || _.isInteger(err.statusCode)) return next(err);
-      const error2 = RestError.InternalServerError(err.message);
+      const error2 = errors.InternalServerError(err.message);
       error2.stack = err.stack;
       next(error2);
     });
@@ -1334,7 +1336,7 @@ module.exports = function(baucis, mongoose, express) {
         });
 
         // TODO deprecated -- always send as single error in 2.0.0
-        const f = formatter(err instanceof RestError.UnprocessableEntity);
+        const f = formatter(err instanceof errors.UnprocessableEntityError);
         f.on('error', next);
 
         eventStream

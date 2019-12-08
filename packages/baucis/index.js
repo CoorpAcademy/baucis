@@ -1,4 +1,4 @@
-const RestError = require('rest-error');
+const errors = require('restify-errors');
 const ApiFactory = require('./src/api');
 const ControllerFactory = require('./src/controller');
 const extendMongooseModel = require('./src/model');
@@ -48,7 +48,7 @@ module.exports = function(mongoose, express) {
 
     const handlers = {
       default() {
-        callback(RestError.NotAcceptable());
+        callback(new errors.NotAcceptableError());
       }
     };
 
@@ -92,7 +92,7 @@ module.exports = function(mongoose, express) {
 
   baucis.Api = Api;
   baucis.Controller = Controller;
-  baucis.Error = RestError;
+  baucis.Error = errors.RestError;
   baucis.Api.Controller = Controller;
 
   baucis.addPlugin(builtInPlugins.links);

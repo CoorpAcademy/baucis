@@ -1,4 +1,4 @@
-const RestError = require('rest-error');
+const errors = require('restify-errors');
 const {last} = require('./predicates-and-accessors');
 
 // Returns `true` if the given stirng is a recognized HTTP method.
@@ -18,19 +18,25 @@ function factor(options) {
 
   methods.forEach(function(method) {
     if (!isRecognizedMethod(method))
-      throw RestError.Misconfigured('Unrecognized HTTP method: "%s"', method);
+      throw new errors.InternalServerError(
+        `Misconfiguration: Unrecognized HTTP method: "${method}"`
+      );
   });
 
-  if (!options.stage) throw RestError.Misconfigured('The middleware stage was not provided');
+  if (!options.stage)
+    throw new errors.InternalServerError('Misconfiguration: The middleware stage was not provided');
   if (options.endpoint && options.endpoint !== 'instance' && options.endpoint !== 'collection') {
-    throw RestError.Misconfigured(
-      'End-point type must be either "instance" or "collection," not "%s"',
-      options.endpoint
+    throw new errors.InternalServerError(
+      `Misconfiguration: End-point type must be either "instance" or "collection," not "${
+        options.endpoint
+      }"'`
     );
   }
   // Middleware function or array
   if (!Array.isArray(options.middleware) && typeof options.middleware !== 'function') {
-    throw RestError.Misconfigured('Middleware must be an array or function');
+    throw new errors.InternalServerError(
+      'Misconfiguration: Middleware must be an array or function'
+    );
   }
   // Check endpoint is valid
   if (
@@ -38,7 +44,7 @@ function factor(options) {
     options.endpoint !== 'instance' &&
     options.endpoint !== 'collection'
   ) {
-    throw RestError.Misconfigured(
+    throw new errors.InternalServerError(
       'End-point type must be either "instance" or "collection," not "%s"',
       options.endpoint
     );

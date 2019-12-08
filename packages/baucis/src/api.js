@@ -1,5 +1,5 @@
 const semver = require('semver');
-const RestError = require('rest-error');
+const errors = require('restify-errors');
 
 module.exports = (express, Controller) => {
   /**
@@ -15,7 +15,7 @@ module.exports = (express, Controller) => {
 
     api.use(function(res, req, next) {
       if (res.baucis)
-        return next(RestError.Misconfigured('Baucis request property already created'));
+        return next(new errors.InternalServerError('Baucis request property already created'));
 
       res.baucis = {};
       req.removeHeader('x-powered-by');
@@ -28,7 +28,7 @@ module.exports = (express, Controller) => {
       // Check the requested API version is valid.
       if (!semver.validRange(version)) {
         next(
-          RestError.BadRequest(
+          new errors.BadRequestError(
             `The requested API version range "${version}" was not a valid semver range`
           )
         );
@@ -39,7 +39,7 @@ module.exports = (express, Controller) => {
       // Check for API version unsatisfied and give a 400 if no versions match.
       if (!res.baucis.release) {
         next(
-          RestError.BadRequest(
+          new errors.BadRequestError(
             `The requested API version range "${version}" could not be satisfied`
           )
         );
@@ -54,7 +54,7 @@ module.exports = (express, Controller) => {
     api.releases = function(release) {
       if (arguments.length === 1) {
         if (!semver.valid(release)) {
-          throw RestError.Misconfigured(
+          throw new errors.InternalServerError(
             'Release version "%s" is not a valid semver version',
             release
           );

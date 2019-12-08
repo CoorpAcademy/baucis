@@ -4,7 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const async = require('async');
 const eventStream = require('event-stream');
-const RestError = require('rest-error');
+const errors = require('restify-errors');
 const baucis = require('../..')(mongoose, express);
 const config = require('./config');
 
@@ -39,7 +39,7 @@ const fixture = {
         next(err);
       })
       .errorHandler((err, req, res, next) => {
-        next(RestError.NotFound(`I'm an ${err.who}, you cannot access me`));
+        next(new errors.NotFoundError(`I'm an ${err.who}, you cannot access me`));
       });
     baucis
       .rest('animal')

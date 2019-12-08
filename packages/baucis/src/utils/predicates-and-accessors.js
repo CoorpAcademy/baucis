@@ -1,4 +1,4 @@
-const RestError = require('rest-error');
+const errors = require('restify-errors');
 const _ = require('lodash/fp');
 
 const exist = _.negate(_.isNil);
@@ -8,7 +8,7 @@ function last(skip, names, values) {
   const r = {};
   let position = names.length;
   const count = values.filter(exist).length - skip;
-  if (count < 1) throw RestError.Misconfigured('Too few arguments.');
+  if (count < 1) throw new errors.InternalServerError('Misconfigured: Too few arguments.');
 
   names.forEach(function(name) {
     const index = skip + count - position;
