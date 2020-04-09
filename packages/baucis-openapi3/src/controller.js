@@ -217,7 +217,13 @@ module.exports = (pluginOptions = {}) =>
       if (type === Boolean) {
         return 'boolean';
       }
-      if (type === String || type === Date || type.name === 'ObjectId' || type.name === 'Oid') {
+      if (
+        type === String ||
+        type === Date ||
+        type === 'ObjectId' ||
+        type.name === 'ObjectId' ||
+        type.name === 'Oid'
+      ) {
         return 'string';
       }
       if (Array.isArray(type) || type.name === 'Array') {
