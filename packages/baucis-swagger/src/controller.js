@@ -9,7 +9,7 @@ function swaggerTypeFor(type) {
   if (type === Boolean) return 'boolean';
   if (Array.isArray(type) || type.name === 'Array') return 'Array';
   // mongoose Types
-  if (type.name === 'ObjectID' || type.name === 'ObjectId') return 'string';
+  if (type === 'ObjectId' || type.name === 'ObjectID' || type.name === 'ObjectId') return 'string';
   if (type.name === 'Oid') return 'string';
   if (type.name === 'Buffer') return null;
   if (type.name === 'Mixed') return null;

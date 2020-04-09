@@ -58,7 +58,7 @@
     "codeclimate-test-reporter": "^0.5.1",
     "express": "~4.16.4",
     "mocha": "~6.0.2",
-    "mongoose": "^5.4.19",
+    "mongoose": "^5.9.7",
     "nyc": "^13.3.0",
     "request": "^2.64.0"
   },
