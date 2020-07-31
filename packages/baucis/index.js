@@ -39,9 +39,7 @@ module.exports = function(mongoose, express) {
   baucis._formatters = function(response, callback) {
     // if (response._headerSent) {
     //   callback(null, function () {
-    //     return eventStream.through(function (data) { console.log(data) }, function () {
-    //       this.emit('end');
-    //     });
+    //     return miss.through(function (data, encoding, callback) { console.log(data); callback(); });
     //   });
     //   return;
     // }

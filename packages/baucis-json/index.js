@@ -1,4 +1,4 @@
-const eventStream = require('event-stream');
+const miss = require('mississippi');
 
 module.exports = function(baucis) {
   // Default formatter — emit a single JSON object or an array of them.
@@ -6,39 +6,36 @@ module.exports = function(baucis) {
     let first = false;
     let multiple = false;
 
-    return eventStream.through(
-      function(doc) {
+    return miss.through(
+      {writableObjectMode: true},
+      function(doc, encoding, callback) {
         // Start building the output.  If this is the first document,
         // store it for a moment.
         if (!first) {
           first = doc;
-          return;
+          return callback();
         }
         // If this is the second document, output array opening and the two documents
         // separated by a comma.
         if (!multiple) {
           multiple = true;
-          this.emit('data', '[');
-          this.emit('data', JSON.stringify(first));
-          this.emit('data', ',\n');
-          this.emit('data', JSON.stringify(doc));
-          return;
+          return callback(null, `[${JSON.stringify(first)},\n${JSON.stringify(doc)}`);
         }
         // For all documents after the second, emit a comma preceding the document.
-        this.emit('data', ',\n');
-        this.emit('data', JSON.stringify(doc));
+        return callback(null, `,\n${JSON.stringify(doc)}`);
       },
-      function() {
+      function(callback) {
         // If no documents, simply end the stream.
-        if (!first) return this.emit('end');
+        if (!first) return callback();
         // If only one document emit it unwrapped, unless always returning an array.
-        if (!multiple && alwaysArray) this.emit('data', '[');
-        if (!multiple) this.emit('data', JSON.stringify(first));
+
+        if (!multiple && alwaysArray) this.push('[');
+        if (!multiple) this.push(JSON.stringify(first));
         // For greater than one document, emit the closing array.
-        else this.emit('data', ']');
-        if (!multiple && alwaysArray) this.emit('data', ']');
+        else this.push(']');
+        if (!multiple && alwaysArray) this.push(']');
         // Done.  End the stream.
-        this.emit('end');
+        callback();
       }
     );
   }
@@ -53,7 +50,7 @@ module.exports = function(baucis) {
     let depth = 0;
     let buffer = '';
 
-    return eventStream.through(function(chunk) {
+    return miss.through({readableObjectMode: true}, function(chunk, encoding, callback) {
       let match;
       let head;
       let brace;
@@ -92,8 +89,7 @@ module.exports = function(baucis) {
             try {
               emission = JSON.parse(buffer);
             } catch (error) {
-              this.emit(
-                'error',
+              return callback(
                 baucis.Error.BadSyntax(
                   'The body of this request was invalid and could not be parsed. "%s"',
                   error.message
@@ -101,13 +97,14 @@ module.exports = function(baucis) {
               );
             }
 
-            this.emit('data', emission);
             buffer = '';
+            this.push(emission);
           }
         }
         // Move on to the unprocessed remainder of the string.
         remaining = tail;
       }
+      callback();
     });
   }
 

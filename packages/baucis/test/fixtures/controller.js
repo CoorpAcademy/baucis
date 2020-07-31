@@ -49,7 +49,11 @@ mongoose.model('bal', Stores, 'stores').plural('baloo');
 module.exports = {
   init(done) {
     mongoose.Promise = global.Promise;
-    mongoose.connect(config.mongo.url, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+    mongoose.connect(config.mongo.url, {
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useUnifiedTopology: true
+    });
 
     // Stores controller
     const stores = baucis
