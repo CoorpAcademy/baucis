@@ -25,7 +25,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "event-stream": "~4.0.1"
+    "mississippi": "^4.0.0"
   },
   "repository": {
     "type": "git",

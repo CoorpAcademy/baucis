@@ -33,7 +33,11 @@ mongoose.model('vegetable', Vegetable);
 mongoose.model('fungus', Fungus).plural('fungi');
 mongoose.model('goose', Goose).plural('geese');
 
-mongoose.connect(config.mongo.url, {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(config.mongo.url, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true
+});
 
 const controller = baucis
   .rest('vegetable')

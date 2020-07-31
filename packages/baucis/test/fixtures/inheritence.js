@@ -25,7 +25,11 @@ const Cordial = Liqueur.discriminator('cordial', CordialSchema);
 
 module.exports = {
   init(done) {
-    mongoose.connect(config.mongo.url, {useNewUrlParser: true, useUnifiedTopology: true});
+    mongoose.connect(config.mongo.url, {
+      useNewUrlParser: true,
+      useCreateIndex: true,
+      useUnifiedTopology: true
+    });
 
     baucis.rest(Liqueur);
     baucis.rest(Amaro);

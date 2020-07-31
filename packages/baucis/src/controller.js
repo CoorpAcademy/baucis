@@ -1,10 +1,9 @@
 const util = require('util');
 const crypto = require('crypto');
-const domain = require('domain');
 const RestError = require('rest-error');
-const eventStream = require('event-stream');
 const semver = require('semver');
 const _ = require('lodash/fp');
+const miss = require('mississippi');
 
 const {
   isPositiveInteger,
@@ -371,30 +370,24 @@ module.exports = function(baucis, mongoose, express) {
      */
     controller.pipeline = function(handler) {
       const streams = [];
-      const d = domain.create();
-      d.on('error', handler);
       return function(transmute) {
         // If it's a stream, add it to the reserve pipeline.
         if (transmute && (transmute.writable || transmute.readable)) {
           streams.push(transmute);
-          d.add(transmute);
           return transmute;
         }
         // If it's a function, create a map stream with it.
         if (transmute) {
-          transmute = eventStream.map(transmute);
-          streams.push(transmute);
-          d.add(transmute);
-          return transmute;
+          const stream = miss.through.obj((chunk, enc, cb) => transmute(chunk, cb));
+          streams.push(stream);
+          return stream;
         }
         // If called without arguments, return a pipeline linking all streams.
         if (streams.length > 0) {
-          return d.run(function() {
-            return eventStream.pipeline(...streams);
-          });
+          return streams; // eventStream.pipeline(...streams);
         }
         // But, if no streams were added, just pass back a through stream.
-        return d.run(eventStream.through);
+        return [miss.through.obj()];
       };
     };
     // Create the pipeline interface the user interacts with.
@@ -418,12 +411,25 @@ module.exports = function(baucis, mongoose, express) {
       // Check if the body was parsed by some external middleware e.g. `express.json`.
       // If so, create a stream from the POST'd document or documents.
       if (req.body) {
-        pipeline(eventStream.readArray([].concat(req.body)));
+        pipeline(miss.from.obj([].concat(req.body)));
       } else {
         // Otherwise, stream and parse the request.
         parser = baucis.parser(req.get('content-type'));
         if (!parser) return next(RestError.UnsupportedMediaType());
-        pipeline(req);
+        let alreadyDrained = false;
+        pipeline(
+          miss.from((size, cb) => {
+            if (alreadyDrained) return cb(null, null);
+            alreadyDrained = true;
+            miss.pipe(
+              req,
+              miss.concat({encoding: 'buffer'}, buf => {
+                cb(null, buf);
+              }),
+              err => (err ? cb(err) : null)
+            );
+          })
+        );
         pipeline(parser);
       }
       // Create the stream context.
@@ -431,7 +437,7 @@ module.exports = function(baucis, mongoose, express) {
         callback(null, {incoming, doc: null});
       });
       // Process the incoming document or documents.
-      pipeline(req.baucis.incoming());
+      req.baucis.incoming().map(pipeline);
       // Map function to create a document from incoming JSON and update the context.
       pipeline(function(context, callback) {
         const transformed = {incoming: context.incoming};
@@ -472,10 +478,9 @@ module.exports = function(baucis, mongoose, express) {
         callback(null, context.doc.get(findBy));
       });
       // Write the IDs to an array and process them.
-      const s = pipeline();
-      s.pipe(
-        eventStream.writeArray(function(error, ids) {
-          if (error) return next(error);
+      miss.pipe(
+        ...pipeline(),
+        miss.concat({encoding: 'object'}, function(ids) {
           // URL location of newly created document or documents.
           let location;
           // Set the conditions used to build `request.baucis.query`.
@@ -502,9 +507,9 @@ module.exports = function(baucis, mongoose, express) {
             );
           res.set('Location', location);
           next();
-        })
+        }),
+        err => (err ? next(err) : null)
       );
-      s.resume();
     });
 
     // /※Update
@@ -529,12 +534,25 @@ module.exports = function(baucis, mongoose, express) {
       // Check if the body was parsed by some external middleware e.g. `express.json`.
       // If so, create a one-document stream from the parsed body.
       if (req.body) {
-        pipeline(eventStream.readArray([req.body]));
+        pipeline(miss.from.obj([req.body]));
       } else {
         // Otherwise, stream and parse the request.
         parser = baucis.parser(req.get('content-type'));
         if (!parser) return next(RestError.UnsupportedMediaType());
-        pipeline(req);
+        let alreadyDrained = false;
+        pipeline(
+          miss.from((size, cb) => {
+            if (alreadyDrained) return cb(null, null);
+            alreadyDrained = true;
+            miss.pipe(
+              req,
+              miss.concat({encoding: 'buffer'}, buf => {
+                cb(null, buf);
+              }),
+              err => (err ? cb(err) : null)
+            );
+          })
+        );
         pipeline(parser);
       }
       // Set up the stream context.
@@ -556,7 +574,7 @@ module.exports = function(baucis, mongoose, express) {
         });
       }
       // Pipe through user streams, if any.
-      pipeline(req.baucis.incoming());
+      req.baucis.incoming().map(pipeline);
       // If the document ID is present, ensure it matches the ID in the URL.
       pipeline(function(context, callback) {
         const bodyId = context.incoming[controller.findBy()];
@@ -614,12 +632,11 @@ module.exports = function(baucis, mongoose, express) {
       }
       // Ensure there is exactly one update document.
       pipeline(
-        eventStream.through(
-          function(context) {
+        miss.through.obj(
+          function(context, enc, cb) {
             count += 1;
             if (count === 2) {
-              this.emit(
-                'error',
+              cb(
                 RestError.UnprocessableEntity({
                   message: 'The request body contained more than one update document',
                   name: 'RestError'
@@ -629,12 +646,11 @@ module.exports = function(baucis, mongoose, express) {
             }
             if (count > 1) return;
 
-            this.emit('data', context);
+            cb(null, context);
           },
-          function() {
+          function(cb) {
             if (count === 0) {
-              this.emit(
-                'error',
+              cb(
                 RestError.UnprocessableEntity({
                   message: 'The request body did not contain an update document',
                   name: 'RestError'
@@ -642,7 +658,7 @@ module.exports = function(baucis, mongoose, express) {
               );
               return;
             }
-            this.emit('end');
+            cb();
           }
         )
       );
@@ -702,9 +718,10 @@ module.exports = function(baucis, mongoose, express) {
         });
       }
 
-      const s = pipeline();
-      s.on('end', next);
-      s.resume();
+      miss.pipe(
+        ...pipeline(),
+        next
+      );
     });
 
     // / ※Build
@@ -910,19 +927,19 @@ module.exports = function(baucis, mongoose, express) {
 
       const hash = crypto.createHash('md5');
 
-      return eventStream.through(
-        function(chunk) {
+      return miss.through.obj(
+        function(chunk, enc, cb) {
           hash.update(chunk);
-          this.emit('data', chunk);
+          cb(null, chunk);
         },
-        function() {
+        function(cb) {
           if (useTrailer) {
             trailers.Etag = `"${hash.digest('hex')}"`;
           } else {
             response.set('Etag', `"${hash.digest('hex')}"`);
           }
 
-          this.emit('end');
+          cb();
         }
       );
     }
@@ -930,16 +947,11 @@ module.exports = function(baucis, mongoose, express) {
     function etagImmediate(response) {
       const hash = crypto.createHash('md5');
 
-      return eventStream.through(
-        function(chunk) {
-          hash.update(JSON.stringify(chunk));
-          response.set('Etag', `"${hash.digest('hex')}"`);
-          this.emit('data', chunk);
-        },
-        function() {
-          this.emit('end');
-        }
-      );
+      return miss.through.obj(function(chunk, enc, cb) {
+        hash.update(JSON.stringify(chunk));
+        response.set('Etag', `"${hash.digest('hex')}"`);
+        cb(null, chunk);
+      });
     }
     /**
      * Generate a Last-Modified header/trailer
@@ -952,23 +964,23 @@ module.exports = function(baucis, mongoose, express) {
 
       let latest = null;
 
-      return eventStream.through(
-        function(context) {
-          if (!context) return;
-          if (!context.doc) return this.emit('data', context);
-          if (!context.doc.get) return this.emit('data', context);
+      return miss.through.obj(
+        function(context, enc, cb) {
+          if (!context) return cb();
+          if (!context.doc) return cb(null, context);
+          if (!context.doc.get) return cb(null, context);
 
           const current = context.doc.get(lastModifiedPath);
           latest = latest === null ? current : new Date(Math.max(latest, current));
           if (!useTrailer) {
             response.set('Last-Modified', latest.toUTCString());
           }
-          this.emit('data', context);
+          cb(null, context);
         },
-        function() {
+        function(cb) {
           if (useTrailer && latest) trailers['Last-Modified'] = latest.toUTCString();
 
-          this.emit('end');
+          cb();
         }
       );
     }
@@ -977,13 +989,13 @@ module.exports = function(baucis, mongoose, express) {
      * Build a reduce stream.
      */
     function reduce(accumulated, f) {
-      return eventStream.through(
-        function(context) {
+      return miss.through.obj(
+        function(context, enc, cb) {
           accumulated = f(accumulated, context);
+          cb();
         },
-        function() {
-          this.emit('data', accumulated);
-          this.emit('end');
+        function(cb) {
+          cb(null, accumulated);
         }
       );
     }
@@ -993,6 +1005,16 @@ module.exports = function(baucis, mongoose, express) {
     function count() {
       return reduce(0, function(a, b) {
         return a + 1;
+      });
+    }
+
+    function stringify() {
+      return miss.through.obj(function(chunk, enc, cb) {
+        try {
+          return cb(null, `${JSON.stringify(Buffer.isBuffer(chunk) ? chunk.toString() : chunk)}\n`);
+        } catch (err) {
+          return cb(err);
+        }
       });
     }
 
@@ -1014,7 +1036,7 @@ module.exports = function(baucis, mongoose, express) {
       const pipeline = controller.pipeline(next);
       req.baucis.send = pipeline;
       // If documents were set in the baucis hash, use them.
-      if (documents) pipeline(eventStream.readArray([].concat(documents)));
+      if (documents) pipeline(miss.from.obj([].concat(documents)));
       else {
         // Otherwise, stream the relevant documents from Mongo, based on constructed query.
         pipeline(req.baucis.query.cursor());
@@ -1026,35 +1048,34 @@ module.exports = function(baucis, mongoose, express) {
       });
       // Check for not found.
       pipeline(
-        eventStream.through(
-          function(context) {
+        miss.through.obj(
+          function(context, enc, cb) {
             count += 1;
-            this.emit('data', context);
+            cb(null, context);
           },
-          function() {
-            if (count > 0) return this.emit('end');
+          function(cb) {
+            if (count > 0) return cb();
 
             const status = controller.emptyCollection();
             res.status(status);
 
             if (status === 204) {
               res.removeHeader('Trailer');
-              return this.emit('end');
+              return cb();
             }
             if (status === 200) {
               res.removeHeader('Transfer-Encoding');
               res.removeHeader('Trailer');
               res.json([]); // TODO other content types
-              this.emit('end');
-              return;
+              return cb();
             }
 
-            this.emit('error', RestError.NotFound());
+            cb(RestError.NotFound());
           }
         )
       );
       // Apply user streams.
-      pipeline(req.baucis.outgoing());
+      req.baucis.outgoing().map(pipeline);
 
       // Set the document formatter based on the Accept header of the request.
       baucis._formatters(res, function(error, formatter) {
@@ -1071,7 +1092,7 @@ module.exports = function(baucis, mongoose, express) {
       req.baucis.send = pipeline;
       // If documents were set in the baucis hash, use them.
       if (documents) {
-        pipeline(eventStream.readArray([].concat(documents)));
+        pipeline(miss.from.obj([].concat(documents)));
       } else {
         // Otherwise, stream the relevant documents from Mongo, based on constructed query.
         pipeline(req.baucis.query.cursor());
@@ -1083,19 +1104,19 @@ module.exports = function(baucis, mongoose, express) {
       });
       // Check for not found.
       pipeline(
-        eventStream.through(
-          function(context) {
+        miss.through.obj(
+          function(context, enc, cb) {
             count += 1;
-            this.emit('data', context);
+            cb(null, context);
           },
-          function() {
-            if (count > 0) return this.emit('end');
-            this.emit('error', RestError.NotFound());
+          function(cb) {
+            if (count > 0) return cb();
+            cb(RestError.NotFound());
           }
         )
       );
       // Apply user streams.
-      pipeline(req.baucis.outgoing());
+      req.baucis.outgoing().map(pipeline);
 
       // Set the document formatter based on the Accept header of the request.
       baucis._formatters(res, function(error, formatter) {
@@ -1157,7 +1178,7 @@ module.exports = function(baucis, mongoose, express) {
 
       if (req.baucis.count) {
         req.baucis.send(count());
-        req.baucis.send(eventStream.stringify());
+        req.baucis.send(stringify());
       } else {
         req.baucis.send(redoc);
         req.baucis.send(req.baucis.formatter(true));
@@ -1189,22 +1210,25 @@ module.exports = function(baucis, mongoose, express) {
       });
       // Respond with the count of deleted documents.
       req.baucis.send(count());
-      req.baucis.send(eventStream.stringify());
+      req.baucis.send(stringify());
       next();
     });
 
     controller.finalize(function(req, res, next) {
-      req.baucis.send().pipe(
-        eventStream.through(
-          function(chunk) {
+      miss.pipe(
+        ...req.baucis.send(),
+        miss.through(
+          function(chunk, enc, cb) {
             res.write(chunk);
+            cb();
           },
-          function() {
+          function(cb) {
             res.addTrailers(trailers);
             res.end();
-            this.emit('end');
+            cb();
           }
-        )
+        ),
+        next
       );
     });
 
@@ -1337,20 +1361,27 @@ module.exports = function(baucis, mongoose, express) {
           Object.getOwnPropertyNames(error3).forEach(function(key) {
             o[key] = error3[key];
           });
-          delete o.domain;
-          delete o.domainEmitter;
-          delete o.domainThrown;
           return o;
         });
 
         // TODO deprecated -- always send as single error in 2.0.0
         const f = formatter(err instanceof RestError.UnprocessableEntity);
-        f.on('error', next);
 
-        eventStream
-          .readArray(errors)
-          .pipe(f)
-          .pipe(res);
+        miss.pipe(
+          miss.from.obj(errors),
+          f,
+          miss.through(
+            (chunk, enc, cb) => {
+              res.write(chunk);
+              cb();
+            },
+            cb => {
+              res.end();
+              cb();
+            }
+          ),
+          next
+        );
       });
     });
     getController.__extensions__.map(ext => ext(controller));
