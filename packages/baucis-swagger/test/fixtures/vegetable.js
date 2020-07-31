@@ -37,7 +37,7 @@ mongoose.model('goose', Goose).plural('geese');
 
 const fixture = {
   init(done) {
-    mongoose.connect(config.mongo.url, {useNewUrlParser: true});
+    mongoose.connect(config.mongo.url, {useNewUrlParser: true, useUnifiedTopology: true});
 
     fixture.controller = baucis
       .rest('vegetable')
