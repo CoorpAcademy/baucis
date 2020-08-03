@@ -1,6 +1,6 @@
 {
   "name": "@coorpacademy/baucis-json",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Baucis uses this to parse and format streams of JSON.",
   "main": "index.js",
   "scripts": {
