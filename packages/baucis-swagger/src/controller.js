@@ -100,15 +100,15 @@ module.exports = (pluginOptions = {}) =>
     }
 
     // Generate parameter list for operations
-    function generateParameters(verb, plural) {
+    function generateParameters(verb, plural, resourceRef, resourceRefName) {
       const parameters = [];
 
       // Parameters available for singular routes
       if (!plural) {
         parameters.push({
           paramType: 'path',
-          name: 'id',
-          description: `The ID of a ${controller.model().singular()}`,
+          name: resourceRef,
+          description: `The ${resourceRefName} of a ${controller.model().singular()}`,
           dataType: 'string',
           required: true,
           allowMultiple: false
@@ -248,9 +248,8 @@ module.exports = (pluginOptions = {}) =>
     /**
      * Generate a list of a controller's operations
      */
-    function generateOperations(plural) {
+    function generateOperations(plural, resourceRef, resourceRefName) {
       const operations = [];
-
       controller.methods().forEach(function(verb) {
         const operation = {};
         const model = controller.model();
@@ -273,9 +272,12 @@ module.exports = (pluginOptions = {}) =>
         operation.responseClass = titleSingular; // TODO sometimes an array!
 
         if (plural) operation.summary = `${_.capitalize(verb)} some ${model.plural()}`;
-        else operation.summary = `${_.capitalize(verb)} a ${model.singular()} by its unique ID`;
+        else
+          operation.summary = `${_.capitalize(
+            verb
+          )} a ${model.singular()} by its unique ${resourceRefName}`;
 
-        operation.parameters = generateParameters(verb, plural);
+        operation.parameters = generateParameters(verb, plural, resourceRef, resourceRefName);
         operation.errorResponses = generateErrorResponses(plural);
 
         operations.push(operation);
@@ -288,6 +290,9 @@ module.exports = (pluginOptions = {}) =>
       if (controller.swagger) return controller;
 
       const modelName = _.capitalize(controller.model().singular());
+      const _findBy = controller.findBy();
+      const resourceRef = _findBy === '_id' ? 'id' : _findBy;
+      const resourceRefName = _findBy === '_id' ? 'ID' : _findBy;
 
       controller.swagger = {apis: [], models: {}};
 
@@ -296,16 +301,16 @@ module.exports = (pluginOptions = {}) =>
 
       // Instance route
       controller.swagger.apis.push({
-        path: `/${controller.model().plural()}/{id}`,
+        path: `/${controller.model().plural()}/{${resourceRef}}`,
         description: `Operations about a given ${controller.model().singular()}`,
-        operations: generateOperations(false)
+        operations: generateOperations(false, resourceRef, resourceRefName)
       });
 
       // Collection route
       controller.swagger.apis.push({
         path: `/${controller.model().plural()}`,
         description: `Operations about ${controller.model().plural()}`,
-        operations: generateOperations(true)
+        operations: generateOperations(true, resourceRef, resourceRefName)
       });
 
       return controller;
