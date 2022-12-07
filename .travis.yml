@@ -5,11 +5,19 @@ node_js:
   - 10
   - 12
 
+env:
+- MONGO=3.4
+- MONGO=4.0
+- MONGO=4.2
+- MONGO=4.4
+- MONGO=5.0
+- MONGO=6.0
+
 services:
 - docker
 
 before_script:
-  - docker-compose up -d
+  - docker run -d -p 27017:27017 mongo:${MONGO}
 
 script:
   - npm run test
