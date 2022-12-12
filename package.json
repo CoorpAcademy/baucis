@@ -7,10 +7,12 @@
     "test": "npm run lint && npm run test:unit",
     "test:unit": "lerna run test --concurrency 1 --stream",
     "lint": "eslint packages",
-    "postinstall": "lerna bootstrap",
     "publish": "lerna publish",
     "publish-coverage": "nyc report --reporter=lcov > coverage.lcov && codecov"
   },
+  "workspaces": [
+    "./packages/*"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/CoorpAcademy/baucis.git"
@@ -35,7 +37,7 @@
     "codecov": "^3.6.1",
     "eslint": "^6.6.0",
     "express": "^4.17.1",
-    "lerna": "^3.18.4",
+    "lerna": "^6.1.0",
     "mongoose": "^5.9.7",
     "nyc": "^14.1.1"
   }

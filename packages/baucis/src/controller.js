@@ -1055,12 +1055,12 @@ module.exports = function(baucis, mongoose, express) {
           },
           function(cb) {
             if (count > 0) return cb();
-
             const status = controller.emptyCollection();
             res.status(status);
 
             if (status === 204) {
               res.removeHeader('Trailer');
+              res.send();
               return cb();
             }
             if (status === 200) {
@@ -1361,6 +1361,9 @@ module.exports = function(baucis, mongoose, express) {
           Object.getOwnPropertyNames(error3).forEach(function(key) {
             o[key] = error3[key];
           });
+          if (error3 instanceof Error) {
+            o.name = error3.name;
+          }
           return o;
         });
 
