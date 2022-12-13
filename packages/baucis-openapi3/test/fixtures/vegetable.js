@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const express = require('express');
-const async = require('async');
 const baucis = require('@coorpacademy/baucis')(mongoose, express);
 const plugin = require('../..');
 const config = require('./config');
@@ -94,12 +93,9 @@ mongoose.model('chargeCluster', ChargeCluster);
 mongoose.model('chargeArea', ChargeArea);
 
 const fixture = {
-  init(done) {
-    mongoose.connect(config.mongo.url, {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true
-    });
+  async init() {
+    mongoose.set('strictQuery', true);
+    await mongoose.connect(config.mongo.url);
 
     const serverVars = plugin
       .buildServerVariables()
@@ -176,15 +172,12 @@ const fixture = {
     });
 
     server = app.listen(8012);
-    done();
   },
-  deinit(done) {
-    mongoose.disconnect(function() {
-      server.close();
-      done();
-    });
+  async deinit() {
+    await mongoose.disconnect();
+    server.close();
   },
-  create(done) {
+  async create() {
     const Vegetable = mongoose.model('vegetable');
     const vegetableNames = [
       'Turnip',
@@ -201,15 +194,10 @@ const fixture = {
         name
       });
     });
-    let deferred = [Vegetable.deleteMany.bind(Vegetable)];
 
-    deferred = deferred.concat(
-      vegetables.map(function(vegetable) {
-        return vegetable.save.bind(vegetable);
-      })
-    );
+    await Vegetable.deleteMany();
 
-    async.series(deferred, done);
+    await Promise.all(vegetables.map(vegetable => vegetable.save()));
   }
 };
 module.exports = fixture;

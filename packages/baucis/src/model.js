@@ -1,66 +1,53 @@
 const pluralize = require('pluralize');
 
 module.exports = function(mongoose) {
-  function extendModel(model) {
-    model._locking = false;
-    model.locking = function(value) {
+  mongoose.plugin((schema, options) => {
+    schema.static('locking', function(value) {
       if (arguments.length === 1) {
-        model._locking = value;
-        return model;
+        this._locking = value;
+        return this;
       } else {
-        return model._locking;
+        return !!this._locking;
       }
-    };
-    model._lastModified = undefined;
-    model.lastModified = function(value) {
-      if (arguments.length === 1) {
-        model._lastModified = value;
-        return model;
-      } else {
-        return model._lastModified;
-      }
-    };
+    });
 
-    model.deselected = function(path) {
+    schema.static('lastModified', function(value) {
+      if (arguments.length === 1) {
+        this._lastModified = value;
+        return this;
+      } else {
+        return this._lastModified;
+      }
+    });
+
+    schema.static('deselected', function(path) {
       const deselected = [];
       // Store naming, model, and schema.
       // Find deselected paths in the schema.
-      model.schema.eachPath(function(name, path) {
-        if (path.options.select === false) deselected.push(name);
+      schema.eachPath(function(name, schemaType) {
+        if (schemaType.options.select === false) deselected.push(name);
       });
       if (arguments.length === 0) return deselected;
       else return deselected.indexOf(path) !== -1;
-    };
+    });
 
-    model._singular = model.modelName;
-    model.singular = function(value) {
+    schema.static('singular', function(value) {
+      this._singular = '_singular' in this ? this._singular : this.modelName;
       if (arguments.length === 1) {
-        model._singular = value;
-        return model;
+        this._singular = value;
       } else {
-        return model._singular;
+        return this._singular;
       }
-    };
+    });
 
-    model._plural = pluralize(model.singular());
-    model.plural = function(value) {
+    schema.static('plural', function(value) {
+      this._plural = '_plural' in this ? this._plural : pluralize(this.singular());
       if (arguments.length === 1) {
-        model._plural = value;
-        return model;
+        this._plural = value;
+        return this;
       } else {
-        return model._plural;
+        return this._plural;
       }
-    };
-    return model;
-  }
-
-  const originalMongooseModel = mongoose.model;
-  mongoose.model = function() {
-    const m = originalMongooseModel.apply(mongoose, arguments);
-    if (!m.singular) {
-      extendModel(m);
-    }
-    return m;
-  };
-  return extendModel;
+    });
+  });
 };

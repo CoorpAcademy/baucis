@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const express = require('express');
-const async = require('async');
 const baucis = require('../..')(mongoose, express);
 const config = require('./config');
 
@@ -24,13 +23,9 @@ const Amaro = Liqueur.discriminator('amaro', AmaroSchema).plural('amari');
 const Cordial = Liqueur.discriminator('cordial', CordialSchema);
 
 module.exports = {
-  init(done) {
-    mongoose.connect(config.mongo.url, {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true
-    });
-
+  async init() {
+    mongoose.set('strictQuery', true);
+    await mongoose.connect(config.mongo.url);
     baucis.rest(Liqueur);
     baucis.rest(Amaro);
 
@@ -38,16 +33,12 @@ module.exports = {
     app.use('/api', baucis());
 
     server = app.listen(8012);
-
-    done();
   },
-  deinit(done) {
-    mongoose.disconnect(function() {
-      server.close();
-      done();
-    });
+  async deinit() {
+    await mongoose.disconnect();
+    server.close();
   },
-  create(done) {
+  async create() {
     const liqueurs = [{name: 'Generic'}];
     const amari = [
       {name: 'Amaro alle Erbe', bitterness: 3},
@@ -55,33 +46,16 @@ module.exports = {
       {name: 'Fernet', bitterness: 10}
     ];
     const cordials = [{name: 'Blackberry', sweetness: 5}, {name: 'Peach', sweetness: 7}];
-    let deferred = [
-      Liqueur.deleteMany.bind(Liqueur),
-      Amaro.deleteMany.bind(Amaro),
-      Cordial.deleteMany.bind(Cordial)
-    ];
+    await Promise.all([
+      await Liqueur.deleteMany(),
+      await Amaro.deleteMany(),
+      await Cordial.deleteMany()
+    ]);
 
-    deferred = deferred.concat(
-      liqueurs.map(function(data) {
-        const liqueur = new Liqueur(data);
-        return liqueur.save.bind(liqueur);
-      })
-    );
+    await Promise.all(liqueurs.map(data => new Liqueur(data).save()));
 
-    deferred = deferred.concat(
-      amari.map(function(data) {
-        const amaro = new Amaro(data);
-        return amaro.save.bind(amaro);
-      })
-    );
+    await Promise.all(amari.map(data => new Amaro(data).save()));
 
-    deferred = deferred.concat(
-      cordials.map(function(data) {
-        const cordial = new Cordial(data);
-        return cordial.save.bind(cordial);
-      })
-    );
-
-    async.series(deferred, done);
+    await Promise.all(cordials.map(data => new Cordial(data).save()));
   }
 };

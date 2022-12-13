@@ -6,13 +6,9 @@ const fixtures = require('./fixtures');
 describe('Middleware', function() {
   let vegetables;
   before(fixtures.vegetable.init);
-  beforeEach(done =>
-    fixtures.vegetable.create((err, legumes) => {
-      if (err) return done(err);
-      vegetables = legumes;
-      return done();
-    })
-  );
+  beforeEach(async () => {
+    vegetables = await fixtures.vegetable.create();
+  });
   after(fixtures.vegetable.deinit);
 
   it('should prevent resource from being loaded when block is set', function(done) {

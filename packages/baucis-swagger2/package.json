@@ -53,12 +53,11 @@
   },
   "devDependencies": {
     "@coorpacademy/baucis": "^2.0.0",
-    "async": "^2.6.2",
     "chai": "^4.2.0",
     "codeclimate-test-reporter": "^0.5.1",
     "express": "^4.18.2",
     "mocha": "^10.1.0",
-    "mongoose": "^5.9.7",
+    "mongoose": "^6.8.0",
     "nyc": "^15.1.0",
     "request": "^2.64.0"
   },
