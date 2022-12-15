@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const express = require('express');
-const async = require('async');
 
 const baucisSwagger = require('../..');
 const baucis = require('../../../baucis')(mongoose, express);
@@ -36,12 +35,9 @@ mongoose.model('fungus', Fungus).plural('fungi');
 mongoose.model('goose', Goose).plural('geese');
 
 const fixture = {
-  init(done) {
-    mongoose.connect(config.mongo.url, {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true
-    });
+  async init() {
+    mongoose.set('strictQuery', true);
+    await mongoose.connect(config.mongo.url);
 
     fixture.controller = baucis
       .rest('vegetable')
@@ -63,15 +59,12 @@ const fixture = {
     });
 
     server = app.listen(8012);
-    done();
   },
-  deinit(done) {
-    mongoose.disconnect(function() {
-      server.close();
-      done();
-    });
+  async deinit() {
+    await mongoose.disconnect();
+    server.close();
   },
-  create(done) {
+  async create() {
     const Vegetable = mongoose.model('vegetable');
     const vegetableNames = [
       'Turnip',
@@ -83,18 +76,10 @@ const fixture = {
       'Zucchini',
       'Radicchio'
     ];
-    const vegetables = vegetableNames.map(function(name) {
-      return new Vegetable({name});
-    });
-    let deferred = [Vegetable.deleteMany.bind(Vegetable)];
+    const vegetables = vegetableNames.map(name => new Vegetable({name}));
+    await Vegetable.deleteMany();
 
-    deferred = deferred.concat(
-      vegetables.map(function(vegetable) {
-        return vegetable.save.bind(vegetable);
-      })
-    );
-
-    async.series(deferred, done);
+    await Promise.all(vegetables.map(vegetable => vegetable.save()));
   }
 };
 module.exports = fixture;

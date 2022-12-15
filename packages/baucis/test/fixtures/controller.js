@@ -47,13 +47,10 @@ mongoose.model('mean', Fiends, 'fiends').locking(true);
 mongoose.model('bal', Stores, 'stores').plural('baloo');
 
 module.exports = {
-  init(done) {
+  async init() {
     mongoose.Promise = global.Promise;
-    mongoose.connect(config.mongo.url, {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true
-    });
+    mongoose.set('strictQuery', true);
+    await mongoose.connect(config.mongo.url);
 
     // Stores controller
     const stores = baucis
@@ -114,47 +111,35 @@ module.exports = {
     app.use('/api-no-error-handler', baucis());
 
     server = app.listen(8012);
-
-    done();
   },
-  deinit(done) {
-    mongoose.disconnect(function() {
-      server.close();
-      done();
-    });
+  async deinit() {
+    await mongoose.disconnect();
+    server.close();
   },
-  create(done) {
+  async create() {
     // clear all first
-    mongoose.model('store').deleteMany({}, function(error) {
-      if (error) return done(error);
+    await mongoose.model('store').deleteMany({});
+    await mongoose.model('cheese').deleteMany({});
 
-      mongoose.model('cheese').deleteMany({}, function(error) {
-        // create stores and tools
-        mongoose.model('store').create(
-          ['Westlake', 'Corner'].map(function(name) {
-            return {name};
-          }),
-          function(error, store) {
-            if (error) return done(error);
+    // create stores and tools
+    await mongoose.model('store').create(
+      ['Westlake', 'Corner'].map(function(name) {
+        return {name};
+      })
+    );
 
-            mongoose.model('lien').create({title: 'Heraclitus'}, function(error, lien) {
-              if (error) return done(error);
+    await mongoose.model('lien').create({title: 'Heraclitus'});
 
-              const cheeses = [
-                {name: 'Cheddar', color: 'Yellow'},
-                {name: 'Huntsman', color: 'Yellow, Blue, White'},
-                {
-                  name: 'Camembert',
-                  color: 'White',
-                  arbitrary: [{goat: true, llama: [3, 4]}, {goat: false, llama: [1, 2]}]
-                }
-              ];
+    const cheeses = [
+      {name: 'Cheddar', color: 'Yellow'},
+      {name: 'Huntsman', color: 'Yellow, Blue, White'},
+      {
+        name: 'Camembert',
+        color: 'White',
+        arbitrary: [{goat: true, llama: [3, 4]}, {goat: false, llama: [1, 2]}]
+      }
+    ];
 
-              mongoose.model('cheese').create(cheeses, done);
-            });
-          }
-        );
-      });
-    });
+    await mongoose.model('cheese').create(cheeses);
   }
 };

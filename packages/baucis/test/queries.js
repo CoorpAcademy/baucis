@@ -7,13 +7,9 @@ const fixtures = require('./fixtures');
 describe('Queries', function() {
   let vegetables;
   before(fixtures.vegetable.init);
-  beforeEach(done =>
-    fixtures.vegetable.create((err, legumes) => {
-      if (err) return done(err);
-      vegetables = legumes;
-      return done();
-    })
-  );
+  beforeEach(async () => {
+    vegetables = await fixtures.vegetable.create();
+  });
   after(fixtures.vegetable.deinit);
 
   it('should support skip 1', function(done) {

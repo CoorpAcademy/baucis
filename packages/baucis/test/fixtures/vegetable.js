@@ -2,7 +2,6 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
-const async = require('async');
 const miss = require('mississippi');
 const RestError = require('rest-error');
 const baucis = require('../..')(mongoose, express);
@@ -14,12 +13,9 @@ let server;
 
 // __Module Definition__
 const fixture = {
-  init(done) {
-    mongoose.connect(config.mongo.url, {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true
-    });
+  async init() {
+    mongoose.set('strictQuery', true);
+    await mongoose.connect(config.mongo.url);
 
     fixture.saveCount = 0;
     fixture.removeCount = 0;
@@ -164,16 +160,12 @@ const fixture = {
     app.use('/api', baucis.get());
 
     server = app.listen(8012);
-
-    done();
   },
-  deinit(done) {
-    mongoose.disconnect(function() {
-      server.close();
-      done();
-    });
+  async deinit() {
+    await mongoose.disconnect();
+    server.close();
   },
-  create(done) {
+  async create() {
     const Vegetable = mongoose.model('vegetable');
     const Mineral = mongoose.model('mineral');
     const Fungus = mongoose.model('fungus');
@@ -210,30 +202,19 @@ const fixture = {
         nutrients: [minerals[0]._id]
       });
     });
-    let deferred = [
-      Vegetable.deleteMany.bind(Vegetable),
-      Mineral.deleteMany.bind(Mineral),
-      Fungus.deleteMany.bind(Fungus)
-    ];
+    await Promise.all([
+      await Vegetable.deleteMany({}),
+      await Mineral.deleteMany({}),
+      await Fungus.deleteMany({})
+    ]);
 
-    deferred = deferred.concat(
-      vegetables.map(function(vegetable) {
-        return vegetable.save.bind(vegetable);
-      })
-    );
+    await Promise.all(vegetables.map(vegetable => vegetable.save()));
 
-    deferred = deferred.concat(
-      minerals.map(function(mineral) {
-        return mineral.save.bind(mineral);
-      })
-    );
+    await Promise.all(minerals.map(mineral => mineral.save()));
 
-    deferred.push(fungus.save.bind(fungus));
+    await fungus.save();
 
-    async.series(deferred, err => {
-      if (err) return done(err);
-      return done(null, vegetables);
-    });
+    return vegetables;
   }
 };
 

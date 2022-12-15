@@ -24,11 +24,8 @@ mongoose.model('task', Task);
 
 module.exports = {
   init(done) {
-    mongoose.connect(config.mongo.url, {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true
-    });
+    mongoose.set('strictQuery', true);
+    mongoose.connect(config.mongo.url);
     const users = baucis.rest('user');
     const tasks = users.vivify('tasks');
 

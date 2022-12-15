@@ -16,11 +16,8 @@ mongoose.model('pumpkin', Pumpkin).locking(true);
 
 module.exports = {
   init(done) {
-    mongoose.connect(config.mongo.url, {
-      useNewUrlParser: true,
-      useCreateIndex: true,
-      useUnifiedTopology: true
-    });
+    mongoose.set('strictQuery', true);
+    mongoose.connect(config.mongo.url);
 
     app = express();
 
