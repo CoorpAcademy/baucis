@@ -576,7 +576,7 @@ describe('Controllers', function() {
     });
   });
 
-  it('should return a 400 when ID malformed (not ObjectID)', function(done) {
+  it('should return a 400 when ID malformed (not ObjectId)', function(done) {
     const options = {
       url: 'http://localhost:8012/api/beans/bad'
     };

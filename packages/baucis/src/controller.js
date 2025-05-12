@@ -290,12 +290,12 @@ module.exports = function(baucis, mongoose, express) {
       next();
     });
 
-    const check = ['ObjectID', 'Number'];
+    const check = ['ObjectId', 'Number'];
 
     controller.isInvalid = function(id, instance, type) {
       if (!id) return false;
       if (check.indexOf(instance) === -1) return false;
-      if (instance === 'ObjectID' && id.match(/^[a-f0-9]{24}$/i)) return false;
+      if (instance === 'ObjectId' && id.match(/^[a-f0-9]{24}$/i)) return false;
       if (instance === 'Number' && !isNaN(Number(id))) return false;
       return true;
     };
