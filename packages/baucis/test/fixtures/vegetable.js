@@ -253,7 +253,7 @@ Vegetable.pre('save', function(next) {
   next();
 });
 
-Vegetable.pre('remove', function(next) {
+Vegetable.pre('deleteOne', function(next) {
   fixture.removeCount += 1;
   next();
 });
