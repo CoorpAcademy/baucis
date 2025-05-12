@@ -12,6 +12,8 @@ env:
 - MONGO=4.4
 - MONGO=5.0
 - MONGO=6.0
+- MONGO=7.0
+- MONGO=8.0
 
 services:
 - docker
