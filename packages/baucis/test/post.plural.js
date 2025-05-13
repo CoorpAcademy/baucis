@@ -160,7 +160,7 @@ describe('POST plural', function() {
       if (error) return done(error);
       expect(response.statusCode).to.equal(400);
       expect(
-        /The body of this request was invalid and could not be parsed. "(Unexpected token c in JSON at position 2|Expected property name or '}' in JSON at position 2 \(line 1 column 3\))" \(400\)./.test(
+        /The body of this request was invalid and could not be parsed. "(Unexpected token c in JSON at position 2|Expected property name or '}' in JSON at position 2( \(line 1 column 3\))?)" \(400\)./.test(
           body.message
         )
       ).to.be.equal(true, 'Message was not the one expected');
