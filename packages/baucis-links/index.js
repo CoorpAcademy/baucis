@@ -54,20 +54,22 @@ function extendControllerWithLinks(controller) {
     if (request.method !== 'GET') return done();
     if (!request.query.limit) return done();
 
-    controller.model().countDocuments(request.baucis.conditions, function(error, count) {
-      if (error) return next(error);
+    controller
+      .model()
+      .countDocuments(request.baucis.conditions)
+      .then(function(count) {
+        const limit = Number(request.query.limit);
+        const skip = Number(request.query.skip || 0);
 
-      const limit = Number(request.query.limit);
-      const skip = Number(request.query.skip || 0);
+        links.first = makeLink({skip: 0});
+        links.last = makeLink({skip: Math.max(0, count - limit)});
 
-      links.first = makeLink({skip: 0});
-      links.last = makeLink({skip: Math.max(0, count - limit)});
+        if (skip) links.previous = makeLink({skip: Math.max(0, skip - limit)});
+        if (limit + skip < count) links.next = makeLink({skip: limit + skip});
 
-      if (skip) links.previous = makeLink({skip: Math.max(0, skip - limit)});
-      if (limit + skip < count) links.next = makeLink({skip: limit + skip});
-
-      done();
-    });
+        return done();
+      })
+      .catch(done);
   });
 
   // Add "Link" header field based on previously set links.

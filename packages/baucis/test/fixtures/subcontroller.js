@@ -49,11 +49,9 @@ module.exports = {
 
     done();
   },
-  deinit(done) {
-    mongoose.disconnect(function() {
-      server.close();
-      done();
-    });
+  async deinit() {
+    await mongoose.disconnect();
+    server.close();
   },
   create(done) {
     // clear all first

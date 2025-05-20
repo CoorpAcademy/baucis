@@ -2,7 +2,7 @@
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 [![Npm version](https://img.shields.io/npm/v/@coorpacademy/baucis.svg)](https://www.npmjs.com/package/@coorpacademy/baucis)
-[![Build Status](https://travis-ci.com/CoorpAcademy/baucis.svg?branch=master)](https://travis-ci.com/CoorpAcademy/baucis)
+[![Build Status](https://app.travis-ci.com/CoorpAcademy/baucis.svg?token=KnYzxEMEXjZwczDR8x2L&branch=master)](https://travis-ci.com/CoorpAcademy/baucis)
 [![codecov](https://codecov.io/gh/CoorpAcademy/baucis/branch/master/graph/badge.svg)](https://codecov.io/gh/CoorpAcademy/baucis)
 
 > Build scalable REST APIs using the open source tools and standards you and your team already know — *Mongoose, Express, and Node.js streams*.

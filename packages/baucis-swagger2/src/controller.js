@@ -170,7 +170,9 @@ module.exports = (pluginOptions = {}) =>
         type === Date ||
         type === 'ObjectId' ||
         type.name === 'ObjectId' ||
-        type.name === 'Oid'
+        type.name === 'Oid' ||
+        type.schemaName === 'ObjectId' ||
+        type.schemaName === 'Oid'
       ) {
         return 'string';
       }
@@ -218,7 +220,11 @@ module.exports = (pluginOptions = {}) =>
 
     function isArrayOfRefs(type) {
       return (
-        type && type.length > 0 && type[0].ref && type[0].type && type[0].type.name === 'ObjectId'
+        type &&
+        type.length > 0 &&
+        type[0].ref &&
+        type[0].type &&
+        (type[0].type.name === 'ObjectId' || type[0].type.schemaName === 'ObjectId')
       );
     }
     function warnInvalidType(name, path) {
@@ -259,7 +265,10 @@ module.exports = (pluginOptions = {}) =>
         return;
       }
       // Configure the property
-      if (path.options.type && path.options.type.name === 'ObjectId') {
+      if (
+        path.options.type &&
+        (path.options.type.schemaName === 'ObjectId' || path.options.type.name === 'ObjectId')
+      ) {
         if (name === '_id') {
           property.type = 'string';
         } else if (path.options.ref) {

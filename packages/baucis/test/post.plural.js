@@ -159,10 +159,12 @@ describe('POST plural', function() {
     request.post(options, function(error, response, body) {
       if (error) return done(error);
       expect(response.statusCode).to.equal(400);
-      expect(body).to.have.property(
-        'message',
-        'The body of this request was invalid and could not be parsed. "Unexpected token c in JSON at position 2" (400).'
-      );
+      expect(
+        /The body of this request was invalid and could not be parsed. "(Unexpected token c in JSON at position 2|Expected property name or '}' in JSON at position 2( \(line 1 column 3\))?)" \(400\)./.test(
+          body.message
+        )
+      ).to.be.equal(true, 'Message was not the one expected');
+
       done();
     });
   });

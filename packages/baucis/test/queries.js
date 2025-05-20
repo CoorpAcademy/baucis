@@ -884,10 +884,9 @@ describe('Queries', function() {
       // before:  'The conditions query string value was not valid JSON: "Unexpected token \'" (400).'
       // after:   'The conditions query string value was not valid JSON: "Unexpected token \' in JSON at position 2" (400).'
       // test changed to be less fragile
+      // in latest node error message is now "Expected property name or '}' in JSON at position 2 (line 1 column 3)"
       expect(body).to.have.property('message');
-      expect(body.message).to.contain(
-        'The conditions query string value was not valid JSON: "Unexpected token \''
-      );
+      expect(body.message).to.contain('The conditions query string value was not valid JSON: "');
       done();
     });
   });

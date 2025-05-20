@@ -290,12 +290,12 @@ module.exports = function(baucis, mongoose, express) {
       next();
     });
 
-    const check = ['ObjectID', 'Number'];
+    const check = ['ObjectId', 'Number'];
 
     controller.isInvalid = function(id, instance, type) {
       if (!id) return false;
       if (check.indexOf(instance) === -1) return false;
-      if (instance === 'ObjectID' && id.match(/^[a-f0-9]{24}$/i)) return false;
+      if (instance === 'ObjectId' && id.match(/^[a-f0-9]{24}$/i)) return false;
       if (instance === 'Number' && !isNaN(Number(id))) return false;
       return true;
     };
@@ -468,10 +468,10 @@ module.exports = function(baucis, mongoose, express) {
       });
       // Save each document.
       pipeline(function(context, callback) {
-        context.doc.save(function(error, doc) {
-          if (error) return next(error);
-          callback(null, {incoming: context.incoming, doc});
-        });
+        context.doc
+          .save()
+          .then(doc => callback(null, {incoming: context.incoming, doc}))
+          .catch(callback);
       });
       // Map the saved documents to document IDs.
       pipeline(function(context, callback) {
@@ -565,12 +565,14 @@ module.exports = function(baucis, mongoose, express) {
       if (!operator) {
         pipeline(function(context, callback) {
           const query = controller.model().findOne(req.baucis.conditions);
-          query.exec(function(error, doc) {
-            if (error) return callback(error);
-            if (!doc) return callback(RestError.NotFound());
-            // Add the Mongoose document to the context.
-            callback(null, {doc, incoming: context.incoming});
-          });
+          query
+            .exec()
+            .then(function(doc) {
+              if (!doc) throw RestError.NotFound();
+              // Add the Mongoose document to the context.
+              return callback(null, {doc, incoming: context.incoming});
+            })
+            .catch(callback);
         });
       }
       // Pipe through user streams, if any.
@@ -672,7 +674,10 @@ module.exports = function(baucis, mongoose, express) {
         });
         // Save the Mongoose document.
         pipeline(function(context, callback) {
-          context.doc.save(callback);
+          context.doc
+            .save()
+            .then(doc => callback(null, doc))
+            .catch(callback);
         });
       } else {
         // Finish up for a non-default update operator (bypasses validation).
@@ -714,7 +719,11 @@ module.exports = function(baucis, mongoose, express) {
             req.baucis.conditions[versionKey] = Number(context.incoming[versionKey]);
           }
           // Update the doc using the supplied operator and bypassing validation.
-          controller.model().updateMany(req.baucis.conditions, wrapper, callback);
+          controller
+            .model()
+            .updateMany(req.baucis.conditions, wrapper)
+            .then(values => callback(null, values))
+            .catch(callback);
         });
       }
 
@@ -749,11 +758,13 @@ module.exports = function(baucis, mongoose, express) {
         return;
       }
       const query = controller.model().distinct(distinct, req.baucis.conditions);
-      query.exec(function(error, values) {
-        if (error) return next(error);
-        req.baucis.documents = values;
-        next();
-      });
+      query
+        .exec()
+        .then(function(values) {
+          req.baucis.documents = values;
+          return next();
+        })
+        .catch(next);
     });
     // Apply controller sort options to the query.
     controller.query(function(req, res, next) {
@@ -1022,11 +1033,13 @@ module.exports = function(baucis, mongoose, express) {
     controller.finalize(function(req, res, next) {
       if (!req.baucis.count) return next();
 
-      req.baucis.query.countDocuments(function(error, n) {
-        if (error) return next(error);
-        res.removeHeader('Transfer-Encoding');
-        return res.json(n); // TODO support other content types
-      });
+      req.baucis.query
+        .countDocuments()
+        .then(function(n) {
+          res.removeHeader('Transfer-Encoding');
+          return res.json(n); // TODO support other content types
+        })
+        .catch(next);
     });
 
     // If not counting, create the basic stream pipeline.
@@ -1206,7 +1219,7 @@ module.exports = function(baucis, mongoose, express) {
     controller.finalize('delete', function(req, res, next) {
       // Remove each document from the database.
       req.baucis.send(function(context, callback) {
-        context.doc.remove(callback);
+        return context.doc.deleteOne().then(stats => callback(null, stats), callback);
       });
       // Respond with the count of deleted documents.
       req.baucis.send(count());
